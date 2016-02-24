@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="org.scala-js:scalajs-cli_2.11:0.6.7" level="project" />
+    <orderEntry type="library" name="scala-sdk-2.11.7" level="application" />
+    <orderEntry type="library" name="org.scala-js:scalajs-compiler_2.11.0:0.6.7" level="project" />
+    <orderEntry type="library" name="org.scala-js:scalajs-library_2.11:0.6.7" level="project" />
+  </component>
+</module>

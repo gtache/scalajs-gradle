@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.scala-js:scalajs-compiler_2.11.7:0.6.7">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.scala-js/scalajs-compiler_2.11.7/0.6.7/b3b847239dcdc51d94cc3c90095978a90006d9df/scalajs-compiler_2.11.7-0.6.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.scala-js/scalajs-compiler_2.11.7/0.6.7/ed1c620cce662f7ebf125b6b8c446e41ae4ca969/scalajs-compiler_2.11.7-0.6.7-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

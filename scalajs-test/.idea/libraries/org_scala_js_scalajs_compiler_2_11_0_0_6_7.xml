@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="org.scala-js:scalajs-compiler_2.11.0:0.6.7" type="repository">
+    <properties maven-id="org.scala-js:scalajs-compiler_2.11.0:0.6.7" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/scalajs-compiler_2.11.0-0.6.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scala-compiler-2.11.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scala-library-2.11.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scala-reflect-2.11.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scala-xml_2.11-1.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scala-parser-combinators_2.11-1.0.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/scalajs-compiler_2.11.0-0.6.7-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>
