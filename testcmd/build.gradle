@@ -1,10 +1,11 @@
 group 'scalajs'
 version '1.0-SNAPSHOT'
 
-apply plugin: 'java'
-apply plugin: 'scala'
+import org.apache.tools.ant.taskdefs.condition.Os
 
-sourceCompatibility = 1.5
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -26,16 +27,47 @@ buildscript {
 
     }
 }
+def sjsirPath = 'sjsir/'
+def jsPath = 'js/'
+def sjslibPath = configurations.runtime.filter{it.name.equals("scalajs-library_2.11-0.6.7.jar")}.first().absolutePath
+def sjscompPath = configurations.runtime.filter{it.name.equals("scalajs-compiler_2.11.7-0.6.7.jar")}.first().absolutePath
+def cmdExe = Os.isFamily(Os.FAMILY_WINDOWS) ? 'cmd' : 'bash'
 
-task compileSJSIR (type: Exec) {
-    executable = "lib/scalajs-cli_2.11-0.6.7/scalajsc.bat"
-    args = ['cmd','/C','src/','-o','sjsir/']
+task createDirs {
+    def sjsirDir=file(sjsirPath)
+    if (!sjsirDir.exists()){
+        if (!sjsirDir.mkdir())
+        {
+            logger.error('Couldn\'t create "'+sjsirPath+'" directory')
+        }
+    }
+    def jsDir = file(jsPath)
+    if (!jsDir.exists()){
+        if (!jsDir.mkdir()){
+            logger.error('Couldn\'t create "'+jsPath+'"directory')
+        }
+    }
 }
-
-task compileJS (type: Exec) {
+task compileSJSIR (type: Exec, dependsOn: 'createDirs') {
+    executable = cmdExe
+    args = ['/C','scalac','-classpath',sjslibPath,'-Xplugin',sjscompPath,'-d',sjsirPath,'src/test.scala']
+}
+task compileSJSIR2 (type: Exec) {
+    executable = "lib/scalajs-cli_2.11-0.6.7/scalajsc.bat"
+    args = ['-d','sjsir','src/test.scala']
+}
+task compileJS (type: Exec, dependsOn: 'compileSJSIR') {
+    def jsld = 'org.scalajs.cli.Scalajsld'
+    def output = jsPath+project.name+'.js'
+    executable = cmdExe
+    args = ['/C','scala', '-classpath', 'lib/scalajs-cli-assembly_2.11-0.6.7.jar', jsld, '--stdlib', sjslibPath,sjsirPath,'-o',output]
+}
+task compileJS2 (type: Exec) {
     executable = "lib/scalajs-cli_2.11-0.6.7/scalajsld.bat"
-    args = ['cmd','/C','sjsir/','-o','generatedJS/']
+    args = ['sjsir/','-d','generatedJS/']
 }
 task printDep << {
     configurations.runtime.each{ println it}
 }
+
+compileJS.mustRunAfter compileSJSIR

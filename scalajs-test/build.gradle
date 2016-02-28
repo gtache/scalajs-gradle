@@ -13,27 +13,54 @@ repositories {
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.3.11'
-    compile group : 'org.scala-js', name : 'scalajs-cli_2.11', version : '0.6.7'
-    compile group : 'org.scala-js',name : 'scalajs-library_2.11', version : '0.6.7'
-    compile group : 'org.scala-js', name : 'scalajs-compiler_2.11.0', version : '0.6.7'
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    //compile 'org.scala-lang:scala-library:2.11.7'
+    compile group: 'org.scala-js', name: 'scalajs-cli_2.11', version: '0.6.7'
+    compile group: 'org.scala-js', name: 'scalajs-library_2.11', version: '0.6.7'
+    compile group: 'org.scala-js', name: 'scalajs-compiler_2.11.0', version: '0.6.7'
+    //testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
 task main << {
     println "Hi"
 }
-
-task compile (type:ScalaCompile) << {
-    options.compilerArgs = []
-    source='src'
-    destinationDir='generated'
-    logger.lifecycle('Creating sjsir...')
-    logger.debug('From '+source+' to '+destinationDir)
+compileScala {
+    options.compilerArgs << "-classpath "+configurations.runtime.filter{it.name.equals("scalajs-library_2.11-0.6.7.jar")} << "-Xplugin:scalajs-compiler_2.11.0-0.6.7.jar"
 }
+tasks.withType(ScalaCompile) {
+    scalaCompileOptions.useAnt = false
+}
+task compile(type: ScalaCompile) {
+    source = files('src/main/scala')
+    destinationDir = file('sjsir')
+    def filepath = configurations.runtime//.filter{ it.name.equals("scalajs-library_2.11-0.6.7.jar")}
+    /* Renaming attempt
+    logger.info("Found file : "+filepath.first())
+    logger.info("File already exists : "+configurations.runtime.filter {it.name.equals("scala-library-2.11.7.jar")}.first())
+    filepath.first().renameTo(file("lib/scala-library-2.11.1.jar"))
+    classpath=files(file("lib/scala-library-2.11.1.jar"))
+    */
+    classpath=filepath
+    logger.info("Using library : "+classpath.files)
+    doFirst {
+        logger.lifecycle('Creating sjsir...')
+        logger.info('From ' + source.files + ' to ' + destinationDir.absolutePath + ' with ' + classpath.files)
+    }
+    scalaCompileOptions.incrementalOptions.analysisFile = new File("${buildDir}/tmp/scala/compilerAnalysis/compileCustomScala.analysis")
+    doLast {
+        logger.lifecycle('Sjsir created')
+    }
+}
+task debug << { println configurations.compile.findAll { it.name.startsWith("scala") } }
 
-task createJS (type:ScalaCompile) << {
-    source='generated'
-    destinationDir='bin'
+/*
+task createJS (type:JavaExec)  {
+    source='sjsir'
+    destinationDir='js'
+    doFirst {
     logger.lifecycle('Creating javascript file...')
-    logger.debug('From '+source+' to '+destinationDir)
-}
+        logger.info('From '+source+' to '+destinationDir)
+    }
+    doLast {
+    logger.lifecycle('Javascript file created.')
+    }
+}*/

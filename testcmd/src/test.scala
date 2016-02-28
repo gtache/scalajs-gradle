@@ -2,7 +2,8 @@ import scala.scalajs.js
 import js.annotation.JSExport
 
 @JSExport
-object ScalaJSExample extends js.JSApp {
+object Test extends js.JSApp {
+  @JSExport
   def main(): Unit = {
     val squared = square(10)
     println("Hello ! Square of 10 is "+squared)
@@ -11,5 +12,6 @@ object ScalaJSExample extends js.JSApp {
   /** Computes the square of an integer.
     *  This demonstrates unit testing.
     */
+  @JSExport
   def square(x: Int): Int = x*x
 }

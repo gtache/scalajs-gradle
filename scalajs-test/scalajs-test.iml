@@ -6,8 +6,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="org.scala-js:scalajs-cli_2.11:0.6.7" level="project" />
-    <orderEntry type="library" name="scala-sdk-2.11.7" level="application" />
     <orderEntry type="library" name="org.scala-js:scalajs-compiler_2.11.0:0.6.7" level="project" />
     <orderEntry type="library" name="org.scala-js:scalajs-library_2.11:0.6.7" level="project" />
+    <orderEntry type="library" name="Gradle: org.scala-lang:scala-library:2.11.7" level="project" />
   </component>
 </module>
