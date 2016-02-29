@@ -24,30 +24,33 @@ buildscript {
         mavenCentral()
     }
 }
-defaultTasks 'compileJS'
 
 def cliPath = 'lib/scalajs-cli_2.11-0.6.7/'
-def srcPath = 'src/main/scala/'
-def sjsirPath = 'sjsir/'
-def jsPath = 'js/'
+def srcDir = 'src/main/scala/'
+def sjsirDir = 'sjsir/'
+def jsDir = 'js/'
+def jsFilePath = jsDir+project.name+'.js'
+def jsExecFilePath = jsDir+project.name+'_exec.js'
 def sjslibPath = configurations.runtime.filter { it.name.equals("scalajs-library_2.11-0.6.7.jar") }.first().absolutePath
 def sjscompPath = configurations.runtime.filter {
     it.name.equals("scalajs-compiler_2.11.7-0.6.7.jar")
 }.first().absolutePath
 def exec = Os.isFamily(Os.FAMILY_WINDOWS) ? 'cmd' : 'bash'
 
+defaultTasks 'compileJS'
+
 task createDirs {
     description = "Creates necessary directories for compiling scalaJS."
-    def sjsirDir = file(sjsirPath)
-    if (!sjsirDir.exists()) {
-        if (!sjsirDir.mkdir()) {
-            logger.error('Couldn\'t create "' + sjsirPath + '" directory')
+    def sjsirDirFile = file(sjsirDir)
+    if (!sjsirDirFile.exists()) {
+        if (!sjsirDirFile.mkdir()) {
+            logger.error('Couldn\'t create "' + sjsirDir + '" directory')
         }
     }
-    def jsDir = file(jsPath)
-    if (!jsDir.exists()) {
-        if (!jsDir.mkdir()) {
-            logger.error('Couldn\'t create "' + jsPath + '"directory')
+    def jsDirFile = file(jsDir)
+    if (!jsDirFile.exists()) {
+        if (!jsDirFile.mkdir()) {
+            logger.error('Couldn\'t create "' + jsDir + '"directory')
         }
     }
     doFirst {
@@ -58,12 +61,12 @@ task createDirs {
     }
 }
 task compileSJSIR(type: Exec, dependsOn: 'createDirs') {
-    description = "Compiles all classes (default) in " + srcPath + " to sjsir and class files in " + sjsirPath + ".\n" +
+    description = "Compiles all classes (default) in " + srcDir + " to sjsir and class files in " + sjsirDir + ".\n" +
             "Usage : gradlew compileSJSIR -Pfile 'nameOfFile'\nDepends on createDirs."
     executable = exec
     doFirst {
         def toCompile
-        if (!properties.containsKey('file')) {
+        if (!project.properties.containsKey('file')) {
             toCompile = '*.scala'
         } else {
             toCompile = file
@@ -72,39 +75,48 @@ task compileSJSIR(type: Exec, dependsOn: 'createDirs') {
             toCompile=toCompile+'.scala'
         }
         logger.info('Compiling ' + toCompile)
-        args = ['/C', 'scalac', '-classpath', sjslibPath, '-Xplugin', sjscompPath, '-d', sjsirPath, srcPath + toCompile]
+        args = ['/C', 'scalac', '-classpath', sjslibPath, '-Xplugin', sjscompPath, '-d', sjsirDir, srcDir + toCompile]
     }
 }
 task compileSJSIR2(type: Exec) {
     executable = cliPath + "scalajsc.bat"
-    args = ['-d', sjsirPath, srcPath + 'test.scala']
+    args = ['-d', sjsirDir, srcDir + 'test.scala']
 }
 task compileJS(type: Exec, dependsOn: 'compileSJSIR') {
-    description = "Compiles all sjsir files in " + sjsirPath + " to a single js file in " + jsPath + ".\nDepends on compileSJSIR."
+    description = "Compiles all sjsir files in " + sjsirDir + " to a single js file in " + jsDir + ".\nDepends on compileSJSIR."
     executable = exec
-    def output=jsPath+project.name+'.js'
+    def output=jsDir+project.name+'.js'
     def jsld = 'org.scalajs.cli.Scalajsld'
     def cliAssemblyPath = 'lib/scalajs-cli-assembly_2.11-0.6.7.jar'
-    args = ['/C', 'scala', '-classpath', cliAssemblyPath, jsld, '--stdlib', sjslibPath, sjsirPath, '-o', output]
+    args = ['/C', 'scala', '-classpath', cliAssemblyPath, jsld, '--stdlib', sjslibPath, sjsirDir, '-o', output]
 }
 task compileJS2(type: Exec) {
     executable = cliPath + "scalajsld.bat"
-    args = [sjsirPath, '-d', jsPath]
+    args = [sjsirDir, '-d', jsDir]
 }
-task addMethExec(dependsOn: 'compileJS') {
+
+task copyJS(dependsOn : 'compileJS', type:Copy){
+    description = "Copy the generated js file while renaming it with \'_exec.js\' at the end. Used by addMethExec for runJS."
+    from(jsFilePath)
+    into(jsDir)
+    rename {
+        String filename -> filename.replace('.js','_exec.js')
+    }
+}
+task addMethExec(dependsOn: 'copyJS') {
     description = "Adds the main exec at the end of the js file, given the object name, assuming function to run is \"main\" (default)\n" +
-            "Depends on compileJS\n" +
+            "Depends on copyJS\n" +
             "Usage : \"gradlew addMainExec -Pclassname=\'nameOfClass\' -Pmethname=\'nameOfMethod\'"
     doFirst {
-        if (!properties.containsKey('classname')) {
+        if (!project.properties.containsKey('classname')) {
             logger.info('Skipping addMainExec : no classname given')
         } else {
-            def js = file(jsPath + project.name)
+            def js = file(jsExecFilePath)
             if (js.exists() && js.canWrite()) {
                 //TODO find more efficient solution
                 def content = js.readLines()
                 def toAdd
-                if (!properties.containsKey('methname')){
+                if (!project.properties.containsKey('methname')){
                     toAdd = classname + '().main()'
                 } else {
                     toAdd = classname + '().'+methname+'()'
@@ -116,18 +128,17 @@ task addMethExec(dependsOn: 'compileJS') {
                     js.append('\n' + toAdd)
                     logger.info('Done')
                 }
+            } else {
+                logger.error('Couldn\'t find '+js.path)
             }
         }
     }
-
 }
 task runJS(type: Exec, dependsOn: 'addMethExec') {
     description = "Runs the generated js file.\n" +
             "Depends on addMainExec.\n" + "Needs Node.js on PATH."
     executable = exec
-    doFirst {
-        args = ['/C', 'node', project.name + ".js"]
-    }
+    args = ['/C', 'node', jsExecFilePath]
 }
 task printDep << {
     configurations.runtime.each { println it }
