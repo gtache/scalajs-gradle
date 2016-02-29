@@ -53,6 +53,7 @@ task createDirs {
             logger.error('Couldn\'t create "' + jsDir + '"directory')
         }
     }
+    outputs.files(sjsirDirFile,jsDirFile)
     doFirst {
         logger.info('Creating directories...')
     }
@@ -64,6 +65,7 @@ task compileSJSIR(type: Exec, dependsOn: 'createDirs') {
     description = "Compiles all classes (default) in " + srcDir + " to sjsir and class files in " + sjsirDir + ".\n" +
             "Usage : gradlew compileSJSIR -Pfile 'nameOfFile'\nDepends on createDirs."
     executable = exec
+    inputs.file(file(srcDir))
     doFirst {
         def toCompile
         if (!project.properties.containsKey('file')) {
@@ -78,25 +80,21 @@ task compileSJSIR(type: Exec, dependsOn: 'createDirs') {
         args = ['/C', 'scalac', '-classpath', sjslibPath, '-Xplugin', sjscompPath, '-d', sjsirDir, srcDir + toCompile]
     }
 }
-task compileSJSIR2(type: Exec) {
-    executable = cliPath + "scalajsc.bat"
-    args = ['-d', sjsirDir, srcDir + 'test.scala']
-}
+
 task compileJS(type: Exec, dependsOn: 'compileSJSIR') {
     description = "Compiles all sjsir files in " + sjsirDir + " to a single js file in " + jsDir + ".\nDepends on compileSJSIR."
     executable = exec
+    inputs.file(file(sjsirDir))
+    outputs.file(file(jsDir+project.name+'.js'))
     def output = jsDir + project.name + '.js'
     def jsld = 'org.scalajs.cli.Scalajsld'
     def cliAssemblyPath = 'lib/scalajs-cli-assembly_2.11-0.6.7.jar'
     args = ['/C', 'scala', '-classpath', cliAssemblyPath, jsld, '--stdlib', sjslibPath, sjsirDir, '-o', output]
 }
-task compileJS2(type: Exec) {
-    executable = cliPath + "scalajsld.bat"
-    args = [sjsirDir, '-d', jsDir]
-}
 
 task copyJS(dependsOn: 'compileJS', type: Copy) {
-    description = "Copy the generated js file while renaming it with \'_exec.js\' at the end. Used by addMethExec for runJS."
+    description = "Copy the generated js file while renaming it with \'_exec.js\' at the end. Used by addMethExec for runJS.\n" +
+            "Depends on compileJS."
     from(jsFilePath)
     into(jsDir)
     rename {
@@ -145,3 +143,15 @@ task printDep << {
 }
 
 compileJS.mustRunAfter compileSJSIR
+
+
+/* Testing with another way
+task compileSJSIR2(type: Exec) {
+    executable = cliPath + "scalajsc.bat"
+    args = ['-d', sjsirDir, srcDir + 'test.scala']
+}
+task compileJS2(type: Exec) {
+    executable = cliPath + "scalajsld.bat"
+    args = [sjsirDir, '-d', jsDir]
+}
+*/
