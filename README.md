@@ -8,3 +8,5 @@ Usage : "gradlew compileJS -Pfile='nameOfFile'" or "gradlew compileJS" to compil
 "gradlew compileSJSIR -Pfile='nameOfFile'" or "gradlew compileSJSIR" to create the related sjsir and class files.
 
 Simply "gradlew" to run the default "compileJS" task.
+
+You can run the generated javascript file with "gradlew runJS -Pclassname='nameOfClass' -Pmethname='nameOfMeth'", where Pmethname is optional (default is 'main'). It requires Node.js to be installed.
