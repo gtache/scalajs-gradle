@@ -115,7 +115,7 @@ task addMethExec(dependsOn: 'copyJS') {
                 if (!project.properties.containsKey('methname')) {
                     toAdd = classname + '().main()'
                 } else {
-                    toAdd = classname + '().' + methname + '()'
+                    toAdd = classname + '().' + methname
                 }
                 /*
                 def content = js.readLines()
