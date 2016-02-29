@@ -23,17 +23,16 @@ buildscript {
     repositories {
         mavenCentral()
     }
-    dependencies {
-
-    }
 }
+def srcPath = 'src/main/scala/'
 def sjsirPath = 'sjsir/'
 def jsPath = 'js/'
 def sjslibPath = configurations.runtime.filter{it.name.equals("scalajs-library_2.11-0.6.7.jar")}.first().absolutePath
 def sjscompPath = configurations.runtime.filter{it.name.equals("scalajs-compiler_2.11.7-0.6.7.jar")}.first().absolutePath
-def cmdExe = Os.isFamily(Os.FAMILY_WINDOWS) ? 'cmd' : 'bash'
+def exec = Os.isFamily(Os.FAMILY_WINDOWS) ? 'cmd' : 'bash'
 
 task createDirs {
+    description = "Creates necessary directories for compiling scalaJS."
     def sjsirDir=file(sjsirPath)
     if (!sjsirDir.exists()){
         if (!sjsirDir.mkdir())
@@ -49,22 +48,36 @@ task createDirs {
     }
 }
 task compileSJSIR (type: Exec, dependsOn: 'createDirs') {
-    executable = cmdExe
-    args = ['/C','scalac','-classpath',sjslibPath,'-Xplugin',sjscompPath,'-d',sjsirPath,'src/test.scala']
+    description = "Compiles all classes (default) in "+srcPath+" to sjsir and class files in "+sjsirPath+".\n" +
+            "Usage : gradlew compileSJSIR -Pfile 'nameOfFile'\nDepends on createDirs."
+    executable = exec
+    doFirst {
+        def toCompile
+        if (!properties.containsKey('file')) {
+            toCompile = '*.scala'
+        } else {
+            toCompile = file
+            logger.info('file = ' + file)
+        }
+        logger.info('toCompile = ' + toCompile)
+        args = ['/C','scalac','-classpath',sjslibPath,'-Xplugin',sjscompPath,'-d',sjsirPath,srcPath+toCompile]
+    }
 }
 task compileSJSIR2 (type: Exec) {
     executable = "lib/scalajs-cli_2.11-0.6.7/scalajsc.bat"
-    args = ['-d','sjsir','src/test.scala']
+    args = ['-d',sjsirPath,srcPath+'test.scala']
 }
 task compileJS (type: Exec, dependsOn: 'compileSJSIR') {
+    description = "Compiles all sjsir files in "+sjsirPath+" to a single js file in "+jsPath+".\nDepends on compileSJSIR."
+    executable = exec
     def jsld = 'org.scalajs.cli.Scalajsld'
+    def cliPath = 'lib/scalajs-cli-assembly_2.11-0.6.7.jar'
     def output = jsPath+project.name+'.js'
-    executable = cmdExe
-    args = ['/C','scala', '-classpath', 'lib/scalajs-cli-assembly_2.11-0.6.7.jar', jsld, '--stdlib', sjslibPath,sjsirPath,'-o',output]
+    args = ['/C','scala', '-classpath', cliPath, jsld, '--stdlib', sjslibPath,sjsirPath,'-o',output]
 }
 task compileJS2 (type: Exec) {
     executable = "lib/scalajs-cli_2.11-0.6.7/scalajsld.bat"
-    args = ['sjsir/','-d','generatedJS/']
+    args = [sjsirPath,'-d',jsPath]
 }
 task printDep << {
     configurations.runtime.each{ println it}
