@@ -138,9 +138,6 @@ task runJS(type: Exec, dependsOn: 'addMethExec') {
     executable = exec
     args = ['/C', 'node', jsExecFilePath]
 }
-task printDep << {
-    configurations.runtime.each { println it }
-}
 
 compileJS.mustRunAfter compileSJSIR
 
