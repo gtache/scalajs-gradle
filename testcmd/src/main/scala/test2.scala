@@ -6,7 +6,7 @@ object Test2 extends js.JSApp {
   @JSExport
   def main(): Unit = {
     val squared = square(3)
-    println("Hello ! Square of 10 is "+squared)
+    println("Hello ! Square of 3 is "+squared)
   }
 
   /** Computes the square of an integer.
