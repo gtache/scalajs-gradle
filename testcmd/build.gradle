@@ -29,8 +29,8 @@ def cliPath = 'lib/scalajs-cli_2.11-0.6.7/'
 def srcDir = 'src/main/scala/'
 def sjsirDir = 'sjsir/'
 def jsDir = 'js/'
-def jsFilePath = jsDir+project.name+'.js'
-def jsExecFilePath = jsDir+project.name+'_exec.js'
+def jsFilePath = jsDir + project.name + '.js'
+def jsExecFilePath = jsDir + project.name + '_exec.js'
 def sjslibPath = configurations.runtime.filter { it.name.equals("scalajs-library_2.11-0.6.7.jar") }.first().absolutePath
 def sjscompPath = configurations.runtime.filter {
     it.name.equals("scalajs-compiler_2.11.7-0.6.7.jar")
@@ -71,8 +71,8 @@ task compileSJSIR(type: Exec, dependsOn: 'createDirs') {
         } else {
             toCompile = file
         }
-        if(!toCompile.endsWith('.scala')){
-            toCompile=toCompile+'.scala'
+        if (!toCompile.endsWith('.scala')) {
+            toCompile = toCompile + '.scala'
         }
         logger.info('Compiling ' + toCompile)
         args = ['/C', 'scalac', '-classpath', sjslibPath, '-Xplugin', sjscompPath, '-d', sjsirDir, srcDir + toCompile]
@@ -85,7 +85,7 @@ task compileSJSIR2(type: Exec) {
 task compileJS(type: Exec, dependsOn: 'compileSJSIR') {
     description = "Compiles all sjsir files in " + sjsirDir + " to a single js file in " + jsDir + ".\nDepends on compileSJSIR."
     executable = exec
-    def output=jsDir+project.name+'.js'
+    def output = jsDir + project.name + '.js'
     def jsld = 'org.scalajs.cli.Scalajsld'
     def cliAssemblyPath = 'lib/scalajs-cli-assembly_2.11-0.6.7.jar'
     args = ['/C', 'scala', '-classpath', cliAssemblyPath, jsld, '--stdlib', sjslibPath, sjsirDir, '-o', output]
@@ -95,12 +95,12 @@ task compileJS2(type: Exec) {
     args = [sjsirDir, '-d', jsDir]
 }
 
-task copyJS(dependsOn : 'compileJS', type:Copy){
+task copyJS(dependsOn: 'compileJS', type: Copy) {
     description = "Copy the generated js file while renaming it with \'_exec.js\' at the end. Used by addMethExec for runJS."
     from(jsFilePath)
     into(jsDir)
     rename {
-        String filename -> filename.replace('.js','_exec.js')
+        String filename -> filename.replace('.js', '_exec.js')
     }
 }
 task addMethExec(dependsOn: 'copyJS') {
@@ -113,23 +113,23 @@ task addMethExec(dependsOn: 'copyJS') {
         } else {
             def js = file(jsExecFilePath)
             if (js.exists() && js.canWrite()) {
-                //TODO find more efficient solution
-                def content = js.readLines()
                 def toAdd
-                if (!project.properties.containsKey('methname')){
+                if (!project.properties.containsKey('methname')) {
                     toAdd = classname + '().main()'
                 } else {
-                    toAdd = classname + '().'+methname+'()'
+                    toAdd = classname + '().' + methname + '()'
                 }
+                /*
+                def content = js.readLines()
                 if (content.get(content.size() - 1).equals(toAdd)) {
                     logger.info('Main line already exists at end of file.')
                 } else {
-                    logger.info('Adding ' + toAdd + ' at the end of the file.')
-                    js.append('\n' + toAdd)
-                    logger.info('Done')
-                }
+                */
+                logger.info('Adding ' + toAdd + ' at the end of the file.')
+                js.append('\n' + toAdd)
+                logger.info('Done')
             } else {
-                logger.error('Couldn\'t find '+js.path)
+                logger.error('Couldn\'t find ' + js.path)
             }
         }
     }
