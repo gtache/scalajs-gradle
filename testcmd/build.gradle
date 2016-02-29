@@ -50,6 +50,12 @@ task createDirs {
             logger.error('Couldn\'t create "' + jsPath + '"directory')
         }
     }
+    doFirst {
+        logger.info('Creating directories...')
+    }
+    doLast {
+        logger.info('Directories creation done')
+    }
 }
 task compileSJSIR(type: Exec, dependsOn: 'createDirs') {
     description = "Compiles all classes (default) in " + srcPath + " to sjsir and class files in " + sjsirPath + ".\n" +
@@ -61,9 +67,11 @@ task compileSJSIR(type: Exec, dependsOn: 'createDirs') {
             toCompile = '*.scala'
         } else {
             toCompile = file
-            logger.info('file = ' + file)
         }
-        logger.info('toCompile = ' + toCompile)
+        if(!toCompile.endsWith('.scala')){
+            toCompile=toCompile+'.scala'
+        }
+        logger.info('Compiling ' + toCompile)
         args = ['/C', 'scalac', '-classpath', sjslibPath, '-Xplugin', sjscompPath, '-d', sjsirPath, srcPath + toCompile]
     }
 }
@@ -74,14 +82,52 @@ task compileSJSIR2(type: Exec) {
 task compileJS(type: Exec, dependsOn: 'compileSJSIR') {
     description = "Compiles all sjsir files in " + sjsirPath + " to a single js file in " + jsPath + ".\nDepends on compileSJSIR."
     executable = exec
+    def output=jsPath+project.name+'.js'
     def jsld = 'org.scalajs.cli.Scalajsld'
     def cliAssemblyPath = 'lib/scalajs-cli-assembly_2.11-0.6.7.jar'
-    def output = jsPath + project.name + '.js'
     args = ['/C', 'scala', '-classpath', cliAssemblyPath, jsld, '--stdlib', sjslibPath, sjsirPath, '-o', output]
 }
 task compileJS2(type: Exec) {
     executable = cliPath + "scalajsld.bat"
     args = [sjsirPath, '-d', jsPath]
+}
+task addMethExec(dependsOn: 'compileJS') {
+    description = "Adds the main exec at the end of the js file, given the object name, assuming function to run is \"main\" (default)\n" +
+            "Depends on compileJS\n" +
+            "Usage : \"gradlew addMainExec -Pclassname=\'nameOfClass\' -Pmethname=\'nameOfMethod\'"
+    doFirst {
+        if (!properties.containsKey('classname')) {
+            logger.info('Skipping addMainExec : no classname given')
+        } else {
+            def js = file(jsPath + project.name)
+            if (js.exists() && js.canWrite()) {
+                //TODO find more efficient solution
+                def content = js.readLines()
+                def toAdd
+                if (!properties.containsKey('methname')){
+                    toAdd = classname + '().main()'
+                } else {
+                    toAdd = classname + '().'+methname+'()'
+                }
+                if (content.get(content.size() - 1).equals(toAdd)) {
+                    logger.info('Main line already exists at end of file.')
+                } else {
+                    logger.info('Adding ' + toAdd + ' at the end of the file.')
+                    js.append('\n' + toAdd)
+                    logger.info('Done')
+                }
+            }
+        }
+    }
+
+}
+task runJS(type: Exec, dependsOn: 'addMethExec') {
+    description = "Runs the generated js file.\n" +
+            "Depends on addMainExec.\n" + "Needs Node.js on PATH."
+    executable = exec
+    doFirst {
+        args = ['/C', 'node', project.name + ".js"]
+    }
 }
 task printDep << {
     configurations.runtime.each { println it }
