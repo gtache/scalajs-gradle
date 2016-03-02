@@ -37,17 +37,16 @@ tasks.withType(ScalaCompile) {
     scalaCompileOptions.useAnt = false
     scalaCompileOptions.additionalParameters = ["-Xplugin:" + configurations.scalaCompilePlugin.asPath]
 }
-
+def deleteFile(File file) {
+    if (file.exists() && file.isDirectory()) {
+        file.listFiles().each(deleteFile(it))
+        Files.delete(file.toPath())
+    } else {
+        Files.deleteIfExists(file.toPath())
+    }
+}
 task cleanAll(dependsOn : 'clean') {
     doLast {
-       def deleteFile(File file) {
-            if (file.exists() && file.isDirectory()) {
-                file.listFiles().each(deleteFile(it))
-                Files.delete(file.toPath())
-            } else {
-                Files.deleteIfExists(file.toPath())
-            }
-        }
         def sjsirDirFile = new File(sjsirDir)
         def jsDirFile = new File(jsDir)
         deleteFile(sjsirDirFile)
@@ -89,6 +88,8 @@ task compileJS(type: JavaExec, dependsOn:[classes, compileSJSIR]) {
     classpath=configurations.runtime
     classpath+=sourceSets.main.runtimeClasspath
     main='Scalajsld'
+    inputs.files(file(sjsirDir))
+    outputs.file(file(jsFile))
     //main="Main"
     def argsL = new ArrayList<String>(3)
     argsL.add(file(sjsirDir).absolutePath)
