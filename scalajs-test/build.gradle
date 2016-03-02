@@ -19,29 +19,44 @@ dependencies {
     compile 'org.scala-lang:scala-library:2.11.7'
     compile group: 'org.scala-js', name: 'scalajs-cli_2.11', version: '0.6.7'
     compile group: 'org.scala-js', name: 'scalajs-library_2.11', version: '0.6.7'
+    compile group: 'org.scala-js', name : 'scalajs-tools_2.11', version : '0.6.7'
     scalaCompilePlugin group: 'org.scala-js', name: 'scalajs-compiler_2.11.0', version: '0.6.7'
-    //testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
-def srcDir = 'src/main/scala/'
+def srcDir = 'src/main/scalajs/'
 def sjsirDir = 'sjsir/'
+def jsDir = 'js/'
+def jsFile = jsDir+project.name+'.js'
 
 task main << {
     println "Hi"
 }
 tasks.withType(ScalaCompile) {
     scalaCompileOptions.useAnt = false
-    scalaCompileOptions.additionalParameters = ["-Xplugin:"+configurations.scalaCompilePlugin.asPath]
+    scalaCompileOptions.additionalParameters = ["-Xplugin:" + configurations.scalaCompilePlugin.asPath]
 }
-task compile(type: ScalaCompile) {
-    compileScala.scalaCompileOptions.additionalParameters = ['']
+task compileSJSIR(type: ScalaCompile) {
     source = files(srcDir)
     destinationDir = file(sjsirDir)
-    classpath=configurations.compile
-    logger.info("ScalaClasspath : "+scalaClasspath.files)
+    classpath = configurations.compile
+    logger.info("ScalaClasspath : " + scalaClasspath.files)
     scalaCompileOptions.incrementalOptions.analysisFile = new File("${buildDir}/tmp/scala/compilerAnalysis/compileCustomScala.analysis")
 }
-
+task compileJS(type: JavaExec, dependsOn:[classes, compileSJSIR]) {
+    classpath=configurations.runtime
+    classpath+=sourceSets.main.runtimeClasspath
+    main='Scalajsld'
+    //main="Main"
+    def argsL = new ArrayList<String>(3)
+    argsL.add(file(sjsirDir).absolutePath)
+    argsL.add(file(jsFile).absolutePath)
+    argsL.add(classpath.getFiles().filter{it.name=='scalajs-library_2.11-0.6.7.jar'}.absolutePath)
+    args=argsL
+}
+/*
+task compileJS2(dependsOn : compileSJSIR){
+    new Scalajsld(file(sjsirDir).absolutePath, file(jsFile).absolutePath)
+}*/
 /*
 task createJS (type:JavaExec)  {
     source='sjsir'
