@@ -16,11 +16,10 @@ import org.scalajs.core.tools.linker.backend.{LinkerBackend, OutputMode}
 
 
 object Scalajsld {
-  def main(args : Array[String]): Unit ={
-    assert(args.length==3)
+  def main(args: Array[String]): Unit = {
     val src = args(0)
     val out = args(1)
-    val std = args(2)
+    val classp = args.slice(2,args.length).toList.map(s => new File(s))
 
     case class Options(
                         cp: Seq[File] = Seq.empty,
@@ -38,10 +37,10 @@ object Scalajsld {
                         stdLib: Option[File] = None,
                         logLevel: Level = Level.Info)
 
-    val options : Options = Options(cp=new File(src).listFiles(),output=new File(out),stdLib=Some(new File(std)))
+    val options: Options = Options(cp = new File(src).listFiles().toList++classp, output = new File(out))
     val classpath = options.stdLib.toList ++ options.cp
-    val irContainers  = IRFileCache.IRContainer.fromClasspath(classpath)
-    val semantics : Semantics =
+    val irContainers = IRFileCache.IRContainer.fromClasspath(classpath)
+    val semantics: Semantics =
       if (options.fullOpt) options.semantics.optimized
       else options.semantics
 

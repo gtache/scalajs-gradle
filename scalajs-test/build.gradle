@@ -23,17 +23,19 @@ dependencies {
     compile 'org.scala-lang:scala-library:2.11.7'
     compile group: 'org.scala-js', name: 'scalajs-cli_2.11', version: '0.6.7'
     compile group: 'org.scala-js', name: 'scalajs-library_2.11', version: '0.6.7'
-    compile group: 'org.scala-js', name : 'scalajs-tools_2.11', version : '0.6.7'
+    compile group: 'org.scala-js', name: 'scalajs-tools_2.11', version: '0.6.7'
+    compile group: 'org.scala-js', name: 'scalajs-dom_sjs0.6_2.11', version: '0.9.0'
+    compile group: 'com.lihaoyi', name: 'scalatags_sjs0.6_2.11', version: '0.5.4'
     scalaCompilePlugin group: 'org.scala-js', name: 'scalajs-compiler_2.11.0', version: '0.6.7'
 }
 
-defaultTasks+='compileJS'
+defaultTasks += 'compileJS'
 
 def srcDir = 'src/main/scalajs/'
 def sjsirDir = 'sjsir/'
 def jsDir = 'js/'
-def jsFile = jsDir+project.name+'.js'
-def jsExecFile = jsDir+project.name+'_exec.js'
+def jsFile = jsDir + project.name + '.js'
+def jsExecFile = jsDir + project.name + '_exec.js'
 
 tasks.withType(ScalaCompile) {
     scalaCompileOptions.useAnt = false
@@ -47,15 +49,15 @@ tasks.withType(ScalaCompile) {
  */
 def deleteFile(File file) {
     if (file.exists() && file.isDirectory()) {
-        file.listFiles().each{deleteFile(it)}
+        file.listFiles().each { deleteFile(it) }
         Files.delete(file.toPath())
     } else {
         Files.deleteIfExists(file.toPath())
     }
 }
 
-task cleanAll(dependsOn : 'clean') {
-    description="Deletes build, js and sjsir folders."
+task cleanAll(dependsOn: 'clean') {
+    description = "Deletes build, js and sjsir folders."
     doLast {
         def sjsirDirFile = new File(sjsirDir)
         def jsDirFile = new File(jsDir)
@@ -78,7 +80,7 @@ task createDirs {
             logger.error('Couldn\'t create "' + jsDir + '"directory')
         }
     }
-    outputs.files(sjsirDirFile,jsDirFile)
+    outputs.files(sjsirDirFile, jsDirFile)
     doFirst {
         logger.info('Creating directories...')
     }
@@ -87,8 +89,8 @@ task createDirs {
     }
 }
 
-task compileSJSIR(type: ScalaCompile, dependsOn : 'createDirs') {
-    description="Compiles all scala files in src/main/scalajs/"
+task compileSJSIR(type: ScalaCompile, dependsOn: 'createDirs') {
+    description = "Compiles all scala files in src/main/scalajs/"
     source = files(srcDir)
     destinationDir = file(sjsirDir)
     classpath = configurations.compile
@@ -97,18 +99,17 @@ task compileSJSIR(type: ScalaCompile, dependsOn : 'createDirs') {
 }
 
 task compileJS(type: JavaExec, dependsOn: ['classes', 'compileSJSIR']) {
-    description="Compiles all sjsir files into a single javascript file"
-    classpath=configurations.runtime
-    classpath+=sourceSets.main.runtimeClasspath
-    main='Scalajsld'
+    description = "Compiles all sjsir files into a single javascript file"
+    classpath = configurations.runtime
+    classpath += sourceSets.main.runtimeClasspath
+    main = 'Scalajsld'
     inputs.files(file(sjsirDir))
     outputs.file(file(jsFile))
-    //main="Main"
-    def argsL = new ArrayList<String>(3)
+    def argsL = new ArrayList<String>()
     argsL.add(file(sjsirDir).absolutePath)
     argsL.add(file(jsFile).absolutePath)
-    argsL.add(configurations.runtime.filter{it.name=='scalajs-library_2.11-0.6.7.jar'}.first().absolutePath)
-    args=argsL
+    classpath.filter{it.name.contains('scala')}.each{argsL.add(it.absolutePath)}
+    args = argsL
 }
 
 task copyJS(dependsOn: 'compileJS', type: Copy) {
@@ -151,5 +152,5 @@ task runJS(type: Exec, dependsOn: 'addMethExec') {
     def exec = Os.isFamily(Os.FAMILY_WINDOWS) ? 'cmd' : 'node'
     executable = exec
 
-    args = exec=='cmd'? ['/C', 'node', jsExecFile] : [jsExecFile]
+    args = exec == 'cmd' ? ['/C', 'node', jsExecFile] : [jsExecFile]
 }

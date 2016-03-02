@@ -19,5 +19,5 @@ object Test extends js.JSApp {
   def square(x: Int): Int = x * x
 
   @JSExport
-  def printSomething(s : String) : Unit = println(s)
+  def printSomething(s: String): Unit = println(s)
 }
