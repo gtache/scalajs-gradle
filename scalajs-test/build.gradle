@@ -39,7 +39,7 @@ tasks.withType(ScalaCompile) {
 }
 def deleteFile(File file) {
     if (file.exists() && file.isDirectory()) {
-        file.listFiles().each(deleteFile(it))
+        file.listFiles().each{deleteFile(it)}
         Files.delete(file.toPath())
     } else {
         Files.deleteIfExists(file.toPath())
