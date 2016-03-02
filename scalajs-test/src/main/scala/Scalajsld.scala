@@ -1,5 +1,5 @@
 
-import java.io.File
+import java.io.{IOException, File}
 import java.net.URI
 
 import org.scalajs.core.ir.ScalaJSVersions
@@ -38,7 +38,7 @@ object Scalajsld {
                         stdLib: Option[File] = None,
                         logLevel: Level = Level.Info)
 
-    val options : Options = Options(cp=new File(src).listFiles(),output=new File(out))
+    val options : Options = Options(cp=new File(src).listFiles(),output=new File(out),stdLib=Some(new File(std)))
     val classpath = options.stdLib.toList ++ options.cp
     val irContainers  = IRFileCache.IRContainer.fromClasspath(classpath)
     val semantics : Semantics =
