@@ -139,9 +139,6 @@ task runJS(type: Exec, dependsOn: 'addMethExec') {
     args = ['/C', 'node', jsExecFilePath]
 }
 
-compileJS.mustRunAfter compileSJSIR
-
-
 /* Testing with another way
 task compileSJSIR2(type: Exec) {
     executable = cliPath + "scalajsc.bat"
