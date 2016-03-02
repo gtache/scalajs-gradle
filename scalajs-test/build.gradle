@@ -39,6 +39,12 @@ tasks.withType(ScalaCompile) {
     scalaCompileOptions.useAnt = false
     scalaCompileOptions.additionalParameters = ["-Xplugin:" + configurations.scalaCompilePlugin.asPath]
 }
+
+/**
+ * Deletes a file, and if it is a folder, deletes it recursively.
+ * @param file The file to be deleted
+ * @return Unit
+ */
 def deleteFile(File file) {
     if (file.exists() && file.isDirectory()) {
         file.listFiles().each{deleteFile(it)}
@@ -47,7 +53,9 @@ def deleteFile(File file) {
         Files.deleteIfExists(file.toPath())
     }
 }
+
 task cleanAll(dependsOn : 'clean') {
+    description="Deletes build, js and sjsir folders."
     doLast {
         def sjsirDirFile = new File(sjsirDir)
         def jsDirFile = new File(jsDir)
@@ -55,6 +63,7 @@ task cleanAll(dependsOn : 'clean') {
         deleteFile(jsDirFile)
     }
 }
+
 task createDirs {
     description = "Creates necessary directories for compiling scalaJS."
     def sjsirDirFile = file(sjsirDir)
@@ -77,6 +86,7 @@ task createDirs {
         logger.info('Directories creation done')
     }
 }
+
 task compileSJSIR(type: ScalaCompile, dependsOn : 'createDirs') {
     description="Compiles all scala files in src/main/scalajs/"
     source = files(srcDir)
@@ -85,7 +95,8 @@ task compileSJSIR(type: ScalaCompile, dependsOn : 'createDirs') {
     logger.info("ScalaClasspath : " + scalaClasspath.files)
     scalaCompileOptions.incrementalOptions.analysisFile = new File("${buildDir}/tmp/scala/compilerAnalysis/compileCustomScala.analysis")
 }
-task compileJS(type: JavaExec, dependsOn:[classes, compileSJSIR]) {
+
+task compileJS(type: JavaExec, dependsOn: ['classes', 'compileSJSIR']) {
     description="Compiles all sjsir files into a single javascript file"
     classpath=configurations.runtime
     classpath+=sourceSets.main.runtimeClasspath
@@ -125,12 +136,6 @@ task addMethExec(dependsOn: 'copyJS') {
                 } else {
                     toAdd = classname + '().' + methname
                 }
-                /*
-                def content = js.readLines()
-                if (content.get(content.size() - 1).equals(toAdd)) {
-                    logger.info('Main line already exists at end of file.')
-                } else {
-                */
                 logger.info('Adding ' + toAdd + ' at the end of the file.')
                 js.append('\n' + toAdd)
                 logger.info('Done')

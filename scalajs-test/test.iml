@@ -19,5 +19,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="scala-sdk-2.11.7" level="application" />
+    <orderEntry type="library" name="Gradle: org.scala-lang:scala-library:2.11.7" level="project" />
   </component>
 </module>
