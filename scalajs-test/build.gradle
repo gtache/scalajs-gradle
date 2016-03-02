@@ -27,6 +27,8 @@ dependencies {
     scalaCompilePlugin group: 'org.scala-js', name: 'scalajs-compiler_2.11.0', version: '0.6.7'
 }
 
+defaultTasks+='compileJS'
+
 def srcDir = 'src/main/scalajs/'
 def sjsirDir = 'sjsir/'
 def jsDir = 'js/'
