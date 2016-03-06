@@ -25,17 +25,17 @@ buildscript {
     }
 }
 
-def cliPath = 'lib/scalajs-cli_2.11-0.6.7/'
 def srcDir = 'src/main/scala/'
 def sjsirDir = 'sjsir/'
 def jsDir = 'js/'
 def jsFilePath = jsDir + project.name + '.js'
 def jsExecFilePath = jsDir + project.name + '_exec.js'
-def sjslibPath = configurations.runtime.filter { it.name.equals("scalajs-library_2.11-0.6.7.jar") }.first().absolutePath
-def sjscompPath = configurations.runtime.filter {
+def compileCp = configurations.compile
+def sjslibPath = compileCp.filter { it.name.equals("scalajs-library_2.11-0.6.7.jar") }.first().absolutePath
+def sjscompPath = compileCp.filter {
     it.name.equals("scalajs-compiler_2.11.7-0.6.7.jar")
 }.first().absolutePath
-def exec = Os.isFamily(Os.FAMILY_WINDOWS) ? 'cmd' : 'bash'
+def exec = Os.isFamily(Os.FAMILY_WINDOWS) ? 'cmd' : ''
 
 defaultTasks 'compileJS'
 
@@ -64,7 +64,7 @@ task createDirs {
 task compileSJSIR(type: Exec, dependsOn: 'createDirs') {
     description = "Compiles all classes (default) in " + srcDir + " to sjsir and class files in " + sjsirDir + ".\n" +
             "Usage : gradlew compileSJSIR -Pfile 'nameOfFile'\nDepends on createDirs."
-    executable = exec
+    executable = exec == 'cmd' ? exec : 'scalac'
     inputs.file(file(srcDir))
     doFirst {
         def toCompile
@@ -77,19 +77,21 @@ task compileSJSIR(type: Exec, dependsOn: 'createDirs') {
             toCompile = toCompile + '.scala'
         }
         logger.info('Compiling ' + toCompile)
-        args = ['/C', 'scalac', '-classpath', sjslibPath, '-Xplugin', sjscompPath, '-d', sjsirDir, srcDir + toCompile]
+        logger.info('classpath : '+compileCp.files)
+        args = exec=='cmd' ? ['/C', 'scalac', '-classpath', sjslibPath, '-Xplugin', sjscompPath, '-d', sjsirDir, srcDir + toCompile]
+                : ['-classpath', sjslibPath, '-Xplugin', sjscompPath, '-d', sjsirDir, srcDir + toCompile]
     }
 }
 
 task compileJS(type: Exec, dependsOn: 'compileSJSIR') {
     description = "Compiles all sjsir files in " + sjsirDir + " to a single js file in " + jsDir + ".\nDepends on compileSJSIR."
-    executable = exec
+    executable = exec == 'cmd' ? exec : 'scala'
     inputs.file(file(sjsirDir))
     outputs.file(file(jsDir+project.name+'.js'))
     def output = jsDir + project.name + '.js'
     def jsld = 'org.scalajs.cli.Scalajsld'
-    def cliAssemblyPath = 'lib/scalajs-cli-assembly_2.11-0.6.7.jar'
-    args = ['/C', 'scala', '-classpath', cliAssemblyPath, jsld, '--stdlib', sjslibPath, sjsirDir, '-o', output]
+    args = exec == 'cmd' ? ['/C', 'scala', '-classpath', compileCp, jsld, '--stdlib', sjslibPath, sjsirDir, '-o', output]
+            : ['-classpath', compileCp, jsld, '--stdlib', sjslibPath, sjsirDir, '-o', output]
 }
 
 task copyJS(dependsOn: 'compileJS', type: Copy) {
@@ -135,14 +137,14 @@ task addMethExec(dependsOn: 'copyJS') {
 task runJS(type: Exec, dependsOn: 'addMethExec') {
     description = "Runs the generated js file.\n" +
             "Depends on addMainExec.\n" + "Needs Node.js on PATH."
-    executable = exec
-    args = ['/C', 'node', jsExecFilePath]
+    executable = exec == 'cmd' ? exec : 'node'
+    args = exec == 'cmd' ? ['/C', 'node', jsExecFilePath] : [jsExecFilePath]
 }
 
 /* Testing with another way
 task compileSJSIR2(type: Exec) {
     executable = cliPath + "scalajsc.bat"
-    args = ['-d', sjsirDir, srcDir + 'test.scala']
+    args = ['-d', sjsirDir, srcDir + 'Test.scala']
 }
 task compileJS2(type: Exec) {
     executable = cliPath + "scalajsld.bat"
