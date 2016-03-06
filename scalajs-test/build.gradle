@@ -24,7 +24,6 @@ dependencies {
     compile group: 'org.scala-js', name: 'scalajs-cli_2.11', version: '0.6.7'
     compile group: 'org.scala-js', name: 'scalajs-library_2.11', version: '0.6.7'
     compile group: 'org.scala-js', name: 'scalajs-tools_2.11', version: '0.6.7'
-    compile group: 'org.scala-js', name: 'scalajs-dom_sjs0.6_2.11', version: '0.9.0'
     compile group: 'com.lihaoyi', name: 'scalatags_sjs0.6_2.11', version: '0.5.4'
     scalaCompilePlugin group: 'org.scala-js', name: 'scalajs-compiler_2.11.0', version: '0.6.7'
 }
