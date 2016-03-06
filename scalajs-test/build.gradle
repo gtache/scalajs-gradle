@@ -93,7 +93,6 @@ task compileSJSIR(type: ScalaCompile, dependsOn: 'createDirs') {
     source = files(srcDir)
     destinationDir = file(sjsirDir)
     classpath = configurations.compile
-    logger.info("ScalaClasspath : " + scalaClasspath.files)
     scalaCompileOptions.incrementalOptions.analysisFile = new File("${buildDir}/tmp/scala/compilerAnalysis/compileCustomScala.analysis")
 }
 
