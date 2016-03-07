@@ -1,10 +1,18 @@
 language: scala
+jdk:
+    - oraclejdk8
 
 before_install:
     - sudo apt-get -qq update
-    - sudo apt-get install -y nodejs
 
 script: 
     - chmod +x ./scalajs-test/gradlew
     - ./scalajs-test/gradlew runJS -Pclassname=main.scalajs.ScalaTagTest
     - ./scalajs-test/gradlew cleanAll
+	
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
