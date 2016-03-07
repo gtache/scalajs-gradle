@@ -7,9 +7,10 @@ before_install:
     - sudo apt-get -qq update
 
 script: 
-    - chmod +x ./scalajs-test/gradlew
-    - ./scalajs-test/gradlew runJS -Pclassname=main.scalajs.ScalaTagTest --d
-    - ./scalajs-test/gradlew cleanAll --d
+    - cd ./scalajs-test/
+    - chmod +x ./gradlew
+    - ./gradlew runJS -Pclassname=main.scalajs.ScalaTagTest --d
+    - ./gradlew cleanAll --d
 
 before_cache:
     - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
