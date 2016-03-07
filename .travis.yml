@@ -6,7 +6,7 @@ before_install:
     - sudo apt-get -qq update
 
 script: 
-    - chmod +x ./scalajs-test/gradlew --i
+    - chmod +x ./scalajs-test/gradlew
     - ./scalajs-test/gradlew runJS -Pclassname=main.scalajs.ScalaTagTest --i
     - ./scalajs-test/gradlew cleanAll --i
 
