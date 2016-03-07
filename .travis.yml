@@ -9,8 +9,8 @@ before_install:
 script: 
     - cd ./scalajs-test/
     - chmod +x ./gradlew
-    - ./gradlew runJS -Pclassname=main.scalajs.ScalaTagTest --i
-    - ./gradlew cleanAll --i
+    - ./gradlew runJS -Pclassname=main.scalajs.ScalaTagTest
+    - ./gradlew cleanAll
 
 before_cache:
     - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
