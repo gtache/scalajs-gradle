@@ -1,7 +1,6 @@
 group 'scalajs'
 version '1.0-SNAPSHOT'
 
-apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'scala'
 
@@ -19,7 +18,6 @@ configurations {
     scalaCompilePlugin
 }
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.3.11'
     compile 'org.scala-lang:scala-library:2.11.7'
     compile group: 'org.scala-js', name: 'scalajs-cli_2.11', version: '0.6.7'
     compile group: 'org.scala-js', name: 'scalajs-library_2.11', version: '0.6.7'
@@ -47,11 +45,12 @@ tasks.withType(ScalaCompile) {
  * @return Unit
  */
 def deleteFile(File file) {
-    if (file.exists() && file.isDirectory()) {
-        file.listFiles().each { deleteFile(it) }
+    if (file.exists()){
+        if (file.isDirectory()){
+            file.listFiles().each{deleteFile(it)}
+        }
+        logger.info("Deleting : "+file.absolutePath)
         Files.delete(file.toPath())
-    } else {
-        Files.deleteIfExists(file.toPath())
     }
 }
 
@@ -106,7 +105,7 @@ task compileJS(type: JavaExec, dependsOn: ['classes', 'compileSJSIR']) {
     def argsL = new ArrayList<String>()
     argsL.add(file(sjsirDir).absolutePath)
     argsL.add(file(jsFile).absolutePath)
-    classpath.filter{it.name.contains('scala')}.each{argsL.add(it.absolutePath)}
+    classpath.each{argsL.add(it.absolutePath)}
     args = argsL
 }
 

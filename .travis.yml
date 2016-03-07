@@ -5,3 +5,4 @@ language: scala
 
 script: 
 	/scalajs-test/gradlew runJS -Pclassname=main.scalajs.ScalaTagTest
+	/scalajs-test/gradlew cleanAll
