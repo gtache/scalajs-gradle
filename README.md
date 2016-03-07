@@ -1,4 +1,4 @@
-# scalajs-gradle
+# scalajs-gradle [![Build Status](https://travis-ci.org/gtache/scalajs-gradle.svg?branch=master)](https://travis-ci.org/gtache/scalajs-gradle)
 It is advised to use the **scalajs-test** project.
 
 Needs .scala files to be in src/main/scala (and scalajs files in src/main/scalajs)
