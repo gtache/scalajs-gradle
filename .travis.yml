@@ -5,6 +5,6 @@ before_install:
     - sudo apt-get install -y nodejs
 
 script: 
-	- chmod +x scalajs-test/gradlew
-    - scalajs-test/gradlew runJS -Pclassname=main.scalajs.ScalaTagTest
-    - scalajs-test/gradlew cleanAll
+    - chmod +x ./scalajs-test/gradlew
+    - ./scalajs-test/gradlew runJS -Pclassname=main.scalajs.ScalaTagTest
+    - ./scalajs-test/gradlew cleanAll
