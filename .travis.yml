@@ -1,8 +1,9 @@
-before_install:
-	- sudo apt-get -qq update
-	- sudo apt-get install -y nodejs-legacy
 language: scala
 
+before_install:
+    - sudo apt-get -qq update
+    - sudo apt-get install -y nodejs-legacy
+
 script: 
-	/scalajs-test/gradlew runJS -Pclassname=main.scalajs.ScalaTagTest
-	/scalajs-test/gradlew cleanAll
+    - /scalajs-test/gradlew runJS -Pclassname=main.scalajs.ScalaTagTest
+    - /scalajs-test/gradlew cleanAll
