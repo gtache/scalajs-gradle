@@ -5,13 +5,13 @@ import org.gradle.api.tasks.TaskAction
 
 class FastOptJSTask extends JavaExec {
     String description = "Compiles all sjsir files into a single javascript file"
-    File srcDir
     File destFile
 
     @TaskAction
     def fastOptJS() {
         classpath = project.configurations.runtime
-        classpath += sourceSets.main.runtimeClasspath
+        def srcDir = project.sourceSets.main.runtimeClasspath
+        classpath += srcDir
         main = 'Scalajsld'
         inputs.files(srcDir)
         outputs.file(destFile)
