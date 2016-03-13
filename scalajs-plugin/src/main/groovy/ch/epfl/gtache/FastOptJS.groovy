@@ -1,26 +1,23 @@
+package ch.epfl.gtache
+
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 
-/**
- * Created by Guillaume on 09.03.2016.
- */
 class FastOptJSTask extends JavaExec {
     String description = "Compiles all sjsir files into a single javascript file"
-    String srcDir
-    String destFile
+    File srcDir
+    File destFile
 
     @TaskAction
     def fastOptJS() {
         classpath = project.configurations.runtime
         classpath += sourceSets.main.runtimeClasspath
         main = 'Scalajsld'
-        def src = project.file(srcDir)
-        def dest = project.file(destFile)
-        inputs.files(src)
-        outputs.file(dest)
+        inputs.files(srcDir)
+        outputs.file(destFile)
         def argsL = new ArrayList<String>()
-        argsL.add(src.absolutePath)
-        argsL.add(dest.absolutePath)
+        argsL.add(srcDir.absolutePath)
+        argsL.add(destFile.absolutePath)
         classpath.each { argsL.add(it.absolutePath) }
         args = argsL
     }

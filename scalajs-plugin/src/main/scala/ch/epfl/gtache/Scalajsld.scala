@@ -1,19 +1,14 @@
+package ch.epfl.gtache
 
-import java.io.{IOException, File}
+import java.io.File
 import java.net.URI
 
-import org.scalajs.core.ir.ScalaJSVersions
-
-import org.scalajs.core.tools.sem._
 import org.scalajs.core.tools.io._
-import org.scalajs.core.tools.logging._
-
-import CheckedBehavior.Compliant
-
 import org.scalajs.core.tools.linker.Linker
-import org.scalajs.core.tools.linker.frontend.LinkerFrontend
 import org.scalajs.core.tools.linker.backend.{LinkerBackend, OutputMode}
-
+import org.scalajs.core.tools.linker.frontend.LinkerFrontend
+import org.scalajs.core.tools.logging._
+import org.scalajs.core.tools.sem._
 
 object Scalajsld {
   def main(args: Array[String]): Unit = {
