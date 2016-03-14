@@ -2,7 +2,7 @@
 Use the **scalajs-plugin-test** project.
 
 Needs .scala files to be in src/main/scala
-You must run *gradlew install* in scalajs-plugin (it installs the plugin on local maven repository)
+You must run *gradlew install* on **scalajs-plugin** project (it installs the plugin on local maven repository)
 
 Usage : *gradlew FastOptJS* or *gradlew FullOptJS* to compile everything.
 
