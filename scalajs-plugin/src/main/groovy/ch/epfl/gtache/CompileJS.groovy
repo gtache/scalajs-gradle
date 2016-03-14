@@ -6,25 +6,29 @@ import org.gradle.api.tasks.TaskAction
 
 import javax.inject.Inject
 
-public class FastOptJSTask extends JavaExec {
+public class CompileJSTask extends JavaExec {
     String description = "Compiles all sjsir files into a single javascript file"
     @OutputFile
     File destFile
+    String fullOpt = 'f'
 
-    @Inject
-    public FastOptJSTask(){
-        this.main='Scalajsld'
-        // workingDir = ?
-        logger.info(workingDir.absolutePath)
+    public CompileJSTask() {
+        this.main = 'ch.epfl.gtache.Scalajsld'
     }
-    @TaskAction
-    def fastOptJS() {
-        classpath = project.configurations.runtime
-        def srcDir = project.sourceSets.main.runtimeClasspath
-        classpath += srcDir
-        inputs.files(srcDir)
+
+    def fullOpt() {
+        this.fullOpt = 't'
+    }
+
+    def fastOpt() {
+        this.fullOpt = 'f'
+    }
+
+    def finishConfiguration() {
+        classpath += project.configurations.runtime
+        classpath += project.sourceSets.main.runtimeClasspath
         def argsL = new ArrayList<String>()
-        argsL.add(srcDir.absolutePath)
+        argsL.add(fullOpt)
         argsL.add(destFile.absolutePath)
         classpath.each { argsL.add(it.absolutePath) }
         args = argsL

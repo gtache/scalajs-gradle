@@ -12,7 +12,7 @@ import org.scalajs.core.tools.sem._
 
 object Scalajsld {
   def main(args: Array[String]): Unit = {
-    val src = args(0)
+    val opt = args(0)
     val out = args(1)
     val classp = args.slice(2, args.length).toList.map(s => new File(s))
 
@@ -32,7 +32,8 @@ object Scalajsld {
                         stdLib: Option[File] = None,
                         logLevel: Level = Level.Info)
 
-    val options: Options = Options(cp = new File(src).listFiles().toList ++ classp, output = new File(out))
+    val options: Options = Options(cp = classp,
+      output = new File(out), fullOpt = opt == "t")
     val classpath = options.stdLib.toList ++ options.cp
     val irContainers = IRFileCache.IRContainer.fromClasspath(classpath)
     val semantics: Semantics =
