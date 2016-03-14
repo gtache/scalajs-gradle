@@ -7,8 +7,11 @@ before_install:
     - sudo apt-get -qq update
 
 script: 
-    - cd ./scalajs-test/
+    - cd ./scalajs-plugin/
     - chmod +x ./gradlew
+	- ./gradlew install
+	- cd ../scalajs-plugin-test/
+	- chmod +x ./gradlew
     - ./gradlew runJS -Pclassname=main.scalajs.ScalaTagTest
     - ./gradlew cleanAll
 
