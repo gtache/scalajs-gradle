@@ -62,7 +62,7 @@ class ScalajsPlugin implements Plugin<Project> {
 
         final def runJS = tasks.create('RunJS', RunJSTask.class)
         runJS.dependsOn('AddMethExec')
-        runJS.toExec = jsExecFile
+        runJS.toExec = jsExecFile.absolutePath
         runJS.inferArgs()
         project.logger.info('RunJS task added')
 

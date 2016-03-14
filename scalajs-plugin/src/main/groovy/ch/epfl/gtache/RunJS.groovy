@@ -7,9 +7,8 @@ import javax.inject.Inject
 public class RunJSTask extends Exec {
     String description = "Runs the generated js file.\n" +
             "Depends on addMainExec.\n" + "Needs Node.js on PATH."
-    File toExec
+    String toExec
 
-    @Inject
     public RunJSTask(){
         executable = Os.isFamily(Os.FAMILY_WINDOWS) ? 'cmd' : 'node'
     }

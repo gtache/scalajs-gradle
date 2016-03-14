@@ -1,4 +1,4 @@
-package main.scalajs
+package main.scala
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport

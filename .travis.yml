@@ -12,7 +12,7 @@ script:
     - ./gradlew install
     - cd ../scalajs-plugin-test/
     - chmod +x ./gradlew
-    - ./gradlew runJS -Pclassname=main.scalajs.ScalaTagTest
+    - ./gradlew runJS -Pclassname=main.scala.ScalaTagTest
     - ./gradlew cleanAll
 
 before_cache:
