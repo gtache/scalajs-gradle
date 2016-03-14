@@ -1,12 +1,16 @@
 package ch.epfl.gtache
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
 class AddMethExecTask extends DefaultTask {
     String description = "Adds the main exec at the end of the js file, given the object name, assuming function to run is \"main\" (default)\n" +
             "Depends on copyJS\n" +
             "Usage : \"gradlew addMainExec -Pclassname=\'nameOfClass\' -Pmethname=\'nameOfMethod\'"
+    @InputFile
+    @OutputFile
     File srcFile
 
     @TaskAction

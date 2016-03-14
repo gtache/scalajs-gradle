@@ -2,26 +2,23 @@ package ch.epfl.gtache
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.OutputDirectories
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 
 class CreateDirsTask extends DefaultTask {
     String description = "Creates necessary directories for compiling scalaJS."
-    @OutputFiles
+    @OutputDirectories
     FileCollection toCreate
 
     @TaskAction
     def create() {
+        logger.info('Creating directories...')
         toCreate.each {
-            if (!it.exists() && !it.mkdir()) {
+            if (!it.exists() && !it.mkdirs()) {
                 logger.error("Couldn\'t create '" + it.name + "' directory")
             }
         }
-        doFirst {
-            logger.info('Creating directories...')
-        }
-        doLast {
-            logger.info('Directories creation done')
-        }
+        logger.info('Directories creation done')
     }
 }
