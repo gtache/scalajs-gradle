@@ -2,8 +2,6 @@ package ch.epfl.gtache
 
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.TaskAction
-
 import javax.inject.Inject
 
 public class CompileJSTask extends JavaExec {
@@ -12,6 +10,7 @@ public class CompileJSTask extends JavaExec {
     File destFile
     String fullOpt = 'f'
 
+    @Inject
     public CompileJSTask() {
         this.main = 'ch.epfl.gtache.Scalajsld'
     }

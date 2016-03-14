@@ -2,7 +2,6 @@ package ch.epfl.gtache
 
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.Exec
-import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
 public class RunJSTask extends Exec {
@@ -10,6 +9,7 @@ public class RunJSTask extends Exec {
             "Depends on addMainExec.\n" + "Needs Node.js on PATH."
     File toExec
 
+    @Inject
     public RunJSTask(){
         executable = Os.isFamily(Os.FAMILY_WINDOWS) ? 'cmd' : 'node'
     }
