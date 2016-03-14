@@ -2,7 +2,6 @@ package ch.epfl.gtache
 
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.Exec
-import javax.inject.Inject
 
 public class RunJSTask extends Exec {
     String description = "Runs the generated js file.\n" +
@@ -10,6 +9,7 @@ public class RunJSTask extends Exec {
     String toExec
 
     public RunJSTask(){
+        super()
         executable = Os.isFamily(Os.FAMILY_WINDOWS) ? 'cmd' : 'node'
     }
 

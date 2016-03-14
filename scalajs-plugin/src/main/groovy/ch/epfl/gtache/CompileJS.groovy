@@ -2,7 +2,6 @@ package ch.epfl.gtache
 
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.OutputFile
-import javax.inject.Inject
 
 public class CompileJSTask extends JavaExec {
     String description = "Compiles all sjsir files into a single javascript file"
@@ -11,6 +10,7 @@ public class CompileJSTask extends JavaExec {
     String fullOpt = 'f'
 
     public CompileJSTask() {
+        super()
         this.main = 'ch.epfl.gtache.Scalajsld'
     }
 
