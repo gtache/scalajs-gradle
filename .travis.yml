@@ -12,6 +12,8 @@ script:
     - ./gradlew install
     - cd ../scalajs-plugin-test/
     - chmod +x ./gradlew
+    - ./gradlew FullOptJS
+    - ./gradlew FastOptJS
     - ./gradlew runJS -Pclassname=main.scala.ScalaTagTest
     - ./gradlew cleanAll
 
