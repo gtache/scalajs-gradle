@@ -21,3 +21,5 @@ buildscript {
 dependencies {
 	compile group: 'com.lihaoyi', name: 'scalatags_sjs0.6_2.11', version: '0.5.4'
 }
+
+defaultTasks += 'FastOptJS'
