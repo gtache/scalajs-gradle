@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     compile gradleApi()
-    compile 'org.codehaus.groovy:groovy-all:2.3.11'
+    compile 'org.codehaus.groovy:groovy-all:2.4.4'
     compile 'org.scala-lang:scala-compiler:2.11.7'
     compile 'org.scala-lang:scala-library:2.11.7'
     compile group: 'org.scala-js', name: 'scalajs-tools_2.11', version: '0.6.7'
