@@ -15,6 +15,6 @@ public class RunJSTask extends Exec {
 
     def inferArgs() {
         args = executable == 'cmd' ? ['/C', 'node', toExec] : [toExec]
-        println('\n args for RunJS : '+args+'\n')
+        logger.info('Configuring RunJS with '+executable+' and args '+args)
     }
 }

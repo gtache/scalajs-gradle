@@ -14,8 +14,8 @@ script:
     - chmod +x ./gradlew
     - ./gradlew FullOptJS
     - ./gradlew FastOptJS
-    - ./gradlew runJS -Pclassname=main.scala.ScalaTagTest
-    - ./gradlew cleanAll
+    - ./gradlew RunJS -Pclassname=main.scala.ScalaTagTest
+    - ./gradlew CleanAll
 
 before_cache:
     - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock

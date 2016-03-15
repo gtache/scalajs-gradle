@@ -75,7 +75,7 @@ class ScalajsPlugin implements Plugin<Project> {
                 scalaCompileOptions.additionalParameters = ["-Xplugin:" + project.configurations.scalaCompilePlugin.asPath]
             }
             project.logger.info('Xplugin for compiler added')
-            def cp = project.files(project.buildscript.configurations.getByName('classpath').asPath.split(";"))
+            def cp = project.files(project.buildscript.configurations.getByName('classpath').asPath.split(';'))
             project.logger.info('buildscript : ' + cp.files)
             fullOptJS.classpath += project.files(cp)
             fastOptJS.classpath += project.files(cp)
