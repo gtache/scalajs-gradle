@@ -1,17 +1,23 @@
 language: scala
+language: groovy
 jdk:
     - oraclejdk8
 scala:
     - 2.11.7
 before_install:
     - sudo apt-get -qq update
+    - cd ./scalajs-plugin/
+    - chmod +x ./gradlew
+    - ./gradlew assemble
+    - cd ../scalajs-plugin-test/
+    - chmod +x ./gradlew
+    - ./gradlew assemble
+    - cd ..
 
 script: 
     - cd ./scalajs-plugin/
-    - chmod +x ./gradlew
     - ./gradlew install
     - cd ../scalajs-plugin-test/
-    - chmod +x ./gradlew
     - ./gradlew FullOptJS
     - ./gradlew FastOptJS
     - ./gradlew RunJS -Pclassname=main.scala.ScalaTagTest
