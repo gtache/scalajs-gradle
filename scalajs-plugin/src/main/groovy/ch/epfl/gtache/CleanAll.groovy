@@ -2,9 +2,6 @@ package ch.epfl.gtache
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectories
-import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 
 import java.nio.file.Files

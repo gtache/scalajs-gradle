@@ -10,7 +10,6 @@ public class CompileJSTask extends JavaExec {
     String fullOpt = 'f'
 
     public CompileJSTask() {
-        super()
         this.main = 'ch.epfl.gtache.Scalajsld'
     }
 

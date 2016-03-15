@@ -70,7 +70,7 @@ class ScalajsPlugin implements Plugin<Project> {
 
         project.afterEvaluate {
             project.logger.info('Configuring additional parameters related to Scalajs')
-            tasks.withType(ScalaCompile){
+            tasks.withType(ScalaCompile) {
                 scalaCompileOptions.useAnt = false
                 scalaCompileOptions.additionalParameters = ["-Xplugin:" + project.configurations.scalaCompilePlugin.asPath]
             }
