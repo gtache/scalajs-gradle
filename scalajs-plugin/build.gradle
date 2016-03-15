@@ -19,3 +19,7 @@ dependencies {
     compile group: 'org.scala-js', name: 'scalajs-tools_2.11', version: '0.6.7'
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
+
+task wrapper(type: Wrapper){
+	gradleVersion = '2.12'
+}
