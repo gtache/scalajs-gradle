@@ -4,7 +4,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.Exec
 
 public class RunJSTask extends Exec {
-    String description = "Runs the generated js file.\n" +
+    final String description = "Runs the generated js file.\n" +
             "Depends on addMainExec.\n" + "Needs Node.js on PATH."
     String toExec
 

@@ -6,7 +6,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
 class AddMethExecTask extends DefaultTask {
-    String description = "Adds the main exec at the end of the js file, given the object name, assuming function to run is \"main\" (default)\n" +
+    final String description = "Adds the main exec at the end of the js file, given the object name, assuming function to run is \"main\" (default)\n" +
             "Depends on copyJS\n" +
             "Usage : \"gradlew addMainExec -Pclassname=\'nameOfClass\' -Pmethname=\'nameOfMethod\'"
     @InputFile
@@ -18,7 +18,7 @@ class AddMethExecTask extends DefaultTask {
         if (!project.properties.containsKey('classname')) {
             logger.info('Skipping addMainExec : no classname given')
         } else {
-            def classname = project.properties.get('classname');
+            final def classname = project.properties.get('classname');
             if (srcFile.exists() && srcFile.canWrite()) {
                 String toAdd
                 if (!project.properties.containsKey('methname')) {

@@ -11,29 +11,14 @@ import org.scalajs.core.tools.logging._
 import org.scalajs.core.tools.sem._
 
 object Scalajsld {
-  def main(args: Array[String]): Unit = {
-    val opt = args(0)
-    val out = args(1)
-    val classp = args.slice(2, args.length).toList.map(s => new File(s))
 
-    case class Options(
-                        cp: Seq[File] = Seq.empty,
-                        output: File = null,
-                        jsoutput: Boolean = false,
-                        semantics: Semantics = Semantics.Defaults,
-                        outputMode: OutputMode = OutputMode.ECMAScript51Isolated,
-                        noOpt: Boolean = false,
-                        fullOpt: Boolean = false,
-                        prettyPrint: Boolean = false,
-                        sourceMap: Boolean = false,
-                        relativizeSourceMap: Option[URI] = None,
-                        bypassLinkingErrors: Boolean = false,
-                        checkIR: Boolean = false,
-                        stdLib: Option[File] = None,
-                        logLevel: Level = Level.Info)
+  var options: Options = new Options()
 
-    val options: Options = Options(cp = classp,
-      output = new File(out), fullOpt = opt == "t")
+  def setOptions(newOptions: Options): Unit = {
+    this.options = newOptions
+  }
+
+  def exec(): Unit = {
     val classpath = options.stdLib.toList ++ options.cp
     val irContainers = IRFileCache.IRContainer.fromClasspath(classpath)
     val semantics: Semantics =
@@ -54,9 +39,118 @@ object Scalajsld {
 
     val logger = new ScalaConsoleLogger(options.logLevel)
     val outFile = WritableFileVirtualJSFile(options.output)
+
+    //TODO Would be great to keep cache and linker alive between builds
     val cache = (new IRFileCache).newCache
 
     linker.link(cache.cached(irContainers), outFile, logger)
+  }
+
+  class Options(val cp: Seq[File] = Seq.empty,
+                val output: File = null,
+                val jsoutput: Boolean = false,
+                val semantics: Semantics = Semantics.Defaults,
+                val outputMode: OutputMode = OutputMode.ECMAScript51Isolated,
+                val noOpt: Boolean = false,
+                val fullOpt: Boolean = false,
+                val prettyPrint: Boolean = false,
+                val sourceMap: Boolean = false,
+                val relativizeSourceMap: Option[URI] = None,
+                val bypassLinkingErrors: Boolean = false,
+                val checkIR: Boolean = false,
+                val stdLib: Option[File] = None,
+                val logLevel: Level = Level.Info) {
+
+    def withCp(newCp: Seq[File]): Options = {
+      new Options(newCp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
+        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
+        this.checkIR, this.stdLib, this.logLevel)
+    }
+
+    def withOutput(newOutput: File): Options = {
+      new Options(this.cp, newOutput, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
+        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
+        this.checkIR, this.stdLib, this.logLevel)
+    }
+
+    def withJsOutput(newJsOutput: Boolean): Options = {
+      new Options(this.cp, this.output, newJsOutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
+        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
+        this.checkIR, this.stdLib, this.logLevel)
+    }
+
+    def withSemantics(newSemantics: Semantics): Options = {
+      new Options(this.cp, this.output, this.jsoutput, newSemantics, this.outputMode, this.noOpt, this.fullOpt,
+        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
+        this.checkIR, this.stdLib, this.logLevel)
+    }
+
+    def withOutputMode(newOutputMode: OutputMode): Options = {
+      new Options(this.cp, this.output, this.jsoutput, this.semantics, newOutputMode, this.noOpt, this.fullOpt,
+        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
+        this.checkIR, this.stdLib, this.logLevel)
+    }
+
+    def withNoOpt(): Options = {
+      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, true, false,
+        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
+        this.checkIR, this.stdLib, this.logLevel)
+    }
+
+    def withFastOpt(): Options = {
+      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, false, false,
+        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
+        this.checkIR, this.stdLib, this.logLevel)
+    }
+
+    def withFullOpt(): Options = {
+      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, false, true,
+        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
+        this.checkIR, this.stdLib, this.logLevel)
+    }
+
+    def withPrettyPrint(newPrettyPrint: Boolean): Options = {
+      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
+        newPrettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
+        this.checkIR, this.stdLib, this.logLevel)
+    }
+
+    def withSourceMap(newSourceMap: Boolean): Options = {
+      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
+        this.prettyPrint, newSourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
+        this.checkIR, this.stdLib, this.logLevel)
+    }
+
+    def withRelativizeSourceMap(newRelativizeSourceMap: Option[URI]): Options = {
+      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
+        this.prettyPrint, this.sourceMap, newRelativizeSourceMap, this.bypassLinkingErrors,
+        this.checkIR, this.stdLib, this.logLevel)
+    }
+
+    def withBypassLinkingErrors(newBypass: Boolean): Options = {
+      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
+        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, newBypass,
+        this.checkIR, this.stdLib, this.logLevel)
+    }
+
+    def withCheckIR(newCheckIR: Boolean): Options = {
+      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
+        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
+        newCheckIR, this.stdLib, this.logLevel)
+    }
+
+    def withStdLib(newStdLib: Option[File]): Options = {
+      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
+        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
+        this.checkIR, newStdLib, this.logLevel)
+    }
+
+    def withLogLevel(newLogLevel: Level): Options = {
+      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
+        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
+        this.checkIR, this.stdLib, newLogLevel)
+    }
+
   }
 
 }

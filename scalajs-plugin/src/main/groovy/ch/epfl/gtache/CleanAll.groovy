@@ -7,10 +7,10 @@ import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
 
 class CleanAllTask extends DefaultTask {
+    final String description = "Deletes all files given in toDelete."
 
     FileCollection toDelete
 
-    String description = "Deletes all files given in toDelete."
 
     /**
      * Deletes a file, and if it is a folder, deletes it recursively.

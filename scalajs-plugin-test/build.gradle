@@ -14,7 +14,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'scalajs:plugin:0.1.0'
+        classpath 'ch.epfl.gtache:scalajs-plugin:0.1.0'
     }
 }
 

@@ -6,7 +6,7 @@ import org.gradle.api.tasks.OutputDirectories
 import org.gradle.api.tasks.TaskAction
 
 class CreateDirsTask extends DefaultTask {
-    String description = "Creates necessary directories for compiling scalaJS."
+    final String description = "Creates necessary directories for compiling scalaJS."
     @OutputDirectories
     FileCollection toCreate
 
