@@ -21,8 +21,12 @@ class ScalajsPlugin implements Plugin<Project> {
         project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_2.11.7:0.6.7')
         project.logger.info('Dependencies added')
         final def jsDir = project.file('js/')
-        final def jsFile = project.file(jsDir.path + '/' + project.name + '.js')
-        final def jsExecFile = project.file(jsDir.path + '/' + project.name + '_exec.js')
+        final def jsFastFile = project.file(jsDir.path + '/' + project.name + '_fastopt.js')
+        final def jsFullFile = project.file(jsDir.path + '/' + project.name + '_fullopt.js')
+        final def jsFastExecFile = project.file(jsDir.path + '/' + project.name + '_fastopt_exec.js')
+        final def jsFullExecFile = project.file(jsDir.path + '/' + project.name + '_fullopt_exec.js')
+
+        final def runFull = project.hasProperty('runFull')
 
         final def tasks = project.tasks;
 
@@ -38,31 +42,36 @@ class ScalajsPlugin implements Plugin<Project> {
         final def fastOptJS = tasks.create('FastOptJS', CompileJSTask.class)
         fastOptJS.dependsOn('CreateDirs')
         fastOptJS.dependsOn('classes')
-        fastOptJS.destFile = jsFile
+        fastOptJS.destFile = jsFastFile
         fastOptJS.fastOpt()
         project.logger.info('FastOptJS task added')
 
         final def fullOptJS = tasks.create('FullOptJS', CompileJSTask.class)
         fullOptJS.dependsOn('CreateDirs')
         fullOptJS.dependsOn('classes')
-        fullOptJS.destFile = jsFile
+        fullOptJS.destFile = jsFullFile
         fullOptJS.fullOpt()
         project.logger.info('FullOptJS task added')
 
         final def copyJS = tasks.create('CopyJS', CopyJSTask.class)
-        copyJS.dependsOn('FastOptJS')
-        copyJS.from(jsFile)
+        if (runFull) {
+            copyJS.dependsOn('FullOptJS')
+            copyJS.from(jsFullFile)
+        } else {
+            copyJS.dependsOn('FastOptJS')
+            copyJS.from(jsFastFile)
+        }
         copyJS.into(jsDir)
         project.logger.info('CopyJS task added')
 
         final def addMethExec = tasks.create('AddMethExec', AddMethExecTask.class)
         addMethExec.dependsOn('CopyJS')
-        addMethExec.srcFile = jsExecFile
+        addMethExec.srcFile = runFull ? jsFullExecFile : jsFastExecFile
         project.logger.info('AddMethExec task added')
 
         final def runJS = tasks.create('RunJS', RunJSTask.class)
         runJS.dependsOn('AddMethExec')
-        runJS.toExec = jsExecFile.absolutePath
+        runJS.toExec = runFull ? jsFullExecFile.absolutePath : jsFastExecFile.absolutePath
         runJS.inferArgs()
         project.logger.info('RunJS task added')
 
@@ -71,7 +80,6 @@ class ScalajsPlugin implements Plugin<Project> {
         project.afterEvaluate {
             project.logger.info('Configuring additional parameters related to Scalajs')
             tasks.withType(ScalaCompile) {
-                scalaCompileOptions.useAnt = false
                 scalaCompileOptions.additionalParameters = ["-Xplugin:" + project.configurations.scalaCompilePlugin.asPath]
             }
             project.logger.info('Xplugin for compiler added')

@@ -20,7 +20,7 @@ class AddMethExecTask extends DefaultTask {
         } else {
             def classname = project.properties.get('classname');
             if (srcFile.exists() && srcFile.canWrite()) {
-                def toAdd
+                String toAdd
                 if (!project.properties.containsKey('methname')) {
                     toAdd = classname + '().main()'
                 } else {
