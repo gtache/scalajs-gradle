@@ -11,13 +11,21 @@ public class CompileJSTask extends DefaultTask {
     @OutputFile
     File destFile
     Boolean fullOpt = false
+    Boolean noOpt = false
 
     def fullOpt() {
         this.fullOpt = true
+        this.noOpt = false
     }
 
     def fastOpt() {
         this.fullOpt = false
+        this.noOpt = false
+    }
+
+    def noOpt() {
+        this.fullOpt = false
+        this.noOpt = true
     }
 
     @TaskAction
@@ -28,6 +36,8 @@ public class CompileJSTask extends DefaultTask {
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
         if (fullOpt) {
             options = options.withFullOpt()
+        } else if (noOpt) {
+            options = options.withNoOpt()
         } else {
             options = options.withFastOpt()
         }
