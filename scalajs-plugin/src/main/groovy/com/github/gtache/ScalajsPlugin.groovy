@@ -1,8 +1,8 @@
-package ch.epfl.gtache
+package com.github.gtache
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.scala.ScalaCompile;
+import org.gradle.api.tasks.scala.ScalaCompile
 
 class ScalajsPlugin implements Plugin<Project> {
 

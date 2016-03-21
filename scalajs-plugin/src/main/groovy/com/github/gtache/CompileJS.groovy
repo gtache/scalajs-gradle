@@ -1,4 +1,4 @@
-package ch.epfl.gtache
+package com.github.gtache
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
@@ -32,7 +32,7 @@ public class CompileJSTask extends DefaultTask {
     def exec() {
         FileCollection classpath = project.files(project.buildscript.configurations.getByName('classpath').asPath.split(';'))
         FileCollection cp = classpath + project.configurations.runtime + project.sourceSets.main.runtimeClasspath
-        Scalajsld.Options options = Scalajsld.options().withOutput(destFile).withCp(
+        Scalajsld.Options options = Scalajsld.options().withOutput(destFile).withClasspath(
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
         if (fullOpt) {
             options = options.withFullOpt()

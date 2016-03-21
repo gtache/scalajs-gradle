@@ -1,4 +1,4 @@
-package ch.epfl.gtache
+package com.github.gtache
 
 import java.io.File
 import java.net.URI
@@ -61,7 +61,7 @@ object Scalajsld {
                 val stdLib: Option[File] = None,
                 val logLevel: Level = Level.Info) {
 
-    def withCp(newCp: Seq[File]): Options = {
+    def withClasspath(newCp: Seq[File]): Options = {
       new Options(newCp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
         this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
         this.checkIR, this.stdLib, this.logLevel)

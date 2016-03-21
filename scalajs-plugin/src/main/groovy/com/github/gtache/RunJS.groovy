@@ -1,4 +1,4 @@
-package ch.epfl.gtache
+package com.github.gtache
 
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.Exec

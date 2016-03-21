@@ -1,4 +1,4 @@
-group 'ch.epfl.gtache'
+group 'com.github.gtache'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'scalajs-plugin'
@@ -14,7 +14,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'ch.epfl.gtache:scalajs-plugin:0.1.0'
+        classpath 'com.github.gtache:scalajs-plugin:0.1.0'
     }
 }
 

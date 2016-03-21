@@ -1,4 +1,4 @@
-package ch.epfl.gtache
+package com.github.gtache
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputFile

@@ -1,4 +1,4 @@
-group 'ch.epfl.gtache'
+group 'com.github.gtache'
 version '0.1.0'
 
 apply plugin: 'scala'
