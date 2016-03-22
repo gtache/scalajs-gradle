@@ -17,6 +17,12 @@ to use this plugin.
 Needs .scala files to be in src/main/scala (or [configure your ScalaCompile](https://docs.gradle.org/current/userguide/scala_plugin.html) task accordingly)
 (Optional) [Node.js](https://nodejs.org/) to run the generated JS file.
 
+## Added by the plugin
+This plugin adds :   
+-`apply plugin: 'java'`   
+-`apply plugin: 'scala'`   
+as well as dependencies on scalajs-library 2.11:0.6.7 and scalajs-compiler 2.11.7:0.6.7
+
 ## Usage
 `gradlew FastOptJS`, `gradlew FullOptJS` or `gradlew NoOptJS` to compile everything.
 
