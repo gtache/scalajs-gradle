@@ -20,8 +20,6 @@ Needs .scala files to be in src/main/scala (or [configure your ScalaCompile](htt
 ## Usage
 `gradlew FastOptJS`, `gradlew FullOptJS` or `gradlew NoOptJS` to compile everything.
 
-Simply `gradlew` to run the default FastOptJS task.
-
 There is also `gradlew CleanAll` which will delete the build and js directories.
 
 You can run the generated javascript file with `gradlew runJS -Pclassname='nameOfClass' -Pmethname='nameOfMeth'`, where Pclassname is the full name of the class (main.scala.*name* in the scalajs-plugin-test project) and where Pmethname is optional (default is main). It requires Node.js to be on PATH.
