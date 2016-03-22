@@ -5,6 +5,9 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
+/**
+ * Task used to add an executable line at the end of a file
+ */
 class AddMethExecTask extends DefaultTask {
     final String description = "Adds the main exec at the end of the js file, given the object name, assuming function to run is \"main\" (default)\n" +
             "Depends on copyJS\n" +
@@ -13,6 +16,9 @@ class AddMethExecTask extends DefaultTask {
     @OutputFile
     File srcFile
 
+    /**
+     * Main method of the task, adds the executable line at the end of the file.
+     */
     @TaskAction
     def addMethExec() {
         if (!project.properties.containsKey('classname')) {

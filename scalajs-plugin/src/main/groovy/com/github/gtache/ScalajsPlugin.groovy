@@ -4,8 +4,14 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.scala.ScalaCompile
 
+/**
+ * The main class for the plugin
+ */
 class ScalajsPlugin implements Plugin<Project> {
 
+    /**
+     * Applies the plugin to the given project
+     */
     @Override
     public void apply(Project project) {
         project.logger.info('Applying java plugin')

@@ -10,14 +10,25 @@ import org.scalajs.core.tools.linker.frontend.LinkerFrontend
 import org.scalajs.core.tools.logging._
 import org.scalajs.core.tools.sem._
 
+/**
+  * The object used to link and create the js file
+  * (see https://github.com/scala-js/scala-js/blob/master/cli/src/main/scala/org/scalajs/cli/Scalajsld.scala)
+  */
 object Scalajsld {
 
   var options: Options = new Options()
 
+  /**
+    * Changes the option of the linker
+    * @param newOptions the new options to be set
+    */
   def setOptions(newOptions: Options): Unit = {
     this.options = newOptions
   }
 
+  /**
+    * Executes the linker
+    */
   def exec(): Unit = {
     val classpath = options.stdLib.toList ++ options.cp
     val irContainers = IRFileCache.IRContainer.fromClasspath(classpath)
@@ -46,6 +57,23 @@ object Scalajsld {
     linker.link(cache.cached(irContainers), outFile, logger)
   }
 
+  /**
+    * A subclass containing the options for the linker
+    * @param cp the classpath
+    * @param output the output file
+    * @param jsoutput Deprecated
+    * @param semantics
+    * @param outputMode the output mode
+    * @param noOpt with no optimization
+    * @param fullOpt with full optimization
+    * @param prettyPrint with pretty print
+    * @param sourceMap
+    * @param relativizeSourceMap
+    * @param bypassLinkingErrors bypass errors or not
+    * @param checkIR
+    * @param stdLib a library to be used for the linking
+    * @param logLevel the level of the logging to be displayed
+    */
   class Options(val cp: Seq[File] = Seq.empty,
                 val output: File = null,
                 val jsoutput: Boolean = false,
