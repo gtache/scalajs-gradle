@@ -79,6 +79,11 @@ if(project.hasProperty('upload')) {
                             url 'http://www.scala-lang.org/license.html'
                         }
                     }
+                    scm {
+                        connection 'scm:git:ssh://git@github.com:gtache/scalajs-gradle.git'
+                        developerConnection 'scm:git:ss://git@github.com:gtache/scalajs-gradle.git'
+                        url 'https://github.com/gtache/scalajs-gradle'
+                    }
 
                     developers {
                         developer {
