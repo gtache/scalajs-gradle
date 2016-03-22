@@ -28,7 +28,7 @@ as well as dependencies on **scalajs-library 2.11:0.6.7** and **scalajs-compiler
 
 There is also `gradlew CleanAll` which will delete the build and js directories.
 
-You can run the generated javascript file with `gradlew runJS -Pclassname='nameOfClass' -Pmethname='nameOfMeth'`, where Pclassname is the full name of the class (main.scala.*name* in the scalajs-plugin-test project) and where Pmethname is optional (default is main). It requires Node.js to be on PATH.
+You can run the generated javascript file with `gradlew RunJS -Pclassname='nameOfClass' -Pmethname='nameOfMeth'`, where Pclassname is the full name of the class (main.scala.*name* in the scalajs-plugin-test project) and where Pmethname is optional (default is main). It requires Node.js to be on PATH.
 
 ### Options for RunJS
 -Adding `-PrunNoOpt` will copy and run the unoptimized file   
