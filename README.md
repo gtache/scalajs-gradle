@@ -13,7 +13,7 @@ buildscript {
 }
 ```
 to use this plugin.    
-*Check the build.gradle of scalajs-plugin-test if needed*    
+*Check the build.gradle of scalajs-plugin-test if needed.*    
 Needs .scala files to be in src/main/scala (or [configure your ScalaCompile](https://docs.gradle.org/current/userguide/scala_plugin.html) task accordingly)    
 (Optional) [Node.js](https://nodejs.org/) to run the generated JS file.
 
@@ -38,4 +38,4 @@ RunJS will depend on FastOptJS (default), FullOptJS or NoOptJS accordingly.
 
 Examples : `gradlew RunJS -Pclassname=main.scala.Test` will compile everything and run Test().main() (With the scalajs-plugin-test, it should print the square of 10)
 
-`gradlew RunJS -Pclassname=main.scala.Test -Pmethname=printSomething(\"blabla\") -PrunFull` will compile the fully optimized version of the files and will run Test().printSomething("blabla"), which should print "blabla" with the scalajs-plugin-test project.
+`gradlew RunJS -Pclassname=main.scala.Test -Pmethname=printSomething(\"blabla\") -PrunFull` will compile the fully optimized version of the files and will run Test().printSomething("blabla"), which should print "blabla" with the scalajs-plugin-test project. *Escape parenthesises or put everything in quotes if needed.*
