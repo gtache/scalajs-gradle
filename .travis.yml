@@ -13,7 +13,7 @@ script:
     - ./gradlew install
     - cd ../scalajs-plugin-test/
     - chmod +x gradlew
-    - ./gradlew RunJS -Pclassname=main.scala.Test -Pmethname=print\(\"blabla\"\)
+    - ./gradlew RunJS -Pclassname=main.scala.Test -Pmethname=printSomething\(\"blabla\"\)
     - ./gradlew RunJS -Pclassname=main.scala.ScalaTagTest
     - ./gradlew CleanAll
     - ./gradlew RunJS -PtoExec=main.scala.Test\(\).main\(\)\nmain.scala.ScalaTagTest\(\).main\(\) -PrunFull
