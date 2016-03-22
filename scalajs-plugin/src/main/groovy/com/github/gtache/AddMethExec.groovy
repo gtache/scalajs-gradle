@@ -21,9 +21,16 @@ class AddMethExecTask extends DefaultTask {
      */
     @TaskAction
     def addMethExec() {
-        if (!project.properties.containsKey('classname')) {
-            logger.info('Skipping addMainExec : no classname given')
-        } else {
+        if (project.properties.containsKey('toExec')) {
+            if (srcFile.exists() && srcFile.canWrite()){
+                project.properties.get('toExec').toString().split('\\\\n').each {
+                    println(it)
+                    srcFile.append('\n' + it)
+                }
+            } else {
+                logger.error('Coudln\'t find or write '+srcFile.path)
+            }
+        } else if (project.properties.containsKey('classname')) {
             final def classname = project.properties.get('classname');
             if (srcFile.exists() && srcFile.canWrite()) {
                 String toAdd
@@ -38,6 +45,8 @@ class AddMethExecTask extends DefaultTask {
             } else {
                 logger.error('Couldn\'t find or write ' + srcFile.path)
             }
+        } else {
+            logger.info('Skipping addMainExec : no args given')
         }
     }
 }
