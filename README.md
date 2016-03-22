@@ -36,6 +36,6 @@ You can run the generated javascript file with `gradlew runJS -Pclassname='nameO
 -It will copy and run the fast optimized file by default.  
 RunJS will depend on FastOptJS (default), FullOptJS or NoOptJS accordingly.
 
-Examples : `gradlew runJS -Pclassname=main.scala.Test` will compile everything and run Test().main() (With the scalajs-plugin-test, it should print the square of 10)
+Examples : `gradlew RunJS -Pclassname=main.scala.Test` will compile everything and run Test().main() (With the scalajs-plugin-test, it should print the square of 10)
 
-`gradlew runJS -Pclassname=main.scala.Test -Pmethname=printSomething(\"blabla\") -PrunFull` will compile the fully optimized version of the files and will run Test().printSomething("blabla"), which should print "blabla" with the scalajs-plugin-test project.
+`gradlew RunJS -Pclassname=main.scala.Test -Pmethname=printSomething(\"blabla\") -PrunFull` will compile the fully optimized version of the files and will run Test().printSomething("blabla"), which should print "blabla" with the scalajs-plugin-test project.
