@@ -10,10 +10,11 @@ repositories {
 }
 buildscript {
     repositories {
-        mavenCentral()
+        mavenLocal() //Not needed, used for local testing
+		mavenCentral()
     }
     dependencies {
-        classpath 'com.github.gtache:scalajs-plugin:0.1.0'
+        classpath 'com.github.gtache:scalajs-plugin:0.1.1-SNAPSHOT' //Version in development, the one on Maven Central is 0.1.0
     }
 }
 
