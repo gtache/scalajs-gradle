@@ -12,9 +12,9 @@ buildscript {
     }
 }
 ```
-to use this plugin.
-*Check the build.gradle of scalajs-plugin-test if needed*
-Needs .scala files to be in src/main/scala (or [configure your ScalaCompile](https://docs.gradle.org/current/userguide/scala_plugin.html) task accordingly)
+to use this plugin.    
+*Check the build.gradle of scalajs-plugin-test if needed*    
+Needs .scala files to be in src/main/scala (or [configure your ScalaCompile](https://docs.gradle.org/current/userguide/scala_plugin.html) task accordingly)    
 (Optional) [Node.js](https://nodejs.org/) to run the generated JS file.
 
 ## Added by the plugin
