@@ -54,36 +54,38 @@ artifacts {
     archives javadocJar, groovydocJar, scaladocJar, sourcesJar
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+if(project.hasProperty('upload')) {
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            pom.project {
-                name 'Scala.JS plugin'
-                packaging 'jar'
-                description 'A plugin used to build Scala.js on Gradle.'
-                url 'https://github.com/gtache/scalajs-gradle'
-                licenses {
-                    license {
-                        name 'Scala License'
-                        url 'http://www.scala-lang.org/license.html'
-                    }
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
                 }
 
-                developers {
-                    developer {
-                        id 'gtache'
-                        name 'Guillaume Tâche'
-                        email 'guillaume.tache@hotmail.com'
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                pom.project {
+                    name 'Scala.JS plugin'
+                    packaging 'jar'
+                    description 'A plugin used to build Scala.js on Gradle.'
+                    url 'https://github.com/gtache/scalajs-gradle'
+                    licenses {
+                        license {
+                            name 'Scala License'
+                            url 'http://www.scala-lang.org/license.html'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'gtache'
+                            name 'Guillaume Tâche'
+                            email 'guillaume.tache@hotmail.com'
+                        }
                     }
                 }
             }
