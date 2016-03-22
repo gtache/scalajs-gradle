@@ -13,12 +13,12 @@ script:
     - ./gradlew install
     - cd ../scalajs-plugin-test/
     - chmod +x gradlew
-    - ./gradlew RunJS -Pclassname=main.scala.Test -Pmethname=print(\"blabla\")
+    - ./gradlew RunJS -Pclassname=main.scala.Test -Pmethname=print\(\"blabla\"\)
     - ./gradlew RunJS -Pclassname=main.scala.ScalaTagTest
     - ./gradlew CleanAll
-    - ./gradlew RunJS -PtoExec=main.scala.Test().main()\nmain.scala.ScalaTagTest().main() -PrunFull
+    - ./gradlew RunJS -PtoExec=main.scala.Test\(\).main\(\)\nmain.scala.ScalaTagTest\(\).main\(\) -PrunFull
     - ./gradlew CleanAll
-    - ./gradlew RunJS -PtoExec=main.scala.Test().main() -Pclassname=main.scala.ScalaTagTest -PrunNoOpt
+    - ./gradlew RunJS -PtoExec=main.scala.Test\(\).main\(\) -Pclassname=main.scala.ScalaTagTest -PrunNoOpt
     - ./gradlew CleanAll
 
 before_cache:
