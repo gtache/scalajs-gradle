@@ -16,11 +16,12 @@ import org.scalajs.core.tools.sem._
   */
 object Scalajsld {
 
-  var options: Options = new Options()
+  private var options: Options = new Options()
+  private var optionsChanged: Boolean = false
 
-  var optionsChanged: Boolean = false
-  var linker: Linker = null
-  var cache: IRFileCache#Cache = null
+  //Store linker and cache to gain time
+  private var linker: Linker = null
+  private var cache: IRFileCache#Cache = null
 
   /**
     * Changes the option of the linker
@@ -187,6 +188,10 @@ object Scalajsld {
         this.checkIR, this.stdLib, newLogLevel)
     }
 
+    /**
+      * Returns a string representation of this object
+      * @return a string
+      */
     @Override
     override def toString(): String = {
       "cp : " + cp + "\n" +
@@ -202,6 +207,11 @@ object Scalajsld {
         "logLevel : " + logLevel
     }
 
+    /**
+      * Checks if the options given in argument are the same as this instance
+      * @param that the options to compare
+      * @return true if they are the same, false otherwise
+      */
     def equals(that : Options): Boolean = {
       if (!that.getClass.equals(this.getClass)){
         false
