@@ -47,7 +47,8 @@ public class CompileJSTask extends DefaultTask {
     def exec() {
         FileCollection classpath = project.files(project.buildscript.configurations.getByName('classpath').asPath.split(';'))
         FileCollection cp = classpath + project.configurations.runtime + project.sourceSets.main.runtimeClasspath
-        Scalajsld.Options options = Scalajsld.options().withOutput(destFile).withClasspath(
+        Scalajsld.Options curOptions = Scalajsld.options()
+        Scalajsld.Options options = curOptions.withOutput(destFile).withClasspath(
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
         if (fullOpt) {
             options = options.withFullOpt()
@@ -56,7 +57,7 @@ public class CompileJSTask extends DefaultTask {
         } else {
             options = options.withFastOpt()
         }
-        if (!options.equals(Scalajsld.options())) {
+        if (!options.equals(curOptions)) {
             Scalajsld.setOptions(options)
         }
         Scalajsld.exec()
