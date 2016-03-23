@@ -188,12 +188,6 @@ object Scalajsld {
         this.checkIR, this.stdLib, newLogLevel)
     }
 
-    override def clone() : Options = {
-      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
-        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
-        this.checkIR, this.stdLib, this.logLevel)
-    }
-
     /**
       * Returns a string representation of this object
       * @return a string
