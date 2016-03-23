@@ -56,7 +56,9 @@ public class CompileJSTask extends DefaultTask {
         } else {
             options = options.withFastOpt()
         }
-        Scalajsld.setOptions(options)
+        if (!options.equals(Scalajsld.options())) {
+            Scalajsld.setOptions(options)
+        }
         Scalajsld.exec()
     }
 
