@@ -1,5 +1,4 @@
 language: scala
-language: groovy
 jdk:
     - oraclejdk8
 scala:
@@ -13,8 +12,8 @@ script:
     - ./gradlew install
     - cd ../scalajs-plugin-test/
     - chmod +x gradlew
-	
-    //Testing current development version
+
+    #Testing current development version
     - ./gradlew RunJS -Pclassname="main.scala.Test" -Pmethname="printSomething(\"blabla\")" -Psnapshot
     - ./gradlew RunJS -Pclassname="main.scala.ScalaTagTest" -Psnapshot
     - ./gradlew CleanAll -Psnapshot
@@ -22,8 +21,8 @@ script:
     - ./gradlew CleanAll -Psnapshot
     - ./gradlew RunJS -PtoExec="main.scala.Test().main()" -Pclassname="main.scala.ScalaTagTest" -PrunNoOpt -Psnapshot
     - ./gradlew CleanAll -Psnapshot
-	
-    //Testing current release version
+
+    #Testing current release version
     - ./gradlew RunJS -Pclassname="main.scala.Test" -Pmethname="printSomething(\"blabla\")"
     - ./gradlew CleanAll
     - ./gradlew RunJS -Pclassname="main.scala.ScalaTagTest" -PrunFull
