@@ -2,6 +2,8 @@ package com.github.gtache
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import scala.collection.JavaConverters
@@ -13,6 +15,8 @@ public class CompileJSTask extends DefaultTask {
     final String description = "Compiles all sjsir files into a single javascript file"
     @OutputFile
     File destFile
+    @InputFiles
+    FileCollection srcFiles
     Boolean fullOpt = false
     Boolean noOpt = false
 

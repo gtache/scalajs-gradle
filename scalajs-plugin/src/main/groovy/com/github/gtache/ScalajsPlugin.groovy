@@ -106,6 +106,9 @@ class ScalajsPlugin implements Plugin<Project> {
             tasks.withType(ScalaCompile) {
                 scalaCompileOptions.additionalParameters = ["-Xplugin:" + project.configurations.scalaCompilePlugin.asPath]
             }
+            tasks.withType(CompileJSTask) {
+                it.srcFiles = project.files(project.sourceSets.main.runtimeClasspath)
+            }
             project.logger.info('Xplugin for compiler added')
         }
     }
