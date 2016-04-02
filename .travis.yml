@@ -16,7 +16,7 @@ script:
     - ./gradlew RunJS -Pclassname="main.scala.Test" -Pmethname="printSomething(\"blabla\")"
     - ./gradlew RunJS -Pclassname="main.scala.ScalaTagTest"
     - ./gradlew CleanAll
-    - ./gradlew RunJS -PtoExec="main.scala.Test().main()\nmain.scala.ScalaTagTest().main()" -PrunFull
+    - ./gradlew RunJS -PtoExec="main.scala.ScalaTagTest().main()" -PrunFull
     - ./gradlew CleanAll
     - ./gradlew RunJS -PtoExec="main.scala.Test().main()" -Pclassname="main.scala.ScalaTagTest" -PrunNoOpt
     - ./gradlew CleanAll
