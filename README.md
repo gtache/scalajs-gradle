@@ -36,6 +36,18 @@ You can run the generated javascript file with `gradlew RunJS -Pclassname='nameO
 -It will copy and run the fast optimized file by default.  
 RunJS will depend on FastOptJS (default), FullOptJS or NoOptJS accordingly.
 
-Examples : `gradlew RunJS -Pclassname=main.scala.Test` will compile everything and run Test().main() (With the scalajs-plugin-test, it should print the square of 10)
+Examples : `gradlew RunJS -Pclassname="main.scala.Test"` will compile everything and run Test().main() (With the scalajs-plugin-test, it should print the square of 10)
 
-`gradlew RunJS -Pclassname=main.scala.Test -Pmethname=printSomething(\"blabla\") -PrunFull` will compile the fully optimized version of the files and will run Test().printSomething("blabla"), which should print "blabla" with the scalajs-plugin-test project. *Escape parenthesises or put everything in quotes if needed.*
+`gradlew RunJS -Pclassname="main.scala.Test" -Pmethname="printSomething(\"blabla\")" -PrunFull` will compile the fully optimized version of the files and will run Test().printSomething("blabla"), which should print "blabla" with the scalajs-plugin-test project.
+
+`gradlew RunJS -PtoExec="main.scala.Test().main()"` will compile everything and run Test().main(). -PtoExec overrides -Pclassname.
+
+
+## Changelog    
+###0.1.1    
+-Adds -PtoExec to input directly what to execute.   
+-Linker and Cache are kept alive (should increase speed dramatically). Only works with a gradle daemon.   
+-Fixes a problem with the linker not linking when files are changed.
+
+###0.1.0    
+-First version
