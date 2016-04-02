@@ -11,9 +11,8 @@ import org.gradle.api.tasks.TaskAction
 class AddMethExecTask extends DefaultTask {
     final String description = "Adds the main exec at the end of the js file, given the object name, assuming function to run is \"main\" (default)\n" +
             "Depends on copyJS\n" +
-            "Usage : \"gradlew addMainExec -Pclassname=\'nameOfClass\' -Pmethname=\'nameOfMethod\'"
-    @InputFile
-    @OutputFile
+            "Usage : \"gradlew addMainExec (-Pclassname=\'nameOfClass\' (-Pmethname=\'nameOfMethod\')) || (-PtoExec='...')"
+
     File srcFile
 
     /**
@@ -22,13 +21,10 @@ class AddMethExecTask extends DefaultTask {
     @TaskAction
     def addMethExec() {
         if (project.properties.containsKey('toExec')) {
-            if (srcFile.exists() && srcFile.canWrite()){
-                project.properties.get('toExec').toString().split('\\\\n').each {
-                    println(it)
-                    srcFile.append('\n' + it)
-                }
+            if (srcFile.exists() && srcFile.canWrite()) {
+                srcFile.append('\n' + project.properties.get('toExec'))
             } else {
-                logger.error('Coudln\'t find or write '+srcFile.path)
+                logger.error('Coudln\'t find or write ' + srcFile.path)
             }
         } else if (project.properties.containsKey('classname')) {
             final def classname = project.properties.get('classname');

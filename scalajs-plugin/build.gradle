@@ -1,5 +1,5 @@
 group 'com.github.gtache'
-version '0.1.1-SNAPSHOT'
+version '0.1.1'
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
