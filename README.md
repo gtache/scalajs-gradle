@@ -8,7 +8,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.github.gtache:scalajs-plugin:0.1.0'
+        classpath 'com.github.gtache:scalajs-plugin:0.1.1'
     }
 }
 ```
