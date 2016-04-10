@@ -33,6 +33,10 @@ object Scalajsld {
     optionsChanged = true
   }
 
+  def defaultOptions() : Options = {
+    new Options()
+  }
+
   /**
     * Executes the linker
     */
@@ -190,6 +194,7 @@ object Scalajsld {
 
     /**
       * Returns a string representation of this object
+      *
       * @return a string
       */
     override def toString(): String = {
@@ -208,27 +213,28 @@ object Scalajsld {
 
     /**
       * Checks if the options given in argument are the same as this instance
+      *
       * @param that the options to compare
       * @return true if they are the same, false otherwise
       */
-    def equals(that : Options): Boolean = {
-      if (!that.getClass.equals(this.getClass)){
+    def equals(that: Options): Boolean = {
+      if (!that.getClass.equals(this.getClass)) {
         false
       } else {
         this.cp == that.cp &&
-        this.output == that.output &&
-        this.jsoutput == that.jsoutput &&
-        this.semantics == that.semantics &&
-        this.outputMode == that.outputMode &&
-        this.noOpt == that.noOpt &&
-        this.fullOpt == that.fullOpt &&
-        this.prettyPrint == that.prettyPrint &&
-        this.sourceMap == that.sourceMap &&
-        this.relativizeSourceMap == that.relativizeSourceMap &&
-        this.bypassLinkingErrors == that.bypassLinkingErrors &&
-        this.checkIR == that.checkIR &&
-        this.stdLib == that.stdLib &&
-        this.logLevel == that.logLevel
+          this.output == that.output &&
+          this.jsoutput == that.jsoutput &&
+          this.semantics == that.semantics &&
+          this.outputMode == that.outputMode &&
+          this.noOpt == that.noOpt &&
+          this.fullOpt == that.fullOpt &&
+          this.prettyPrint == that.prettyPrint &&
+          this.sourceMap == that.sourceMap &&
+          this.relativizeSourceMap == that.relativizeSourceMap &&
+          this.bypassLinkingErrors == that.bypassLinkingErrors &&
+          this.checkIR == that.checkIR &&
+          this.stdLib == that.stdLib &&
+          this.logLevel == that.logLevel
       }
     }
 

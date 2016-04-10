@@ -1,4 +1,4 @@
-package com.github.gtache
+package com.github.gtache.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
@@ -13,7 +13,6 @@ class CleanAllTask extends DefaultTask {
     final String description = "Deletes all files given in toDelete."
 
     FileCollection toDelete
-
 
     /**
      * Deletes a file, and if it is a folder, deletes it recursively.

@@ -2,7 +2,7 @@ language: scala
 jdk:
     - oraclejdk8
 scala:
-    - 2.11.7
+    - 2.11.8
 before_install:
     - sudo apt-get -qq update
 
@@ -13,10 +13,10 @@ script:
     - cd ../scalajs-plugin-test/
     - chmod +x gradlew
 
-    - ./gradlew RunJS -Pclassname="main.scala.Test" -Pmethname="printSomething(\"blabla\")"
+    - ./gradlew RunJS -Pclassname="main.scala.Test" -Pmethname="printSomething(\"blabla\")" -Prhino
     - ./gradlew RunJS -Pclassname="main.scala.ScalaTagTest"
     - ./gradlew CleanAll
-    - ./gradlew RunJS -PtoExec="main.scala.ScalaTagTest().main()" -PrunFull
+    - ./gradlew RunJS -PtoExec="main.scala.ScalaTagTest().main()" -PrunFull -Prhino
     - ./gradlew CleanAll
     - ./gradlew RunJS -PtoExec="main.scala.Test().main()" -Pclassname="main.scala.ScalaTagTest" -PrunNoOpt
     - ./gradlew CleanAll
