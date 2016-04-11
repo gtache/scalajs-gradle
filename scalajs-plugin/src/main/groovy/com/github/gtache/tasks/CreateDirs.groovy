@@ -1,4 +1,4 @@
-package com.github.gtache
+package com.github.gtache.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection

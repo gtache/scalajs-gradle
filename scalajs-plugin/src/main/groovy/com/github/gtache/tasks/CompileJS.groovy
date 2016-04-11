@@ -1,11 +1,14 @@
-package com.github.gtache
+package com.github.gtache.tasks
 
+import com.github.gtache.Scalajsld
+import com.github.gtache.Scalajsld$
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.scalajs.core.tools.logging.Level
+import org.scalajs.core.tools.logging.Level$
 import scala.collection.JavaConverters
 
 /**
@@ -52,7 +55,7 @@ public class CompileJSTask extends DefaultTask {
         FileCollection classpath = project.files(project.buildscript.configurations.getByName('classpath').asPath.split(';'))
         FileCollection cp = classpath + project.configurations.runtime + project.sourceSets.main.runtimeClasspath
         Scalajsld.Options curOptions = Scalajsld.options()
-        Scalajsld.Options options = curOptions.withOutput(destFile).withClasspath(
+        Scalajsld.Options options = Scalajsld.defaultOptions().withOutput(destFile).withClasspath(
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
         if (fullOpt) {
             options = options.withFullOpt()
@@ -61,6 +64,24 @@ public class CompileJSTask extends DefaultTask {
         } else {
             options = options.withFastOpt()
         }
+        /* FIXME Error/Warn/Info
+        if (project.hasProperty('loglevel')){
+            switch(project.property('loglevel')){
+                case 'Error' :
+                    options.withLogLevel(Level.Error)
+                    break
+                case 'Warn' :
+                    options.withLogLevel(Level.Warn)
+                    break
+                case 'Info' :
+                    options.withLogLevel(Level.Info)
+                    break
+                default :
+                    break
+            }
+        }
+        println(options.logLevel())
+        */
         if (!options.equals(curOptions)) {
             Scalajsld.setOptions(options)
         }

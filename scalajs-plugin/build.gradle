@@ -1,5 +1,5 @@
 group 'com.github.gtache'
-version '0.1.1'
+version '0.1.2'
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
@@ -17,9 +17,10 @@ repositories {
 dependencies {
     compile gradleApi()
     compile 'org.codehaus.groovy:groovy-all:2.4.4'
-    compile 'org.scala-lang:scala-compiler:2.11.7'
-    compile 'org.scala-lang:scala-library:2.11.7'
-    compile group: 'org.scala-js', name: 'scalajs-tools_2.11', version: '0.6.7'
+    compile 'org.scala-lang:scala-compiler:2.11.8'
+    compile 'org.scala-lang:scala-library:2.11.8'
+    compile group: 'org.scala-js', name: 'scalajs-js-envs_2.11', version: '0.6.8'
+    compile group: 'org.scala-js', name: 'scalajs-tools_2.11', version: '0.6.8'
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
@@ -28,14 +29,14 @@ signing {
     sign configurations.archives
 }
 
-signArchives.onlyIf{project.hasProperty('sign')}
+signArchives.onlyIf { project.hasProperty('sign') }
 
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
     from javadoc
 }
 
-task groovydocJar(type: Jar){
+task groovydocJar(type: Jar) {
     classifier = 'groovydoc'
     from groovydoc
 }
@@ -54,7 +55,7 @@ artifacts {
     archives javadocJar, groovydocJar, scaladocJar, sourcesJar
 }
 
-if(project.hasProperty('upload')) {
+if (project.hasProperty('upload')) {
     uploadArchives {
         repositories {
             mavenDeployer {

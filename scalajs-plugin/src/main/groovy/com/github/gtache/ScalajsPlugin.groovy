@@ -1,5 +1,9 @@
 package com.github.gtache
 
+import com.github.gtache.tasks.CleanAllTask
+import com.github.gtache.tasks.CompileJSTask
+import com.github.gtache.tasks.CreateDirsTask
+import com.github.gtache.tasks.RunJSTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.scala.ScalaCompile
@@ -23,16 +27,13 @@ class ScalajsPlugin implements Plugin<Project> {
             scalaCompilePlugin
         }
         project.logger.info('Adding scalajs-library and scalajs-compiler dependencies')
-        project.dependencies.add('compile', 'org.scala-js:scalajs-library_2.11:0.6.7')
-        project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_2.11.7:0.6.7')
+        project.dependencies.add('compile', 'org.scala-js:scalajs-library_2.11:0.6.8')
+        project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_2.11.8:0.6.8')
         project.logger.info('Dependencies added')
         final def jsDir = project.file('js/')
         final def jsFile = project.file(jsDir.path + '/' + project.name + '.js')
         final def jsFastFile = project.file(jsDir.path + '/' + project.name + '_fastopt.js')
         final def jsFullFile = project.file(jsDir.path + '/' + project.name + '_fullopt.js')
-        final def jsExecFile = project.file(jsDir.path + '/' + project.name + '_exec.js')
-        final def jsFastExecFile = project.file(jsDir.path + '/' + project.name + '_fastopt_exec.js')
-        final def jsFullExecFile = project.file(jsDir.path + '/' + project.name + '_fullopt_exec.js')
 
         final def runNoOpt = project.hasProperty('runNoOpt')
         final def runFull = project.hasProperty('runFull')
@@ -73,32 +74,15 @@ class ScalajsPlugin implements Plugin<Project> {
         fullOptJS.fullOpt()
         project.logger.info('FullOptJS task added')
 
-        final def copyJS = tasks.create('CopyJS', CopyJSTask.class)
-        if (runFull) {
-            copyJS.dependsOn('FullOptJS')
-            copyJS.from(jsFullFile)
-        } else if (runNoOpt) {
-            copyJS.dependsOn('NoOptJS')
-            copyJS.from(jsFile)
-        } else {
-            copyJS.dependsOn('FastOptJS')
-            copyJS.from(jsFastFile)
-        }
-        copyJS.into(jsDir)
-        project.logger.info('CopyJS task added')
-
-        final def addMethExec = tasks.create('AddMethExec', AddMethExecTask.class)
-        addMethExec.dependsOn('CopyJS')
-        addMethExec.srcFile = runFull ? jsFullExecFile : (runNoOpt ? jsExecFile : jsFastExecFile)
-        project.logger.info('AddMethExec task added')
-
         final def runJS = tasks.create('RunJS', RunJSTask.class)
-        runJS.dependsOn('AddMethExec')
-        runJS.toExec = runFull ? jsFullExecFile.absolutePath :
-                (runNoOpt ? jsExecFile.absolutePath : jsFastExecFile.absolutePath)
-        runJS.inferArgs()
-        project.logger.info('RunJS task added')
 
+        if (runFull) {
+            runJS.dependsOn('FullOptJS')
+        } else if (runNoOpt) {
+            runJS.dependsOn('NoOptJS')
+        } else {
+            runJS.dependsOn('FastOptJS')
+        }
         project.logger.info('ScalajsPlugin applied')
 
         project.afterEvaluate {
