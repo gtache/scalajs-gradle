@@ -14,7 +14,7 @@ script:
     - chmod +x gradlew
 
     - ./gradlew RunJS -Pclassname="main.scala.Test" -Pmethname="printSomething(\"blabla\")" -Prhino
-    - ./gradlew RunJS -Pclassname="main.scala.ScalaTagTest"
+    - ./gradlew RunJS -Pclassname="main.scala.ScalaTagTest" -Pphantom
     - ./gradlew CleanAll
     - ./gradlew RunJS -PtoExec="main.scala.ScalaTagTest().main()" -PrunFull -Prhino
     - ./gradlew CleanAll
