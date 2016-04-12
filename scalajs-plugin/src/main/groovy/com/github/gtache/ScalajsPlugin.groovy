@@ -79,7 +79,7 @@ class ScalajsPlugin implements Plugin<Project> {
 
         final def testJS = tasks.create('TestJS', TestJSTask.class)
         project.logger.info('TestJS task added')
-        
+
         project.logger.info('ScalajsPlugin applied')
 
         project.afterEvaluate {

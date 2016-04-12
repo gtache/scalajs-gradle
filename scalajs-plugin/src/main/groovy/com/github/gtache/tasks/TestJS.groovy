@@ -7,10 +7,11 @@ import sbt.testing.TaskDef
 
 
 class TestJSTask extends DefaultTask {
+    final String description="Runs tests"
 
     @TaskAction
     def run(){
-        GradleRunner runner = new GradleRunner()
+        final GradleRunner runner = new GradleRunner()
         runner.tasks(new TaskDef[0])
     }
 }

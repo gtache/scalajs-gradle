@@ -52,8 +52,8 @@ public class CompileJSTask extends DefaultTask {
      */
     @TaskAction
     def run() {
-        Scalajsld.Options curOptions = Scalajsld.options()
-        def options = parseOptions()
+        final def curOptions = Scalajsld.options()
+        final def options = parseOptions()
         if (!options.equals(curOptions)) {
             Scalajsld.setOptions(options)
             logger.debug('Options changed, linker and cache recreated')
@@ -66,9 +66,9 @@ public class CompileJSTask extends DefaultTask {
      * @return The configured options
      */
     private def Scalajsld.Options parseOptions() {
-        FileCollection classpath = project.files(project.buildscript.configurations.getByName('classpath').asPath.split(';'))
-        FileCollection cp = classpath + project.configurations.runtime + project.sourceSets.main.runtimeClasspath
-        Scalajsld.Options options = Scalajsld.defaultOptions().withClasspath(
+        final def classpath = project.files(project.buildscript.configurations.getByName('classpath').asPath.split(';'))
+        final def cp = classpath + project.configurations.runtime + project.sourceSets.main.runtimeClasspath
+        def options = Scalajsld.defaultOptions().withClasspath(
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
 
         if (project.hasProperty('o')) {

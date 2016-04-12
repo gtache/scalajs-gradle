@@ -35,22 +35,22 @@ public class RunJSTask extends DefaultTask {
      */
     @TaskAction
     def run() {
-        JSEnv env = resolveEnv()
-        String toExec = resolveToExec()
-        String path = resolvePath()
-        Level logLevel = resolveLogLevel()
+        final JSEnv env = resolveEnv()
+        final String toExec = resolveToExec()
+        final  String path = resolvePath()
+        final Level logLevel = resolveLogLevel()
 
-        MemVirtualJSFile code = new MemVirtualJSFile("")
-        FileVirtualJSFile file = new FileVirtualJSFile(project.file(path))
-        ResolutionInfo fileI = new ResolutionInfo(
+        final MemVirtualJSFile code = new MemVirtualJSFile("")
+        final FileVirtualJSFile file = new FileVirtualJSFile(project.file(path))
+        final ResolutionInfo fileI = new ResolutionInfo(
                 file.path(),
                 Set$.MODULE$.empty(),
                 List$.MODULE$.empty(),
                 Option.apply(null),
                 Option.apply(null))
-        ResolvedJSDependency fileD = new ResolvedJSDependency(file, Option.apply(null), fileI)
+        final ResolvedJSDependency fileD = new ResolvedJSDependency(file, Option.apply(null), fileI)
         code.content_$eq(toExec)
-        Seq<ResolvedJSDependency> dependencySeq = new ArraySeq<>(1)
+        final Seq<ResolvedJSDependency> dependencySeq = new ArraySeq<>(1)
         dependencySeq.update(0, fileD)
 
         env.jsRunner(dependencySeq, code).run(
@@ -63,7 +63,7 @@ public class RunJSTask extends DefaultTask {
      * @return The level of logging (default : Debug)
      */
     private Level resolveLogLevel() {
-        Level level = Level.Debug$.MODULE$
+        def level = Level.Debug$.MODULE$
         if (project.hasProperty('runLogLevel')) {
             switch (project.property('runLogLevel')) {
                 case 'Error':
@@ -91,7 +91,7 @@ public class RunJSTask extends DefaultTask {
      * @return The code to execute
      */
     private String resolveToExec() {
-        String toExec = null
+        def toExec = null
         if (project.properties.containsKey('toExec')) {
             toExec = project.properties.get('toExec')
         } else if (project.properties.containsKey('classname')) {
