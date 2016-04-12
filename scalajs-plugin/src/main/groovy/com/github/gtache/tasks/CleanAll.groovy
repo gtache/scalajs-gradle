@@ -28,7 +28,7 @@ class CleanAllTask extends DefaultTask {
             if (!file.canWrite()) {
                 logger.info("Couldn't delete file " + file.name + " : File is locked ?")
             } else {
-                Files.delete(file.toPath())
+                Files.deleteIfExists(file.toPath())
             }
         } else {
             logger.info("Couldn't delete file " + file.name + " : File doesn't exist.")
