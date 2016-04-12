@@ -11,7 +11,7 @@ import scala.collection.Seq$
 import scala.collection.immutable.List$
 
 
-public static class Utils {
+public class Utils {
 
     private Utils() {}
 

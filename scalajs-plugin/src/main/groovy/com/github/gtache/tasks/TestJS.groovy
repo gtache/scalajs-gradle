@@ -23,8 +23,8 @@ class TestJSTask extends DefaultTask {
                 ConsoleJSConsole$.MODULE$)
         final ScalaJSRunner runner = framework.runner(new String[0], new String[0], null)
         final Task[] tasks = runner.tasks(new TaskDef[0])
-        for(Task t : tasks){
-            t.execute(null,new Logger[0])
+        for (Task t : tasks) {
+            t.execute(null, new Logger[0])
         }
         framework.runDone()
     }
