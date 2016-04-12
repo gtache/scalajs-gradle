@@ -48,28 +48,19 @@ class ScalajsPlugin implements Plugin<Project> {
         cleanAll.toDelete = project.files(jsDir)
         project.logger.info('CleanAll task added')
 
-        /*
-        final def createDirs = tasks.create('CreateDirs', CreateDirsTask.class)
-        createDirs.toCreate = project.files(jsDir)
-        project.logger.info('CreateDirs task added')
-
-*/
         final def noOptJS = tasks.create('NoOptJS', CompileJSTask.class)
-        //noOptJS.dependsOn('CreateDirs')
         noOptJS.dependsOn('classes')
         noOptJS.destFile = jsFile
         noOptJS.noOpt()
         project.logger.info('NoOptJS task added')
 
         final def fastOptJS = tasks.create('FastOptJS', CompileJSTask.class)
-        //fastOptJS.dependsOn('CreateDirs')
         fastOptJS.dependsOn('classes')
         fastOptJS.destFile = jsFastFile
         fastOptJS.fastOpt()
         project.logger.info('FastOptJS task added')
 
         final def fullOptJS = tasks.create('FullOptJS', CompileJSTask.class)
-        //fullOptJS.dependsOn('CreateDirs')
         fullOptJS.dependsOn('classes')
         fullOptJS.destFile = jsFullFile
         fullOptJS.fullOpt()
