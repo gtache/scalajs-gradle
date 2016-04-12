@@ -39,7 +39,7 @@ class CleanAllTask extends DefaultTask {
      * Main method of the task, simply calls deleteFile on toDelete
      */
     @TaskAction
-    def cleanAll() {
+    def run() {
         if (toDelete != null) {
             toDelete.each { deleteFile(it) }
         }

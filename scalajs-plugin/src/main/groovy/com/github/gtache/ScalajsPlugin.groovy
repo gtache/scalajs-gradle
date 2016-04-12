@@ -3,6 +3,7 @@ package com.github.gtache
 import com.github.gtache.tasks.CleanAllTask
 import com.github.gtache.tasks.CompileJSTask
 import com.github.gtache.tasks.RunJSTask
+import com.github.gtache.tasks.TestJSTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.scala.ScalaCompile
@@ -75,6 +76,10 @@ class ScalajsPlugin implements Plugin<Project> {
         } else {
             runJS.dependsOn('FastOptJS')
         }
+
+        final def testJS = tasks.create('TestJS', TestJSTask.class)
+        project.logger.info('TestJS task added')
+        
         project.logger.info('ScalajsPlugin applied')
 
         project.afterEvaluate {

@@ -51,7 +51,7 @@ public class CompileJSTask extends DefaultTask {
      * Main method of the task, configures and runs Scalajsld
      */
     @TaskAction
-    def exec() {
+    def run() {
         Scalajsld.Options curOptions = Scalajsld.options()
         def options = parseOptions()
         if (!options.equals(curOptions)) {
