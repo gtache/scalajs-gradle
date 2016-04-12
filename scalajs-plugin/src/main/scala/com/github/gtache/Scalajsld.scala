@@ -8,6 +8,7 @@ import org.scalajs.core.tools.linker.Linker
 import org.scalajs.core.tools.linker.backend.{LinkerBackend, OutputMode}
 import org.scalajs.core.tools.linker.frontend.LinkerFrontend
 import org.scalajs.core.tools.logging._
+import org.scalajs.core.tools.sem.CheckedBehavior.Compliant
 import org.scalajs.core.tools.sem._
 
 /**
@@ -33,7 +34,12 @@ object Scalajsld {
     optionsChanged = true
   }
 
-  def defaultOptions() : Options = {
+  /**
+    * Returns the default options
+    *
+    * @return the default options
+    */
+  def defaultOptions(): Options = {
     new Options()
   }
 
@@ -190,6 +196,12 @@ object Scalajsld {
       new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
         this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
         this.checkIR, this.stdLib, newLogLevel)
+    }
+
+    def withCompliantsSemantics(): Options = {
+      new Options(this.cp, this.output, this.jsoutput, this.semantics.withAsInstanceOfs(Compliant), this.outputMode,
+        this.noOpt, this.fullOpt, this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
+        this.checkIR, this.stdLib, this.logLevel)
     }
 
     /**

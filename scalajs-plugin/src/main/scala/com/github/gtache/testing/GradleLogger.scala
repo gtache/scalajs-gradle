@@ -3,7 +3,7 @@ package com.github.gtache.testing
 import sbt.testing.Logger
 
 
-class GradleLogger extends Logger{
+class GradleLogger extends Logger {
   override def ansiCodesSupported(): Boolean = ???
 
   override def warn(msg: String): Unit = ???

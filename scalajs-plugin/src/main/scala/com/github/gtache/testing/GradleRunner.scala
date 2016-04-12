@@ -6,9 +6,10 @@ import sbt.testing.{Runner, Task, TaskDef}
 import scala.collection.concurrent.TrieMap
 
 
-class GradleRunner extends Runner{
-  var master : ComJSRunner = null
+class GradleRunner extends Runner {
   val slaves = TrieMap.empty[Long, ComJSRunner]
+  var master: ComJSRunner = null
+
   override def tasks(taskDefs: Array[TaskDef]): Array[Task] = ???
 
   override def serializeTask(task: Task, serializer: (TaskDef) => String): String = ???
