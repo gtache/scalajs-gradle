@@ -8,7 +8,8 @@ class GradleFramework extends Framework {
 
   override def fingerprints(): Array[Fingerprint] = ???
 
-  override def runner(args: Array[String], remoteArgs: Array[String], testClassLoader: ClassLoader): Runner = ???
+  override def runner(args: Array[String], remoteArgs: Array[String], testClassLoader: ClassLoader): Runner = {
+    new GradleRunner(this, args, remoteArgs)
+  }
 
-  override def slaveRunner(args: Array[String], remoteArgs: Array[String], testClassLoader: ClassLoader, send: (String) => Unit): Runner = ???
 }

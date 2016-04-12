@@ -1,6 +1,6 @@
 package com.github.gtache.tasks
 
-import com.github.gtache.Scalajsld$
+import com.github.gtache.Utils
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.io.FileVirtualJSFile
@@ -11,12 +11,7 @@ import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.logging.ScalaConsoleLogger
 import org.scalajs.jsenv.ConsoleJSConsole$
 import org.scalajs.jsenv.JSEnv
-import org.scalajs.jsenv.nodejs.NodeJSEnv
-import org.scalajs.jsenv.phantomjs.PhantomJSEnv
-import org.scalajs.jsenv.rhino.RhinoJSEnv
 import scala.Option
-import scala.collection.Map$
-import scala.collection.Seq$
 import scala.collection.immutable.List$
 import scala.collection.immutable.Set$
 import scala.collection.mutable.ArraySeq
@@ -35,10 +30,10 @@ public class RunJSTask extends DefaultTask {
      */
     @TaskAction
     def run() {
-        final JSEnv env = resolveEnv()
+        final JSEnv env = Utils.resolveEnv(project)
         final String toExec = resolveToExec()
-        final  String path = resolvePath()
-        final Level logLevel = resolveLogLevel()
+        final String path = resolvePath()
+        final Level logLevel = Utils.resolveLogLevel(project, 'runLogLevel', Level.Debug$.MODULE$)
 
         final MemVirtualJSFile code = new MemVirtualJSFile("")
         final FileVirtualJSFile file = new FileVirtualJSFile(project.file(path))
@@ -59,34 +54,6 @@ public class RunJSTask extends DefaultTask {
     }
 
     /**
-     * Resolves the level of logging, depending on the project properties
-     * @return The level of logging (default : Debug)
-     */
-    private Level resolveLogLevel() {
-        def level = Level.Debug$.MODULE$
-        if (project.hasProperty('runLogLevel')) {
-            switch (project.property('runLogLevel')) {
-                case 'Error':
-                    level = Level.Error$.MODULE$
-                    break
-                case 'Warn':
-                    level = Level.Warn$.MODULE$
-                    break
-                case 'Info':
-                    level = Level.Info$.MODULE$
-                    break
-                case 'Debug':
-                    level = Level.Debug$.MODULE$
-                    break
-                default:
-                    logger.warn("Unknown log level : " + project.property('runLogLevel'))
-                    break
-            }
-        }
-        return level
-    }
-
-    /**
      * Resolves the code to execute, depending on the project properties
      * @return The code to execute
      */
@@ -103,22 +70,6 @@ public class RunJSTask extends DefaultTask {
             }
         }
         return toExec
-    }
-
-    /**
-     * Resolves the environment to use, depending on the project properties
-     * @return The environment to use (Default : Node)
-     */
-    private JSEnv resolveEnv() {
-        def env
-        if (project.hasProperty('rhino')) {
-            env = new RhinoJSEnv(Scalajsld$.MODULE$.options().semantics(), false)
-        } else if (project.hasProperty('phantom')) {
-            env = new PhantomJSEnv("phantomjs", List$.MODULE$.empty(), Map$.MODULE$.empty(), true, null)
-        } else {
-            env = new NodeJSEnv("node", Seq$.MODULE$.empty(), Map$.MODULE$.empty())
-        }
-        return env
     }
 
     /**

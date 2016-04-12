@@ -1,6 +1,7 @@
 package com.github.gtache.tasks
 
 import com.github.gtache.Scalajsld
+import com.github.gtache.Utils
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
@@ -115,30 +116,16 @@ public class CompileJSTask extends DefaultTask {
             options = options.withRelativizeSourceMap(Option.apply(new URI((String) project.property('relativizeSourceMap'))))
         }
 
-        if (project.hasProperty('linkLogLevel')) {
-            switch (project.property('linkLogLevel')) {
-                case 'Error':
-                    options = options.withLogLevel(Level.Error$.MODULE$)
-                    break
-                case 'Warn':
-                    options = options.withLogLevel(Level.Warn$.MODULE$)
-                    break
-                case 'Info':
-                    options = options.withLogLevel(Level.Info$.MODULE$)
-                    break
-                case 'Debug':
-                    options = options.withLogLevel(Level.Debug$.MODULE$)
-                    break
-                default:
-                    logger.warn("Unknown log level : " + project.property('linkLogLevel'))
-                    break
-            }
-        } else if (project.hasProperty('d') || project.hasProperty('debug')) {
-            options = options.withLogLevel(Level.Debug$.MODULE$)
+        Level level = Utils.resolveLogLevel(project, 'linkLogLevel', Level.Info$.MODULE$)
+        if (project.hasProperty('d') || project.hasProperty('debug')) {
+            level = Level.Debug$.MODULE$
         } else if (project.hasProperty('q') || project.hasProperty('quiet')) {
-            options = options.withLogLevel(Level.Warn$.MODULE$)
+            level = Level.Warn$.MODULE$
         } else if (project.hasProperty('qq') || project.hasProperty('really-quiet')) {
-            options = options.withLogLevel(Level.Error$.MODULE$)
+            level = Level.Error$.MODULE$
+        }
+        if (level != Level.Info$.MODULE$) {
+            options = options.withLogLevel(level)
         }
 
         logger.info('Running linker with ' + options.toString())

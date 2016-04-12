@@ -209,7 +209,7 @@ object Scalajsld {
       *
       * @return a string
       */
-    override def toString(): String = {
+    override def toString: String = {
       "cp : " + cp + "\n" +
         "output : " + output + " jsoutput : " + jsoutput + "\n" +
         "semantics : " + semantics + "\n" +
@@ -223,31 +223,43 @@ object Scalajsld {
         "logLevel : " + logLevel
     }
 
-    /**
-      * Checks if the options given in argument are the same as this instance
-      *
-      * @param that the options to compare
-      * @return true if they are the same, false otherwise
-      */
-    def equals(that: Options): Boolean = {
-      if (!that.getClass.equals(this.getClass)) {
-        false
-      } else {
-        this.cp == that.cp &&
-          this.output == that.output &&
-          this.jsoutput == that.jsoutput &&
-          this.semantics == that.semantics &&
-          this.outputMode == that.outputMode &&
-          this.noOpt == that.noOpt &&
-          this.fullOpt == that.fullOpt &&
-          this.prettyPrint == that.prettyPrint &&
-          this.sourceMap == that.sourceMap &&
-          this.relativizeSourceMap == that.relativizeSourceMap &&
-          this.bypassLinkingErrors == that.bypassLinkingErrors &&
-          this.checkIR == that.checkIR &&
-          this.stdLib == that.stdLib &&
-          this.logLevel == that.logLevel
+    override def equals(that: Any): Boolean = {
+      that match {
+        case that: Options => {
+          this.cp == that.cp &&
+            this.output == that.output &&
+            this.jsoutput == that.jsoutput &&
+            this.semantics == that.semantics &&
+            this.outputMode == that.outputMode &&
+            this.noOpt == that.noOpt &&
+            this.fullOpt == that.fullOpt &&
+            this.prettyPrint == that.prettyPrint &&
+            this.sourceMap == that.sourceMap &&
+            this.relativizeSourceMap == that.relativizeSourceMap &&
+            this.bypassLinkingErrors == that.bypassLinkingErrors &&
+            this.checkIR == that.checkIR &&
+            this.stdLib == that.stdLib &&
+            this.logLevel == that.logLevel
+        }
+        case _ => false
       }
+    }
+
+    override def hashCode: Int = {
+      cp.hashCode +
+        2 * output.hashCode +
+        3 * jsoutput.hashCode +
+        5 * semantics.hashCode +
+        7 * outputMode.hashCode +
+        11 * noOpt.hashCode +
+        13 * fullOpt.hashCode +
+        17 * prettyPrint.hashCode +
+        19 * sourceMap.hashCode +
+        23 * relativizeSourceMap.hashCode +
+        29 * bypassLinkingErrors.hashCode +
+        31 * checkIR.hashCode +
+        37 * stdLib.hashCode +
+        41 * logLevel.hashCode
     }
 
   }

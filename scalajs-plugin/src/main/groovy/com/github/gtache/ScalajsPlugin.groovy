@@ -15,6 +15,7 @@ class ScalajsPlugin implements Plugin<Project> {
 
     /**
      * Applies the plugin to the given project
+     * @param project The project it will apply the plugin to
      */
     @Override
     public void apply(Project project) {
