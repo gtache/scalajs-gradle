@@ -45,8 +45,9 @@ Examples : `gradlew RunJS -Pclassname="main.scala.Test"` will compile everything
 
 ## Changelog    
 ###0.1.2 (in development)   
--Adds support for RhinoJS and PhantomJS
--Adds options for the linker
+-Adds support for RhinoJS and PhantomJS    
+-Adds options for the linker    
+-Removes (now) useless tasks    
 ###0.1.1    
 -Adds -PtoExec to input directly what to execute.   
 -Linker and Cache are kept alive (should increase speed dramatically). Only works with a gradle daemon.   
