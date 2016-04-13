@@ -32,7 +32,7 @@ public class RunJSTask extends DefaultTask {
     @TaskAction
     def run() {
         final Tuple2<Boolean, String> toExec = resolveToExec()
-        if (toExec.first == null) {
+        if (toExec.second == null) {
             logger.error('Nothing to execute')
         } else {
             final JSEnv env = Utils.resolveEnv(project)
