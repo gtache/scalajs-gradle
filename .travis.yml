@@ -20,6 +20,9 @@ script:
     - ./gradlew CleanAll
     - ./gradlew RunJS -PtoExec="main.scala.Test().main()" -Pclassname="main.scala.ScalaTagTest" -PrunNoOpt
     - ./gradlew CleanAll
+    - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js" -PrunFull -Pphantom
+    - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js" -PrunNoOpt -Prhino
+    - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js"
 
 
 before_cache:

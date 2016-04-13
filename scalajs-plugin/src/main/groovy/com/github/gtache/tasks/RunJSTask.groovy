@@ -5,6 +5,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.io.FileVirtualJSFile
 import org.scalajs.core.tools.io.MemVirtualJSFile
+import org.scalajs.core.tools.io.VirtualJSFile
 import org.scalajs.core.tools.jsdep.ResolutionInfo
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.logging.Level
@@ -30,46 +31,61 @@ public class RunJSTask extends DefaultTask {
      */
     @TaskAction
     def run() {
-        final JSEnv env = Utils.resolveEnv(project)
-        final String toExec = resolveToExec()
-        final String path = resolvePath()
-        final Level logLevel = Utils.resolveLogLevel(project, 'runLogLevel', Level.Debug$.MODULE$)
+        final Tuple2<Boolean, String> toExec = resolveToExec()
+        if (toExec.first == null) {
+            logger.error('Nothing to execute')
+        } else {
+            final JSEnv env = Utils.resolveEnv(project)
+            final String path = resolvePath()
+            final Level logLevel = Utils.resolveLogLevel(project, 'runLogLevel', Level.Debug$.MODULE$)
 
-        final MemVirtualJSFile code = new MemVirtualJSFile("")
-        final FileVirtualJSFile file = new FileVirtualJSFile(project.file(path))
-        final ResolutionInfo fileI = new ResolutionInfo(
-                file.path(),
-                Set$.MODULE$.empty(),
-                List$.MODULE$.empty(),
-                Option.apply(null),
-                Option.apply(null))
-        final ResolvedJSDependency fileD = new ResolvedJSDependency(file, Option.apply(null), fileI)
-        code.content_$eq(toExec)
-        final Seq<ResolvedJSDependency> dependencySeq = new ArraySeq<>(1)
-        dependencySeq.update(0, fileD)
+            VirtualJSFile code
+            if (toExec.first) {
+                code = new FileVirtualJSFile(project.file(toExec.second))
+            } else {
+                code = new MemVirtualJSFile("")
+                code.content_$eq(toExec.second)
+            }
 
-        env.jsRunner(dependencySeq, code).run(
-                new ScalaConsoleLogger(logLevel),
-                ConsoleJSConsole$.MODULE$)
+            final FileVirtualJSFile file = new FileVirtualJSFile(project.file(path))
+            final ResolutionInfo fileI = new ResolutionInfo(
+                    file.path(),
+                    Set$.MODULE$.empty(),
+                    List$.MODULE$.empty(),
+                    Option.apply(null),
+                    Option.apply(null))
+            final ResolvedJSDependency fileD = new ResolvedJSDependency(file, Option.apply(null), fileI)
+            final Seq<ResolvedJSDependency> dependencySeq = new ArraySeq<>(1)
+            dependencySeq.update(0, fileD)
+
+            logger.info('Running env '+env.name()+' with code '+code.name()+' and dependency ' +dependencySeq)
+            env.jsRunner(dependencySeq, code).run(
+                    new ScalaConsoleLogger(logLevel),
+                    ConsoleJSConsole$.MODULE$)
+        }
     }
 
     /**
      * Resolves the code to execute, depending on the project properties
      * @return The code to execute
      */
-    private String resolveToExec() {
+    private Tuple2<Boolean, String> resolveToExec() {
         def toExec = null
-        if (project.properties.containsKey('toExec')) {
-            toExec = project.properties.get('toExec')
-        } else if (project.properties.containsKey('classname')) {
-            final def classname = project.properties.get('classname');
-            if (!project.properties.containsKey('methname')) {
+        def isFile = false
+        if (project.hasProperty('fileToExec')) {
+            toExec = project.property('fileToExec')
+            isFile = true
+        } else if (project.hasProperty('toExec')) {
+            toExec = project.property('toExec')
+        } else if (project.hasProperty('classname')) {
+            final def classname = project.property('classname');
+            if (!project.hasProperty('methname')) {
                 toExec = classname + '().main()'
             } else {
-                toExec = classname + '().' + project.properties.get('methname')
+                toExec = classname + '().' + project.property('methname')
             }
         }
-        return toExec
+        return new Tuple(isFile, toExec)
     }
 
     /**

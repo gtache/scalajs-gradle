@@ -51,7 +51,7 @@ object Scalajsld {
     val irContainers = IRFileCache.IRContainer.fromClasspath(classpath)
     val logger = new ScalaConsoleLogger(options.logLevel)
     val outFile = WritableFileVirtualJSFile(options.output)
-    if (optionsChanged || linker == null || cache == null) {
+    if (optionsChanged || linker == null) {
       val semantics: Semantics =
         if (options.fullOpt) options.semantics.optimized
         else options.semantics
@@ -68,8 +68,9 @@ object Scalajsld {
         useClosureCompiler = options.fullOpt,
         frontendConfig, backendConfig)
 
-      cache = (new IRFileCache).newCache
-
+      if(cache==null) {
+        cache = (new IRFileCache).newCache
+      }
       optionsChanged = false
     }
     linker.link(cache.cached(irContainers), outFile, logger)

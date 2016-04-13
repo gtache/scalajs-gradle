@@ -57,7 +57,7 @@ public class CompileJSTask extends DefaultTask {
         final def options = parseOptions()
         if (!options.equals(curOptions)) {
             Scalajsld.setOptions(options)
-            logger.debug('Options changed, linker and cache recreated')
+            logger.debug('Options changed, linker recreated')
         }
         Scalajsld.exec()
     }
