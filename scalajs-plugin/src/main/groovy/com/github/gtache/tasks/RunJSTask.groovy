@@ -6,15 +6,11 @@ import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.io.FileVirtualJSFile
 import org.scalajs.core.tools.io.MemVirtualJSFile
 import org.scalajs.core.tools.io.VirtualJSFile
-import org.scalajs.core.tools.jsdep.ResolutionInfo
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.logging.ScalaConsoleLogger
 import org.scalajs.jsenv.ConsoleJSConsole$
 import org.scalajs.jsenv.JSEnv
-import scala.Option
-import scala.collection.immutable.List$
-import scala.collection.immutable.Set$
 import scala.collection.mutable.ArraySeq
 import scala.collection.mutable.Seq
 
@@ -43,22 +39,16 @@ public class RunJSTask extends DefaultTask {
             if (toExec.first) {
                 code = new FileVirtualJSFile(project.file(toExec.second))
             } else {
-                code = new MemVirtualJSFile("")
+                code = new MemVirtualJSFile("userInputCode.js")
                 code.content_$eq(toExec.second)
             }
 
             final FileVirtualJSFile file = new FileVirtualJSFile(project.file(path))
-            final ResolutionInfo fileI = new ResolutionInfo(
-                    file.path(),
-                    Set$.MODULE$.empty(),
-                    List$.MODULE$.empty(),
-                    Option.apply(null),
-                    Option.apply(null))
-            final ResolvedJSDependency fileD = new ResolvedJSDependency(file, Option.apply(null), fileI)
+            final ResolvedJSDependency fileD = ResolvedJSDependency.minimal(file)
             final Seq<ResolvedJSDependency> dependencySeq = new ArraySeq<>(1)
             dependencySeq.update(0, fileD)
 
-            logger.info('Running env '+env.name()+' with code '+code.name()+' and dependency ' +dependencySeq)
+            logger.info('Running env ' + env.name() + ' with code ' + code.name() + ' and dependency ' + dependencySeq)
             env.jsRunner(dependencySeq, code).run(
                     new ScalaConsoleLogger(logLevel),
                     ConsoleJSConsole$.MODULE$)

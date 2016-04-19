@@ -22,7 +22,8 @@ dependencies {
     compile group: 'org.scala-js', name: 'scalajs-sbt-test-adapter_2.11', version: '0.6.8'
     compile group: 'org.scala-js', name: 'scalajs-js-envs_2.11', version: '0.6.8'
     compile group: 'org.scala-js', name: 'scalajs-tools_2.11', version: '0.6.8'
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'com.google.guava', name: 'guava', version: '19.0'
 }
 
 signing {

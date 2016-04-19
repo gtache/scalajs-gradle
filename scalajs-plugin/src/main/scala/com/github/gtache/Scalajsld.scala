@@ -68,7 +68,7 @@ object Scalajsld {
         useClosureCompiler = options.fullOpt,
         frontendConfig, backendConfig)
 
-      if(cache==null) {
+      if (cache == null) {
         cache = (new IRFileCache).newCache
       }
       optionsChanged = false

@@ -1,32 +1,42 @@
 package com.github.gtache.tasks
 
 import com.github.gtache.Utils
+import com.github.gtache.testing.ClassScanner
+import com.github.gtache.testing.ScalaJSEventHandler$
+import com.github.gtache.testing.ScalaJSTestStatus$
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.logging.Level
+import org.scalajs.core.tools.logging.ScalaConsoleLogger
+import org.scalajs.jsenv.ComJSEnv
 import org.scalajs.jsenv.ConsoleJSConsole$
 import org.scalajs.testadapter.ScalaJSFramework
-import org.scalajs.testadapter.ScalaJSRunner
-import sbt.testing.Logger
-import sbt.testing.Task
-import sbt.testing.TaskDef
+import sbt.testing.*
 
 class TestJSTask extends DefaultTask {
     final String description = "Runs tests"
 
     @TaskAction
     def run() {
-        final ScalaJSFramework framework = new ScalaJSFramework(
+        final Framework framework = new ScalaJSFramework(
                 "ScalaJS Testing framework",
-                Utils.resolveEnv(project),
-                Utils.resolveLogLevel(project, 'testLogLevel', Level.Debug$.MODULE$),
+                (ComJSEnv) Utils.resolveEnv(project),
+                new ScalaConsoleLogger(Utils.resolveLogLevel(project, 'testLogLevel', Level.Debug$.MODULE$)),
                 ConsoleJSConsole$.MODULE$)
-        final ScalaJSRunner runner = framework.runner(new String[0], new String[0], null)
-        final Task[] tasks = runner.tasks(new TaskDef[0])
+        final Runner runner = framework.runner(new String[0], new String[0], null)
+        final URLClassLoader classL = new URLClassLoader(project.buildDir.toURI().toURL())
+        final Task[] tasks = runner.tasks(ClassScanner.scan(classL, framework.fingerprints()))
+        final EventHandler eventHandler = ScalaJSEventHandler$.MODULE$
+        final ScalaJSTestStatus$ memory = ScalaJSTestStatus$.MODULE$
+        memory.runner_$eq(runner)
+        println("Framework : " + framework)
+        println("Runner : " + runner)
+        println("URLClassLoader : " + classL)
+        println("Tasks : " + tasks)
         for (Task t : tasks) {
-            t.execute(null, new Logger[0])
+            t.execute(eventHandler, [framework.logger()] as Logger[])
+            memory.all_$eq(memory.all() + t)
         }
-        framework.runDone()
     }
 
 

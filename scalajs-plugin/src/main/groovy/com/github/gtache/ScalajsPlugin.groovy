@@ -70,16 +70,18 @@ class ScalajsPlugin implements Plugin<Project> {
 
         final def runJS = tasks.create('RunJS', RunJSTask.class)
 
-        if (runFull) {
-            runJS.dependsOn('FullOptJS')
-        } else if (runNoOpt) {
-            runJS.dependsOn('NoOptJS')
-        } else {
-            runJS.dependsOn('FastOptJS')
-        }
-
         final def testJS = tasks.create('TestJS', TestJSTask.class)
         testJS.dependsOn('testClasses')
+        if (runFull) {
+            testJS.dependsOn('FullOptJS')
+            runJS.dependsOn('FullOptJS')
+        } else if (runNoOpt) {
+            testJS.dependsOn('NoOptJS')
+            runJS.dependsOn('NoOptJS')
+        } else {
+            testJS.dependsOn('FastOptJS')
+            runJS.dependsOn('FastOptJS')
+        }
         project.logger.info('TestJS task added')
 
         project.logger.info('ScalajsPlugin applied')

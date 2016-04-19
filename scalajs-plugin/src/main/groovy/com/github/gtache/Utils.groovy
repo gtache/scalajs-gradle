@@ -1,6 +1,7 @@
 package com.github.gtache
 
 import org.gradle.api.Project
+import org.scalajs.core.tools.linker.backend.OutputMode
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.jsenv.JSEnv
 import org.scalajs.jsenv.nodejs.NodeJSEnv
@@ -60,5 +61,17 @@ public class Utils {
             env = new NodeJSEnv("node", Seq$.MODULE$.empty(), Map$.MODULE$.empty())
         }
         return env
+    }
+
+    public static OutputMode getOutputMode(String s) {
+        if (s == "ECMAScript51Global") {
+            return OutputMode.ECMAScript51Global$.MODULE$
+        } else if (s == "ECMAScript51Isolated") {
+            return OutputMode.ECMAScript51Isolated$.MODULE$
+        } else if (s == "ECMAScript6") {
+            return OutputMode.ECMAScript6$.MODULE$
+        } else {
+            return null
+        }
     }
 }

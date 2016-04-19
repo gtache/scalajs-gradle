@@ -101,9 +101,21 @@ public class CompileJSTask extends DefaultTask {
         }
 
         if (project.hasProperty('m')) {
-            options = options.withOutputMode((OutputMode) project.property('m'))
+            String modeS = project.property('m')
+            OutputMode mode = Utils.getOutputMode(modeS)
+            if (mode != null) {
+                options = options.withOutputMode(mode)
+            } else {
+                logger.error("Unknown outputMode")
+            }
         } else if (project.hasProperty('outputMode')) {
-            options = options.withOutputMode((OutputMode) project.property('outputMode'))
+            String modeS = project.property('outputMode')
+            OutputMode mode = Utils.getOutputMode(modeS)
+            if (mode != null) {
+                options = options.withOutputMode(mode)
+            } else {
+                logger.error("Unknown outputMode")
+            }
         }
 
         if (project.hasProperty('c') || project.hasProperty('checkIR')) {
