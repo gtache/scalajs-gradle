@@ -1,10 +1,10 @@
 package com.github.gtache.testing
 
+import java.lang.annotation.Annotation
 import java.net.{URL, URLClassLoader}
 import java.nio.file.Paths
 
-import org.scalatools.testing.Fingerprint
-import sbt.testing.{AnnotatedFingerprint, SubclassFingerprint, TaskDef}
+import sbt.testing.{AnnotatedFingerprint, Fingerprint, SubclassFingerprint, TaskDef}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -18,10 +18,13 @@ object ClassScanner {
         c.getName == fName || c.getSimpleName == fName || c.getCanonicalName == fName
       }
 
-      var sC = c.getSuperclass
       val fName = sF.superclassName()
+      if (checkName(c,fName)){
+        return true
+      }
+      var sC = c.getSuperclass
       while (sC != null) {
-        if (checkName(c, fName)) {
+        if (checkName(sC, fName)) {
           return true
         } else {
           sC = sC.getSuperclass
@@ -36,7 +39,7 @@ object ClassScanner {
       fingerprints.foreach {
         case aF: AnnotatedFingerprint => {
           try {
-            if (c.isAnnotationPresent(Class.forName(aF.annotationName()).asInstanceOf)) {
+            if (c.isAnnotationPresent(Class.forName(aF.annotationName()).asInstanceOf[Class[_ <: Annotation]])) {
               buffer += new TaskDef(c.getCanonicalName, aF, false, Array.empty)
             }
           } catch {
@@ -62,7 +65,15 @@ object ClassScanner {
     val buffer = ArrayBuffer.empty[Class[_]]
     def parseClasses(url: URL): Array[Class[_]] = {
       val f = Paths.get(url.toURI).toFile
+      val packageName = {
+        if (url != classL.getURLs()(0)) {
+          classL.getURLs()(0).toURI.relativize(url.toURI).toString.replace('/','.')
+        } else {
+          ""
+        }
+      }
       if (f.isDirectory) {
+
         /*
         f.listFiles().flatMap(file => {
           if (!file.isDirectory && file.getName.endsWith(".class")) {
@@ -78,8 +89,8 @@ object ClassScanner {
         val buffer = ArrayBuffer.empty[Class[_]]
         f.listFiles().foreach(file => {
           if (!file.isDirectory && file.getName.endsWith(".class")) {
-            val path = file.getPath
-            buffer += classL.loadClass(path.substring(0, path.indexOf('.')))
+            val name = file.getName
+            buffer += classL.loadClass(packageName+name.substring(0, name.indexOf('.')))
           } else if (file.isDirectory) {
             parseClasses(file.toURI.toURL).foreach(c => {
               buffer += c
@@ -89,8 +100,8 @@ object ClassScanner {
         buffer.toArray
       } else {
         if (f.getName.endsWith(".class")) {
-          val path = f.getPath
-          Array(classL.loadClass(path.substring(0, path.indexOf('.'))))
+          val name = f.getName
+          Array(classL.loadClass(packageName+name.substring(0, name.indexOf('.'))))
         } else {
           Array.empty[Class[_]]
         }
@@ -98,11 +109,10 @@ object ClassScanner {
     }
 
     classL.getURLs.foreach(url => {
-      println(url.toString)
       val f = Paths.get(url.toURI).toFile
       if (!f.isDirectory && f.getName.endsWith(".class")) {
-        val path = f.getPath
-        buffer += classL.loadClass(path.substring(0, path.indexOf('.')))
+        val name = f.getName
+        buffer += classL.loadClass(name.substring(0, name.indexOf('.')))
       } else if (f.isDirectory) {
         parseClasses(url).foreach(c => {
           buffer += c

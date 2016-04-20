@@ -101,6 +101,12 @@ if (project.hasProperty('upload')) {
     }
 }
 
+task copyTestResources(type: Copy) {
+    from "${projectDir}/src/test/resources"
+    into "${buildDir}/classes/test"
+}
+processTestResources.dependsOn('copyTestResources')
+
 tasks.getByName('compileGroovy').dependsOn('compileScala')
 
 task wrapper(type: Wrapper) {
