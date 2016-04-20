@@ -5,12 +5,12 @@ scala:
     - 2.11.8
 before_install:
     - sudo apt-get -qq update
-
+    
 script: 
     - cd ./scalajs-plugin/
     - chmod +x gradlew
     - ./gradlew install
-    - ./gradlew build
+    - travis_wait 50 ./gradlew build
     - cd ../scalajs-plugin-test/
     - chmod +x gradlew
 
