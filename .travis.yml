@@ -10,6 +10,7 @@ script:
     - cd ./scalajs-plugin/
     - chmod +x gradlew
     - ./gradlew install
+    - ./gradlew build
     - cd ../scalajs-plugin-test/
     - chmod +x gradlew
 

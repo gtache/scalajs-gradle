@@ -52,6 +52,7 @@ class PluginTest extends GroovyTestCase {
         }
 
     }
+    
 
     @Test
     public void testTasksPluginsDependenciesAdded() {
