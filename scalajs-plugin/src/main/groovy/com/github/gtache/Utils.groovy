@@ -12,9 +12,8 @@ import org.scalajs.jsenv.rhino.RhinoJSEnv
 import scala.collection.Map$
 import scala.collection.Seq$
 import scala.collection.immutable.List$
-import scala.collection.mutable.Seq
 import scala.collection.mutable.ArraySeq
-
+import scala.collection.mutable.Seq
 
 public class Utils {
 
@@ -73,11 +72,12 @@ public class Utils {
      * @return the outputMode, or null
      */
     public static OutputMode getOutputMode(String s) {
-        if (s == "ECMAScript51Global") {
+        String toCompare = s.toLowerCase()
+        if (toCompare == "ecmascript51global") {
             return OutputMode.ECMAScript51Global$.MODULE$
-        } else if (s == "ECMAScript51Isolated") {
+        } else if (toCompare == "ecmascript51isolated") {
             return OutputMode.ECMAScript51Isolated$.MODULE$
-        } else if (s == "ECMAScript6") {
+        } else if (toCompare == "ecmascript6") {
             return OutputMode.ECMAScript6$.MODULE$
         } else {
             return null
@@ -104,7 +104,7 @@ public class Utils {
         return path
     }
 
-    public static Seq getMinimalDependencySeq(Project project){
+    public static Seq getMinimalDependencySeq(Project project) {
         final FileVirtualJSFile file = new FileVirtualJSFile(project.file(resolvePath(project)))
         final ResolvedJSDependency fileD = ResolvedJSDependency.minimal(file)
         final Seq<ResolvedJSDependency> dependencySeq = new ArraySeq<>(1)

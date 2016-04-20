@@ -17,7 +17,7 @@ object ClassScanner {
     * @param fingerprints The fingerprints to
     * @return The TaskDefs found by the scan
     */
-  def scan(classL: URLClassLoader, fingerprints: Array[Fingerprint], explicitelySpecified : Array[String] = Array.empty): Array[TaskDef] = {
+  def scan(classL: URLClassLoader, fingerprints: Array[Fingerprint], explicitelySpecified: Array[String] = Array.empty): Array[TaskDef] = {
 
     def checkSuperclasses(c: Class[_], sF: SubclassFingerprint): Boolean = {
 
@@ -110,7 +110,7 @@ object ClassScanner {
           if (!file.isDirectory && file.getName.endsWith(".class")) {
             val name = file.getName
             println(url)
-            println(packageName + name.substring(0,name.indexOf('.')))
+            println(packageName + name.substring(0, name.indexOf('.')))
             buffer += classL.loadClass(packageName + name.substring(0, name.indexOf('.')))
           } else if (file.isDirectory) {
             parseClasses(file.toURI.toURL).foreach(c => {

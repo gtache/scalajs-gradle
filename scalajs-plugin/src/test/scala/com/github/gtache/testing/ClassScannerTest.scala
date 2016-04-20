@@ -67,17 +67,17 @@ class C extends B
 @ToTest
 class D
 
-class E(s : String) extends A {
+class E(s: String) extends A {
 
 }
 
 @ToTest
-class F(s : String) extends A {
+class F(s: String) extends A {
 
 }
 
-class G(s : String)
+class G(s: String)
 
-class H(s : String, i : Int) extends G(s)
+class H(s: String, i: Int) extends G(s)
 
 class I

@@ -6,7 +6,6 @@ import com.github.gtache.testing.ScalaJSEventHandler$
 import com.github.gtache.testing.ScalaJSTestStatus$
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
-import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.logging.ScalaConsoleLogger
 import org.scalajs.jsenv.ComJSEnv

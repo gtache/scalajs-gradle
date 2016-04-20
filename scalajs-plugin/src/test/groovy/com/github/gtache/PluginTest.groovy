@@ -4,33 +4,32 @@ import com.github.gtache.tasks.CompileJSTask
 import com.google.common.collect.Sets
 import org.gradle.api.Project
 import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
-import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Test
 import org.scalajs.core.tools.logging.Level
 
 class PluginTest extends GroovyTestCase {
-    Project proj
+    Project project
 
     @Test
     public void testAllConfigurations() {
         def optionsList = [
-                "-Po=js2/js.js",
-                "-Poutput=js2/js2.js",
-                "-Pp",
-                "-PprettyPrint",
-                "-Ps",
-                "-PsourceMap",
-                "-PcompliantAsInstanceOfs",
-                "-Pm",
-                "-PoutputMode=ECMAScript6",
-                "-Pc",
-                "-PcheckIR",
-                //"-Pr",
-                //"-PrelativizeSourceMap",
-                "-PlinkLogLevel=Debug",
-                "-Pd",
-                "-Pq",
-                "-Pqq"
+                "o=js2/js.js",
+                "output=js2/js2.js",
+                "p",
+                "prettyPrint",
+                "s",
+                "sourceMap",
+                "compliantAsInstanceOfs",
+                "m",
+                "outputMode=ECMAScript6",
+                "c",
+                "checkIR",
+                //"r",
+                //"relativizeSourceMap",
+                "linkLogLevel=Debug",
+                "d",
+                "q",
+                "qq"
         ]
         def ret = Sets.powerSet(optionsList.toSet())
         ret.each {
@@ -39,18 +38,18 @@ class PluginTest extends GroovyTestCase {
     }
 
     private void checkProperties(Set<String> p) {
-        proj = getFreshProject()
-        println(p.size())
+        project = TestUtils.getFreshProject()
+        TestUtils.addDummyScalaJSFile(project)
         p.each {
             if (it.contains('=')) {
                 def res = it.split("=")
-                proj.setProperty(res[0], res[1])
+                TestUtils.setProperty(project, res[0], res[1])
             } else {
-                proj.setProperty(it, true)
+                TestUtils.setProperty(project, it)
             }
         }
-        proj.pluginManager.apply("scalajs-plugin")
-        ((CompileJSTask) proj.tasks.getByName("FastOptJS")).run()
+        TestUtils.applyPlugin(project)
+        ((CompileJSTask) project.tasks.getByName("FastOptJS")).run()
         p.each {
             checkProperty(it, p)
         }
@@ -60,11 +59,11 @@ class PluginTest extends GroovyTestCase {
         def options = Scalajsld$.MODULE$.options()
         switch (s) {
             case 'o':
-                assertEquals(options.output().path, proj.file(proj.property(s)).path)
+                assertEquals(options.output().path, project.file(project.property(s)).path)
                 break
             case 'output':
                 if (!p.contains('o')) {
-                    assertEquals(options.output().path, proj.file(proj.property(s)).path)
+                    assertEquals(options.output().path, project.file(project.property(s)).path)
                 }
                 break
             case 'p':
@@ -79,11 +78,11 @@ class PluginTest extends GroovyTestCase {
                 //TODO
                 break
             case 'm':
-                assertEquals(options.outputMode(), Utils.getOutputMode((String) proj.property(s)))
+                assertEquals(options.outputMode(), Utils.getOutputMode((String) project.property(s)))
                 break
             case 'outputMode':
                 if (!p.contains('m')) {
-                    assertEquals(options.outputMode(), Utils.getOutputMode((String) proj.property(s)))
+                    assertEquals(options.outputMode(), Utils.getOutputMode((String) project.property(s)))
                 }
                 break
             case 'c':
@@ -99,7 +98,7 @@ class PluginTest extends GroovyTestCase {
             case 'linkLogLevel':
                 if (!(p.contains('q') || p.contains('qq') || p.contains('d') ||
                         p.contains('quiet') || p.contains('really-quiet') || p.contains('debug'))) {
-                    assertEquals(Utils.resolveLogLevel(proj, (String) proj.property('linkLogLevel'), Level.Info$.MODULE$),
+                    assertEquals(Utils.resolveLogLevel(project, (String) project.property('linkLogLevel'), Level.Info$.MODULE$),
                             options.logLevel())
                 }
                 break
@@ -120,15 +119,15 @@ class PluginTest extends GroovyTestCase {
                     assertEquals(Level.Error$.MODULE$, options.logLevel())
                 }
                 break
-            default :
+            default:
                 break
         }
     }
 
     @Test
     public void testTasksPluginsDependenciesAdded() {
-        proj = getFreshProject()
-        proj.pluginManager.apply("scalajs-plugin")
+        project = TestUtils.getFreshProject()
+        TestUtils.applyPlugin(project)
         def allTasks = [
                 "TestJS",
                 "FastOptJS",
@@ -138,7 +137,7 @@ class PluginTest extends GroovyTestCase {
                 "CleanAll"
         ]
         allTasks.each {
-            assertTrue(proj.tasks.findByPath(it) != null)
+            assertTrue(project.tasks.findByPath(it) != null)
         }
 
         def plugins = [
@@ -148,12 +147,12 @@ class PluginTest extends GroovyTestCase {
         ]
 
         plugins.each {
-            assertTrue(proj.plugins.findPlugin(it) != null)
+            assertTrue(project.plugins.findPlugin(it) != null)
         }
 
         def libDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-library_2.11', '0.6.8')
         def compDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-compiler_2.11.8', '0.6.8')
-        def compileIt = proj.configurations.getByName('compile').dependencies.iterator()
+        def compileIt = project.configurations.getByName('compile').dependencies.iterator()
         def libDepFound = false
         while (compileIt.hasNext() && !libDepFound) {
             def dep = compileIt.next()
@@ -161,7 +160,7 @@ class PluginTest extends GroovyTestCase {
                 libDepFound = true
             }
         }
-        def scalaCompileIt = proj.configurations.getByName('scalaCompilePlugin').dependencies.iterator()
+        def scalaCompileIt = project.configurations.getByName('scalaCompilePlugin').dependencies.iterator()
         def compileDepFound = false
         while (scalaCompileIt.hasNext() && !compileDepFound) {
             def dep = scalaCompileIt.next()
