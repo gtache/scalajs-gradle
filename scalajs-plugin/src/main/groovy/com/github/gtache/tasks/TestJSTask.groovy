@@ -6,7 +6,6 @@ import com.github.gtache.testing.ScalaJSEventHandler$
 import com.github.gtache.testing.ScalaJSTestStatus$
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
-import org.scalajs.core.tools.io.FileVirtualJSFile
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.logging.ScalaConsoleLogger
@@ -14,7 +13,6 @@ import org.scalajs.jsenv.ComJSEnv
 import org.scalajs.jsenv.ConsoleJSConsole$
 import org.scalajs.testadapter.ScalaJSFramework
 import sbt.testing.*
-import scala.collection.mutable.ArraySeq
 import scala.collection.mutable.Seq
 
 class TestJSTask extends DefaultTask {
@@ -25,9 +23,7 @@ class TestJSTask extends DefaultTask {
      */
     @TaskAction
     def run() {
-        final Seq dependencySeq = Utils.getMinimalDependecySeq(project)
-        println(((ResolvedJSDependency) dependencySeq.apply(0)).lib().name())
-        println(((ResolvedJSDependency) dependencySeq.apply(0)).lib().content())
+        final Seq dependencySeq = Utils.getMinimalDependencySeq(project)
         final def libEnv = (ComJSEnv) Utils.resolveEnv(project).loadLibs(dependencySeq)
         final Framework framework = new ScalaJSFramework(
                 "ScalaJS Testing framework",

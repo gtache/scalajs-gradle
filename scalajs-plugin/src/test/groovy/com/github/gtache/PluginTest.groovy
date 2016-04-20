@@ -11,34 +11,6 @@ import org.scalajs.core.tools.logging.Level
 class PluginTest extends GroovyTestCase {
     Project proj
 
-    public static Project getFreshProject() {
-        Project proj
-        proj = ProjectBuilder.builder().build()
-
-        proj.buildscript {
-            repositories {
-                mavenLocal()
-                mavenCentral()
-            }
-            dependencies {
-                classpath 'com.github.gtache:scalajs-plugin:0.1.2'
-            }
-        }
-        proj.repositories {
-            mavenCentral()
-        }
-        proj.plugins.apply('java')
-        proj.dependencies {
-            compile 'org.scala-lang:scala-compiler:2.11.8'
-            compile 'org.scala-lang:scala-library:2.11.8'
-            compile group: 'org.scala-js', name: 'scalajs-sbt-test-adapter_2.11', version: '0.6.8'
-            compile group: 'org.scala-js', name: 'scalajs-js-envs_2.11', version: '0.6.8'
-            compile group: 'org.scala-js', name: 'scalajs-tools_2.11', version: '0.6.8'
-        }
-        proj.plugins.apply('scala')
-        return proj
-    }
-
     @Test
     public void testAllConfigurations() {
         def optionsList = [

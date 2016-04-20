@@ -6,13 +6,10 @@ import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.io.FileVirtualJSFile
 import org.scalajs.core.tools.io.MemVirtualJSFile
 import org.scalajs.core.tools.io.VirtualJSFile
-import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.logging.ScalaConsoleLogger
 import org.scalajs.jsenv.ConsoleJSConsole$
 import org.scalajs.jsenv.JSEnv
-import scala.collection.mutable.ArraySeq
-import scala.collection.mutable.Seq
 
 /**
  * Task used to run a js file
@@ -43,7 +40,7 @@ public class RunJSTask extends DefaultTask {
                 code.content_$eq(toExec.second)
             }
 
-            def dependencySeq = Utils.getMinimalDependecySeq(project)
+            def dependencySeq = Utils.getMinimalDependencySeq(project)
 
             logger.info('Running env ' + env.name() + ' with code ' + code.name() + ' and dependency ' + dependencySeq)
             env.jsRunner(dependencySeq, code).run(

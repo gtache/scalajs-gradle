@@ -104,12 +104,11 @@ public class Utils {
         return path
     }
 
-    public static Seq getMinimalDependecySeq(Project project){
+    public static Seq getMinimalDependencySeq(Project project){
         final FileVirtualJSFile file = new FileVirtualJSFile(project.file(resolvePath(project)))
         final ResolvedJSDependency fileD = ResolvedJSDependency.minimal(file)
         final Seq<ResolvedJSDependency> dependencySeq = new ArraySeq<>(1)
         dependencySeq.update(0, fileD)
         dependencySeq
-
     }
 }
