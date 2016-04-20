@@ -32,7 +32,7 @@ public class RunJSTask extends DefaultTask {
             logger.error('Nothing to execute')
         } else {
             final JSEnv env = Utils.resolveEnv(project)
-            final String path = resolvePath()
+            final String path = Utils.resolvePath(project)
             final Level logLevel = Utils.resolveLogLevel(project, 'runLogLevel', Level.Debug$.MODULE$)
 
             VirtualJSFile code
@@ -43,10 +43,7 @@ public class RunJSTask extends DefaultTask {
                 code.content_$eq(toExec.second)
             }
 
-            final FileVirtualJSFile file = new FileVirtualJSFile(project.file(path))
-            final ResolvedJSDependency fileD = ResolvedJSDependency.minimal(file)
-            final Seq<ResolvedJSDependency> dependencySeq = new ArraySeq<>(1)
-            dependencySeq.update(0, fileD)
+            def dependencySeq = Utils.getMinimalDependecySeq(project)
 
             logger.info('Running env ' + env.name() + ' with code ' + code.name() + ' and dependency ' + dependencySeq)
             env.jsRunner(dependencySeq, code).run(
@@ -76,26 +73,6 @@ public class RunJSTask extends DefaultTask {
             }
         }
         return new Tuple(isFile, toExec)
-    }
-
-    /**
-     * Resolves the path of the file to run, depending on full, fast or no optimization
-     * @return The path of the file
-     */
-    private String resolvePath() {
-        def path
-        if (project.hasProperty('o')) {
-            path = project.file(project.property('o'))
-        } else if (project.hasProperty('output')) {
-            path = project.file(project.property('output'))
-        } else if (project.hasProperty('runFull')) {
-            path = project.file('js/' + project.name + '_fullopt.js').absolutePath
-        } else if (project.hasProperty('runNoOpt')) {
-            path = project.file('js/' + project.name + '.js').absolutePath
-        } else {
-            path = project.file('js/' + project.name + '_fastopt.js').absolutePath
-        }
-        return path
     }
 
 }

@@ -6,21 +6,32 @@ import com.github.gtache.testing.ScalaJSEventHandler$
 import com.github.gtache.testing.ScalaJSTestStatus$
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
+import org.scalajs.core.tools.io.FileVirtualJSFile
+import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.logging.ScalaConsoleLogger
 import org.scalajs.jsenv.ComJSEnv
 import org.scalajs.jsenv.ConsoleJSConsole$
 import org.scalajs.testadapter.ScalaJSFramework
 import sbt.testing.*
+import scala.collection.mutable.ArraySeq
+import scala.collection.mutable.Seq
 
 class TestJSTask extends DefaultTask {
     final String description = "Runs tests"
 
+    /**
+     * The action of the task : Instantiates a framework, a runner, and executes all tests found
+     */
     @TaskAction
     def run() {
+        final Seq dependencySeq = Utils.getMinimalDependecySeq(project)
+        println(((ResolvedJSDependency) dependencySeq.apply(0)).lib().name())
+        println(((ResolvedJSDependency) dependencySeq.apply(0)).lib().content())
+        final def libEnv = (ComJSEnv) Utils.resolveEnv(project).loadLibs(dependencySeq)
         final Framework framework = new ScalaJSFramework(
                 "ScalaJS Testing framework",
-                (ComJSEnv) Utils.resolveEnv(project),
+                libEnv,
                 new ScalaConsoleLogger(Utils.resolveLogLevel(project, 'testLogLevel', Level.Debug$.MODULE$)),
                 ConsoleJSConsole$.MODULE$)
         final Runner runner = framework.runner(new String[0], new String[0], null)

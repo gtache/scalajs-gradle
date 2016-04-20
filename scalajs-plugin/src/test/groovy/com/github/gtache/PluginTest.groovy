@@ -70,7 +70,6 @@ class PluginTest extends GroovyTestCase {
         proj = getFreshProject()
         println(p.size())
         p.each {
-            println(it)
             if (it.contains('=')) {
                 def res = it.split("=")
                 proj.setProperty(res[0], res[1])
@@ -148,6 +147,8 @@ class PluginTest extends GroovyTestCase {
                         p.contains('q') || p.contains('quiet'))) {
                     assertEquals(Level.Error$.MODULE$, options.logLevel())
                 }
+                break
+            default :
                 break
         }
     }

@@ -1,6 +1,8 @@
 package com.github.gtache
 
 import org.gradle.api.Project
+import org.scalajs.core.tools.io.FileVirtualJSFile
+import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.linker.backend.OutputMode
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.jsenv.JSEnv
@@ -10,6 +12,8 @@ import org.scalajs.jsenv.rhino.RhinoJSEnv
 import scala.collection.Map$
 import scala.collection.Seq$
 import scala.collection.immutable.List$
+import scala.collection.mutable.Seq
+import scala.collection.mutable.ArraySeq
 
 
 public class Utils {
@@ -63,6 +67,11 @@ public class Utils {
         return env
     }
 
+    /**
+     * Returns the outputMode corresponding to a string
+     * @param s The string
+     * @return the outputMode, or null
+     */
     public static OutputMode getOutputMode(String s) {
         if (s == "ECMAScript51Global") {
             return OutputMode.ECMAScript51Global$.MODULE$
@@ -73,5 +82,34 @@ public class Utils {
         } else {
             return null
         }
+    }
+
+    /**
+     * Resolves the path of the file to run, depending on full, fast or no optimization
+     * @return The path of the file
+     */
+    public static String resolvePath(Project project) {
+        def path
+        if (project.hasProperty('o')) {
+            path = project.file(project.property('o'))
+        } else if (project.hasProperty('output')) {
+            path = project.file(project.property('output'))
+        } else if (project.hasProperty('runFull')) {
+            path = project.file('js/' + project.name + '_fullopt.js').absolutePath
+        } else if (project.hasProperty('runNoOpt')) {
+            path = project.file('js/' + project.name + '.js').absolutePath
+        } else {
+            path = project.file('js/' + project.name + '_fastopt.js').absolutePath
+        }
+        return path
+    }
+
+    public static Seq getMinimalDependecySeq(Project project){
+        final FileVirtualJSFile file = new FileVirtualJSFile(project.file(resolvePath(project)))
+        final ResolvedJSDependency fileD = ResolvedJSDependency.minimal(file)
+        final Seq<ResolvedJSDependency> dependencySeq = new ArraySeq<>(1)
+        dependencySeq.update(0, fileD)
+        dependencySeq
+
     }
 }
