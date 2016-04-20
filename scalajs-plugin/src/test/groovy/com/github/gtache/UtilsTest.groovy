@@ -143,7 +143,7 @@ class UtilsTest extends GroovyTestCase {
         final def jsFastPath = project.name + '_fastopt.js'
         TestUtils.applyPlugin(project)
         final def seq = Utils.getMinimalDependencySeq(project)
-        assertEquals(1,seq.size())
-        assertEquals(jsFastPath,seq.apply(0).lib().name())
+        assertEquals(1, seq.size())
+        assertEquals(jsFastPath, seq.apply(0).lib().name())
     }
 }

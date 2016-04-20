@@ -20,9 +20,9 @@ class ScalajsPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         project.logger.info('Applying java plugin')
-        project.apply(plugin: 'java')
+        project.pluginManager.apply('java')
         project.logger.info('Applying scala plugin')
-        project.apply(plugin: 'scala')
+        project.pluginManager.apply('scala')
         project.logger.info('Plugins applied')
         project.configurations {
             scalaCompilePlugin
@@ -90,9 +90,6 @@ class ScalajsPlugin implements Plugin<Project> {
             project.logger.info('Configuring additional parameters related to Scalajs')
             tasks.withType(ScalaCompile) {
                 scalaCompileOptions.additionalParameters = ["-Xplugin:" + project.configurations.scalaCompilePlugin.asPath]
-            }
-            tasks.withType(CompileJSTask) {
-                it.srcFiles = project.files(project.sourceSets.main.runtimeClasspath)
             }
             project.logger.info('Xplugin for compiler added')
         }

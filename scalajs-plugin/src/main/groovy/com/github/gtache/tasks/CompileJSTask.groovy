@@ -3,8 +3,6 @@ package com.github.gtache.tasks
 import com.github.gtache.Scalajsld
 import com.github.gtache.Utils
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.linker.backend.OutputMode
@@ -17,12 +15,11 @@ import scala.collection.JavaConverters
  */
 public class CompileJSTask extends DefaultTask {
     final String description = "Compiles all sjsir files into a single javascript file"
+    private final Scalajsld.Options options
     @OutputFile
     File destFile
-    @InputFiles
-    FileCollection srcFiles
-    Boolean fullOpt = false
-    Boolean noOpt = false
+    private Boolean fullOpt = false
+    private Boolean noOpt = false
 
     /**
      * Tells Scalajsld to run with full optimization
@@ -48,18 +45,29 @@ public class CompileJSTask extends DefaultTask {
         this.noOpt = true
     }
 
+    def CompileJSTask() {
+        options = parseOptions()
+    }
+
     /**
      * Main method of the task, configures and runs Scalajsld
      */
     @TaskAction
     def run() {
         final def curOptions = Scalajsld.options()
-        final def options = parseOptions()
         if (!options.equals(curOptions)) {
             Scalajsld.setOptions(options)
             logger.debug('Options changed, linker recreated')
         }
         Scalajsld.exec()
+    }
+
+    /**
+     * Returns the options that will be used with the linker
+     * @return The options
+     */
+    public Scalajsld.Options getOptions() {
+        return options
     }
 
     /**
