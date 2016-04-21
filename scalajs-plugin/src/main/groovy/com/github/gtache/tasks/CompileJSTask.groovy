@@ -68,7 +68,7 @@ public class CompileJSTask extends DefaultTask {
      * @return The options
      */
     public Scalajsld.Options getOptions() {
-        return (Scalajsld.Options) options.clone()
+        return options
     }
 
     /**

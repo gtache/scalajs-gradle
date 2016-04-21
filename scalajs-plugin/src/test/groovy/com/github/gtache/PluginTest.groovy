@@ -198,6 +198,7 @@ class PluginTest extends GroovyTestCase {
         }
 
         private void checkProperty(String s, Set<String> p, Project project) {
+            println(s)
             final def options = ((CompileJSTask) project.tasks.findByName('FastOptJS')).options
             switch (s) {
                 case 'o':
