@@ -10,7 +10,7 @@ script:
     - cd ./scalajs-plugin/
     - chmod +x gradlew
     - ./gradlew install
-    - ./gradlew build
+    - travis_wait 30 ./gradlew build
     - cd ../scalajs-plugin-test/
     - chmod +x gradlew
 
