@@ -143,6 +143,7 @@ class PluginTest extends GroovyTestCase {
             p.each {
                 checkProperty(it, p, project)
             }
+            Utils.deleteRecursive(project.projectDir)
         }
 
         private void checkProperty(String s, Set<String> p, Project project) {

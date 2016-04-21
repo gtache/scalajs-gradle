@@ -15,6 +15,8 @@ import scala.collection.immutable.List$
 import scala.collection.mutable.ArraySeq
 import scala.collection.mutable.Seq
 
+import java.nio.file.Files
+
 public class Utils {
 
     private Utils() {}
@@ -110,5 +112,14 @@ public class Utils {
         final Seq<ResolvedJSDependency> dependencySeq = new ArraySeq<>(1)
         dependencySeq.update(0, fileD)
         dependencySeq
+    }
+
+    public static void deleteRecursive(File file) {
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                file.listFiles().each { deleteRecursive(it) }
+            }
+            Files.deleteIfExists(file.toPath())
+        }
     }
 }
