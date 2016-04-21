@@ -11,7 +11,7 @@ import org.gradle.api.tasks.scala.ScalaCompile
 /**
  * The main class for the plugin
  */
-class ScalajsPlugin implements Plugin<Project> {
+public final class ScalajsPlugin implements Plugin<Project> {
 
     /**
      * Applies the plugin to the given project

@@ -18,7 +18,7 @@ import scala.collection.mutable.Seq
 import java.nio.file.AccessDeniedException
 import java.nio.file.Files
 
-public class Utils {
+public final class Utils {
 
     private Utils() {}
 

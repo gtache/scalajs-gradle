@@ -109,8 +109,6 @@ object ClassScanner {
         f.listFiles().foreach(file => {
           if (!file.isDirectory && file.getName.endsWith(".class")) {
             val name = file.getName
-            println(url)
-            println(packageName + name.substring(0, name.indexOf('.')))
             buffer += classL.loadClass(packageName + name.substring(0, name.indexOf('.')))
           } else if (file.isDirectory) {
             parseClasses(file.toURI.toURL).foreach(c => {

@@ -14,7 +14,7 @@ import org.scalajs.jsenv.JSEnv
 /**
  * Task used to run a js file
  */
-public class RunJSTask extends DefaultTask {
+public final class RunJSTask extends DefaultTask {
     final String description = "Runs the generated js file.\n" +
             "Needs Node.js / PhantomJS on PATH, or use Rhino.\n" +
             "Use -Prhino (highest priority) or -Pphantom. Default : node"
