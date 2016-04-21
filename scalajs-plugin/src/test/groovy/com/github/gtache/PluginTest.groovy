@@ -138,7 +138,9 @@ class PluginTest extends GroovyTestCase {
 
         @Override
         public void run() {
-            for (int i = p.size() / numThreads * id; i < ((int) p.size() / numThreads * (id + 1)); ++i) {
+            int lowerBound = p.size() / numThreads * id
+            int upperBound = (id == numThreads-1) ? p.size() : (p.size() / numThreads* (id+1))
+            for (int i = lowerBound; i < upperBound; ++i) {
                 checkProperties(p.get(i))
                 counter += 1
                 println("ID : " + id + " finished : " + counter + "/" + numOps)

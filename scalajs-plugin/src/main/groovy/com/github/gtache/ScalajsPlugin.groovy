@@ -50,48 +50,47 @@ class ScalajsPlugin implements Plugin<Project> {
         cleanAll.toDelete = project.files(jsDir)
         project.logger.info('CleanAll task added')
 
-        final def noOptJS = tasks.create('NoOptJS', CompileJSTask.class)
-        noOptJS.dependsOn('classes')
-        noOptJS.destFile = jsFile
-        noOptJS.noOpt()
-        project.logger.info('NoOptJS task added')
-
-        final def fastOptJS = tasks.create('FastOptJS', CompileJSTask.class)
-        fastOptJS.dependsOn('classes')
-        fastOptJS.destFile = jsFastFile
-        fastOptJS.fastOpt()
-        project.logger.info('FastOptJS task added')
-
-        final def fullOptJS = tasks.create('FullOptJS', CompileJSTask.class)
-        fullOptJS.dependsOn('classes')
-        fullOptJS.destFile = jsFullFile
-        fullOptJS.fullOpt()
-        project.logger.info('FullOptJS task added')
-
-        final def runJS = tasks.create('RunJS', RunJSTask.class)
-
-        final def testJS = tasks.create('TestJS', TestJSTask.class)
-        testJS.dependsOn('testClasses')
-        if (runFull) {
-            testJS.dependsOn('FullOptJS')
-            runJS.dependsOn('FullOptJS')
-        } else if (runNoOpt) {
-            testJS.dependsOn('NoOptJS')
-            runJS.dependsOn('NoOptJS')
-        } else {
-            testJS.dependsOn('FastOptJS')
-            runJS.dependsOn('FastOptJS')
-        }
-        project.logger.info('TestJS task added')
-
-        project.logger.info('ScalajsPlugin applied')
 
         project.afterEvaluate {
-            project.logger.info('Configuring additional parameters related to Scalajs')
+            final def noOptJS = tasks.create('NoOptJS', CompileJSTask.class)
+            noOptJS.dependsOn('classes')
+            noOptJS.destFile = jsFile
+            noOptJS.noOpt()
+            project.logger.info('NoOptJS task added')
+
+            final def fastOptJS = tasks.create('FastOptJS', CompileJSTask.class)
+            fastOptJS.dependsOn('classes')
+            fastOptJS.destFile = jsFastFile
+            fastOptJS.fastOpt()
+            project.logger.info('FastOptJS task added')
+
+            final def fullOptJS = tasks.create('FullOptJS', CompileJSTask.class)
+            fullOptJS.dependsOn('classes')
+            fullOptJS.destFile = jsFullFile
+            fullOptJS.fullOpt()
+            project.logger.info('FullOptJS task added')
+
+            final def runJS = tasks.create('RunJS', RunJSTask.class)
+
+            final def testJS = tasks.create('TestJS', TestJSTask.class)
+            testJS.dependsOn('testClasses')
+            if (runFull) {
+                testJS.dependsOn('FullOptJS')
+                runJS.dependsOn('FullOptJS')
+            } else if (runNoOpt) {
+                testJS.dependsOn('NoOptJS')
+                runJS.dependsOn('NoOptJS')
+            } else {
+                testJS.dependsOn('FastOptJS')
+                runJS.dependsOn('FastOptJS')
+            }
+            project.logger.info('TestJS task added')
+
             tasks.withType(ScalaCompile) {
                 scalaCompileOptions.additionalParameters = ["-Xplugin:" + project.configurations.scalaCompilePlugin.asPath]
             }
             project.logger.info('Xplugin for compiler added')
+            project.logger.info('ScalajsPlugin applied')
         }
     }
 

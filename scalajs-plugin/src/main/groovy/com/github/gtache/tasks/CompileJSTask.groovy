@@ -59,6 +59,7 @@ public class CompileJSTask extends DefaultTask {
             Scalajsld.setOptions(options)
             logger.debug('Options changed, linker recreated')
         }
+        logger.info('Running linker with ' + options.toString())
         Scalajsld.exec()
     }
 
@@ -148,7 +149,6 @@ public class CompileJSTask extends DefaultTask {
             options = options.withLogLevel(level)
         }
 
-        logger.info('Running linker with ' + options.toString())
 
         return options
     }
