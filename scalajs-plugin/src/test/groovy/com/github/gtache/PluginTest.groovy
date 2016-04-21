@@ -11,32 +11,49 @@ import java.util.concurrent.locks.ReentrantLock
 
 class PluginTest extends GroovyTestCase {
 
+    static final def O_FILE = 'js2/js.js'
+    static final def OUTPUT_FILE = 'js2/js2.js'
+    static final def M_MODE = 'ECMAScript6'
+    static final def OUTPUT_MODE = 'ECMAScript51Global'
+    static final def R_FILE = 'bla.js'
+    static final def REL_FILE = 'blabla.js'
+    static final def LOG_LEVEL = 'Debug'
+
 
     @Test
     public void testAllConfigurations() {
-        def optionsList = [
-                "o=js2/js.js",
-                //"output=js2/js2.js",
+        def optionsSet = [
+                "o=" + O_FILE,
+                "output=" + OUTPUT_FILE,
                 "p",
-                //"prettyPrint",
+                "prettyPrint",
                 "s",
-                //"sourceMap",
+                "sourceMap",
                 //"compliantAsInstanceOfs",
-                "m=ECMAScript6",
-                //"outputMode=ECMAScript6",
+                "m=" + M_MODE,
+                "outputMode=" + OUTPUT_MODE,
                 "c",
-                //"checkIR",
-                //"r",
-                //"relativizeSourceMap",
-                "linkLogLevel=Debug",
+                "checkIR",
+                "r=" + R_FILE,
+                "relativizeSourceMap=" + REL_FILE,
+                "linkLogLevel=" + LOG_LEVEL,
                 "d",
-                //"debug",
+                "debug",
                 "q",
-                //"quiet",
+                "quiet",
                 "qq",
-                //"really-quiet"
-        ]
-        def ret = Sets.powerSet(optionsList.toSet()).toList()
+                "really-quiet"
+        ].toSet()
+        def outputSet = ["o=" + O_FILE, "output=" + OUTPUT_FILE].toSet()
+        def outputModeSet = ["m=" + M_MODE, "outputMode=" + OUTPUT_MODE].toSet()
+        def sourceMapSet = ["r=" + R_FILE, "relativizeSourceMap=" + REL_FILE].toSet()
+        def logLevelSet = ["linkLogLevel=" + LOG_LEVEL, "d", "debug", "q", "quiet", "qq", "really-quiet"].toSet()
+        def setOptionsSet = new HashSet<Set<String>>()
+        setOptionsSet.add(optionsSet)
+        optionsSet.each {
+            setOptionsSet.add([it].toSet())
+        }
+        def ret = (Sets.powerSet(outputSet) + Sets.powerSet(outputModeSet) + Sets.powerSet(sourceMapSet) + Sets.powerSet(logLevelSet) + setOptionsSet).toList()
         def numThreads = Runtime.getRuntime().availableProcessors()
         def threadList = new ArrayList<Thread>()
         def lock = new ReentrantLock()
@@ -151,11 +168,15 @@ class PluginTest extends GroovyTestCase {
             def options = ((CompileJSTask) project.tasks.findByName('FastOptJS')).options
             switch (s) {
                 case 'o':
-                    assertEquals(options.output().path, project.file(project.property(s)).path)
+                    def projectP = project.file(project.property(s)).path
+                    assertEquals(options.output().path, projectP)
+                    assertEquals(project.file(O_FILE).path, projectP)
                     break
                 case 'output':
                     if (!p.contains('o')) {
+                        def projectP = project.file(project.property(s)).path
                         assertEquals(options.output().path, project.file(project.property(s)).path)
+                        assertEquals(project.file(OUTPUT_FILE).path, projectP)
                     }
                     break
                 case 'p':
@@ -171,10 +192,12 @@ class PluginTest extends GroovyTestCase {
                     break
                 case 'm':
                     assertEquals(options.outputMode(), Utils.getOutputMode((String) project.property(s)))
+                    assertEquals(M_MODE, (String) project.property(s))
                     break
                 case 'outputMode':
                     if (!p.contains('m')) {
                         assertEquals(options.outputMode(), Utils.getOutputMode((String) project.property(s)))
+                        assertEquals(OUTPUT_MODE, (String) project.property(s))
                     }
                     break
                 case 'c':
@@ -182,16 +205,23 @@ class PluginTest extends GroovyTestCase {
                     assertTrue(options.checkIR())
                     break
                 case 'r':
-                    //TODO
+                    def projectP = project.file(project.property(s)).path
+                    assertEquals(options.relativizeSourceMap().get(), project.file((String) project.property(s)).toURI())
+                    assertEquals(project.file(R_FILE).path, projectP)
                     break
                 case 'relativizeSourceMap':
-                    //TODO
+                    if (!p.contains('r')) {
+                        def projectP = project.file(project.property(s)).path
+                        assertEquals(options.relativizeSourceMap().get(), project.file((String) project.property(s)).toURI())
+                        assertEquals(project.file(REL_FILE).path, projectP)
+                    }
                     break
                 case 'linkLogLevel':
                     if (!(p.contains('q') || p.contains('qq') || p.contains('d') ||
                             p.contains('quiet') || p.contains('really-quiet') || p.contains('debug'))) {
                         assertEquals(Utils.resolveLogLevel(project, (String) project.property('linkLogLevel'), Level.Info$.MODULE$),
                                 options.logLevel())
+                        assertEquals(LOG_LEVEL, (String) project.property(s))
                     }
                     break
                 case 'd':
