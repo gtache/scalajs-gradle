@@ -15,7 +15,7 @@ import scala.collection.JavaConverters
  */
 public class CompileJSTask extends DefaultTask {
     final String description = "Compiles all sjsir files into a single javascript file"
-    private final Scalajsld.Options options
+    private Scalajsld.Options options
     @OutputFile
     File destFile
     private Boolean fullOpt = false
@@ -45,7 +45,7 @@ public class CompileJSTask extends DefaultTask {
         this.noOpt = true
     }
 
-    def CompileJSTask() {
+    def configure() {
         options = parseOptions()
     }
 
@@ -68,7 +68,7 @@ public class CompileJSTask extends DefaultTask {
      * @return The options
      */
     public Scalajsld.Options getOptions() {
-        return options
+        return (Scalajsld.Options) options.clone()
     }
 
     /**
@@ -82,12 +82,11 @@ public class CompileJSTask extends DefaultTask {
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
 
         if (project.hasProperty('o')) {
-            options = options.withOutput(project.file(project.property('o')))
+            destFile = project.file(project.property('o'))
         } else if (project.hasProperty('output')) {
-            options = options.withOutput(project.file(project.property('output')))
-        } else {
-            options = options.withOutput(destFile)
+            destFile = project.file(project.property('output'))
         }
+        options = options.withOutput(destFile)
 
         if (fullOpt) {
             options = options.withFullOpt()

@@ -6,6 +6,8 @@ import org.gradle.api.Project
 import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
 import org.junit.Test
 import org.scalajs.core.tools.logging.Level
+import org.scalajs.core.tools.sem.Semantics
+import scala.Option
 
 import java.util.concurrent.locks.ReentrantLock
 
@@ -75,6 +77,7 @@ class PluginTest extends GroovyTestCase {
     public void testTasksPluginsDependenciesAdded() {
         def project = TestUtils.getFreshProject()
         TestUtils.applyPlugin(project)
+        project.evaluate()
         def allTasks = [
                 "TestJS",
                 "FastOptJS",
@@ -83,42 +86,40 @@ class PluginTest extends GroovyTestCase {
                 "NoOptJS",
                 "CleanAll"
         ]
-        project.afterEvaluate{
-            allTasks.each {
-                assertTrue(project.tasks.findByPath(it) != null)
-            }
-
-            def plugins = [
-                    "java",
-                    "scala",
-                    "scalajs-plugin"
-            ]
-
-            plugins.each {
-                assertTrue(project.plugins.findPlugin(it) != null)
-            }
-
-            def libDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-library_2.11', '0.6.8')
-            def compDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-compiler_2.11.8', '0.6.8')
-            def compileIt = project.configurations.getByName('compile').dependencies.iterator()
-            def libDepFound = false
-            while (compileIt.hasNext() && !libDepFound) {
-                def dep = compileIt.next()
-                if (libDep.group == dep.group && libDep.name == dep.name && libDep.version == dep.version) {
-                    libDepFound = true
-                }
-            }
-            def scalaCompileIt = project.configurations.getByName('scalaCompilePlugin').dependencies.iterator()
-            def compileDepFound = false
-            while (scalaCompileIt.hasNext() && !compileDepFound) {
-                def dep = scalaCompileIt.next()
-                if (compDep.group == dep.group && compDep.name == dep.name && compDep.version == dep.version) {
-                    compileDepFound = true
-                }
-            }
-            assertTrue(libDepFound)
-            assertTrue(compileDepFound)
+        allTasks.each {
+            assertTrue(project.tasks.findByPath(it) != null)
         }
+
+        def plugins = [
+                "java",
+                "scala",
+                "scalajs-plugin"
+        ]
+
+        plugins.each {
+            assertTrue(project.plugins.findPlugin(it) != null)
+        }
+
+        def libDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-library_2.11', '0.6.8')
+        def compDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-compiler_2.11.8', '0.6.8')
+        def compileIt = project.configurations.getByName('compile').dependencies.iterator()
+        def libDepFound = false
+        while (compileIt.hasNext() && !libDepFound) {
+            def dep = compileIt.next()
+            if (libDep.group == dep.group && libDep.name == dep.name && libDep.version == dep.version) {
+                libDepFound = true
+            }
+        }
+        def scalaCompileIt = project.configurations.getByName('scalaCompilePlugin').dependencies.iterator()
+        def compileDepFound = false
+        while (scalaCompileIt.hasNext() && !compileDepFound) {
+            def dep = scalaCompileIt.next()
+            if (compDep.group == dep.group && compDep.name == dep.name && compDep.version == dep.version) {
+                compileDepFound = true
+            }
+        }
+        assertTrue(libDepFound)
+        assertTrue(compileDepFound)
         Utils.deleteRecursive(project.projectDir)
     }
 
@@ -140,8 +141,8 @@ class PluginTest extends GroovyTestCase {
 
         @Override
         public void run() {
-            int lowerBound = p.size() / numThreads * id
-            int upperBound = (id == numThreads-1) ? p.size() : (p.size() / numThreads* (id+1))
+            final int lowerBound = p.size() / numThreads * id
+            final int upperBound = (id == numThreads - 1) ? p.size() : (p.size() / numThreads * (id + 1))
             for (int i = lowerBound; i < upperBound; ++i) {
                 checkProperties(p.get(i))
                 counter += 1
@@ -151,7 +152,7 @@ class PluginTest extends GroovyTestCase {
 
         private void checkProperties(Set<String> p) {
             lock.lock()
-            def project = TestUtils.getFreshProject()
+            final def project = TestUtils.getFreshProject()
             lock.unlock()
             p.each {
                 if (it.contains('=')) {
@@ -162,14 +163,42 @@ class PluginTest extends GroovyTestCase {
                 }
             }
             TestUtils.applyPlugin(project)
+            project.evaluate() //Internal method, didn't find a way to do it via public API
+            if (p.isEmpty()) {
+                checkDefault(project)
+            }
             p.each {
                 checkProperty(it, p, project)
             }
             Utils.deleteRecursive(project.projectDir)
         }
 
-        private void checkProperty(String s, Set<String> p, Project project) {
+        private void checkDefault(Project project) {
+            final def jsDir = project.file('js/')
+            final def jsFile = project.file(jsDir.path + '/' + project.name + '.js')
+            final def jsFastFile = project.file(jsDir.path + '/' + project.name + '_fastopt.js')
+            final def jsFullFile = project.file(jsDir.path + '/' + project.name + '_fullopt.js')
             def options = ((CompileJSTask) project.tasks.findByName('FastOptJS')).options
+            assertEquals(jsFastFile.path, options.output().path)
+            assertEquals(Semantics.Defaults(), options.semantics())
+            assertEquals(Level.Info$.MODULE$, options.logLevel())
+            assertFalse(options.cp().isEmpty())
+            assertFalse(options.jsoutput())
+            assertFalse(options.sourceMap())
+            assertFalse(options.checkIR())
+            assertFalse(options.fullOpt())
+            assertFalse(options.noOpt())
+            assertFalse(options.prettyPrint())
+            assertEquals(Option.apply(null), options.stdLib())
+            assertEquals(Option.apply(null), options.relativizeSourceMap())
+            options = ((CompileJSTask) project.tasks.findByName('FullOptJS')).options
+            assertEquals(jsFullFile.path, options.output().path)
+            options = ((CompileJSTask) project.tasks.findByName('NoOptJS')).options
+            assertEquals(jsFile.path, options.output().path)
+        }
+
+        private void checkProperty(String s, Set<String> p, Project project) {
+            final def options = ((CompileJSTask) project.tasks.findByName('FastOptJS')).options
             switch (s) {
                 case 'o':
                     def projectP = project.file(project.property(s)).path
