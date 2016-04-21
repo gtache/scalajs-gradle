@@ -83,40 +83,42 @@ class PluginTest extends GroovyTestCase {
                 "NoOptJS",
                 "CleanAll"
         ]
-        allTasks.each {
-            assertTrue(project.tasks.findByPath(it) != null)
-        }
-
-        def plugins = [
-                "java",
-                "scala",
-                "scalajs-plugin"
-        ]
-
-        plugins.each {
-            assertTrue(project.plugins.findPlugin(it) != null)
-        }
-
-        def libDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-library_2.11', '0.6.8')
-        def compDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-compiler_2.11.8', '0.6.8')
-        def compileIt = project.configurations.getByName('compile').dependencies.iterator()
-        def libDepFound = false
-        while (compileIt.hasNext() && !libDepFound) {
-            def dep = compileIt.next()
-            if (libDep.group == dep.group && libDep.name == dep.name && libDep.version == dep.version) {
-                libDepFound = true
+        project.afterEvaluate{
+            allTasks.each {
+                assertTrue(project.tasks.findByPath(it) != null)
             }
-        }
-        def scalaCompileIt = project.configurations.getByName('scalaCompilePlugin').dependencies.iterator()
-        def compileDepFound = false
-        while (scalaCompileIt.hasNext() && !compileDepFound) {
-            def dep = scalaCompileIt.next()
-            if (compDep.group == dep.group && compDep.name == dep.name && compDep.version == dep.version) {
-                compileDepFound = true
+
+            def plugins = [
+                    "java",
+                    "scala",
+                    "scalajs-plugin"
+            ]
+
+            plugins.each {
+                assertTrue(project.plugins.findPlugin(it) != null)
             }
+
+            def libDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-library_2.11', '0.6.8')
+            def compDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-compiler_2.11.8', '0.6.8')
+            def compileIt = project.configurations.getByName('compile').dependencies.iterator()
+            def libDepFound = false
+            while (compileIt.hasNext() && !libDepFound) {
+                def dep = compileIt.next()
+                if (libDep.group == dep.group && libDep.name == dep.name && libDep.version == dep.version) {
+                    libDepFound = true
+                }
+            }
+            def scalaCompileIt = project.configurations.getByName('scalaCompilePlugin').dependencies.iterator()
+            def compileDepFound = false
+            while (scalaCompileIt.hasNext() && !compileDepFound) {
+                def dep = scalaCompileIt.next()
+                if (compDep.group == dep.group && compDep.name == dep.name && compDep.version == dep.version) {
+                    compileDepFound = true
+                }
+            }
+            assertTrue(libDepFound)
+            assertTrue(compileDepFound)
         }
-        assertTrue(libDepFound)
-        assertTrue(compileDepFound)
         Utils.deleteRecursive(project.projectDir)
     }
 

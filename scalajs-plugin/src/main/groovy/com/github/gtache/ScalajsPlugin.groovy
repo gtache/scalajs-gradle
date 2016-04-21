@@ -43,15 +43,14 @@ public final class ScalajsPlugin implements Plugin<Project> {
             project.logger.warn('runNoOpt and runFull both declared : Assuming runFull')
         }
 
-        final def tasks = project.tasks;
-
-        final def cleanAll = tasks.create('CleanAll', CleanAllTask.class)
-        cleanAll.dependsOn('clean')
-        cleanAll.toDelete = project.files(jsDir)
-        project.logger.info('CleanAll task added')
-
-
         project.afterEvaluate {
+            final def tasks = project.tasks;
+
+            final def cleanAll = tasks.create('CleanAll', CleanAllTask.class)
+            cleanAll.dependsOn('clean')
+            cleanAll.toDelete = project.files(jsDir)
+            project.logger.info('CleanAll task added')
+
             final def noOptJS = tasks.create('NoOptJS', CompileJSTask.class)
             noOptJS.dependsOn('classes')
             noOptJS.destFile = jsFile
