@@ -15,6 +15,7 @@ import scala.collection.immutable.List$
 import scala.collection.mutable.ArraySeq
 import scala.collection.mutable.Seq
 
+import java.nio.file.AccessDeniedException
 import java.nio.file.Files
 
 public class Utils {
@@ -119,7 +120,16 @@ public class Utils {
             if (file.isDirectory()) {
                 file.listFiles().each { deleteRecursive(it) }
             }
-            Files.deleteIfExists(file.toPath())
+            try {
+                if (Files.isWritable(file.toPath())) {
+                    if (!(file.isDirectory() && file.listFiles().size() > 0)) {
+                        Files.deleteIfExists(file.toPath())
+                    }
+                }
+            }
+            catch (AccessDeniedException e) {
+                //Files.isWritable doesnt work 100% apparently
+            }
         }
     }
 }

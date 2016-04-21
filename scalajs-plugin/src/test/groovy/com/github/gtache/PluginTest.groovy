@@ -100,6 +100,7 @@ class PluginTest extends GroovyTestCase {
         }
         assertTrue(libDepFound)
         assertTrue(compileDepFound)
+        Utils.deleteRecursive(project.projectDir)
     }
 
     public class CheckRunnable implements Runnable {
@@ -115,15 +116,15 @@ class PluginTest extends GroovyTestCase {
             this.id = id
             this.numThreads = numThreads
             this.lock = lock
-            this.numOps = p.size()/numThreads
+            this.numOps = p.size() / numThreads
         }
 
         @Override
         public void run() {
             for (int i = p.size() / numThreads * id; i < ((int) p.size() / numThreads * (id + 1)); ++i) {
                 checkProperties(p.get(i))
-                counter+=1
-                println("ID : "+id +" finished : "+counter+"/"+numOps)
+                counter += 1
+                println("ID : " + id + " finished : " + counter + "/" + numOps)
             }
         }
 

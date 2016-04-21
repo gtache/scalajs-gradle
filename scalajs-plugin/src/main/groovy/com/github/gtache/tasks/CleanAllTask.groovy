@@ -5,8 +5,6 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.TaskAction
 
-import java.nio.file.Files
-
 /**
  * Task used to delete everything in a given FileCollection
  */
@@ -14,7 +12,6 @@ class CleanAllTask extends DefaultTask {
     final String description = "Deletes all files given in toDelete."
 
     FileCollection toDelete
-
 
     /**
      * Main method of the task, simply calls deleteFile on toDelete

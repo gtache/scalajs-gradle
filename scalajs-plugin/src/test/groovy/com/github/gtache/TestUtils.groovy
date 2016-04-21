@@ -3,9 +3,6 @@ package com.github.gtache
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 
-import java.util.concurrent.locks.Lock
-
-
 class TestUtils {
 
     public static Project getFreshProject() {

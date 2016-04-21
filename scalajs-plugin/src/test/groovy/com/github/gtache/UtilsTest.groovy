@@ -21,6 +21,7 @@ class UtilsTest extends GroovyTestCase {
         def dummyPath = project.file(dummyString).toString()
         TestUtils.applyPlugin(project)
         assertEquals(Utils.resolvePath(project), jsFastPath)
+        Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
         jsDir = project.file('js/')
@@ -28,6 +29,7 @@ class UtilsTest extends GroovyTestCase {
         TestUtils.setProperty(project, 'runFull')
         TestUtils.applyPlugin(project)
         assertEquals(Utils.resolvePath(project), jsFullPath)
+        Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
         jsDir = project.file('js/')
@@ -35,6 +37,7 @@ class UtilsTest extends GroovyTestCase {
         TestUtils.setProperty(project, 'runNoOpt')
         TestUtils.applyPlugin(project)
         assertEquals(Utils.resolvePath(project), jsPath)
+        Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
         jsDir = project.file('js/')
@@ -43,18 +46,21 @@ class UtilsTest extends GroovyTestCase {
         TestUtils.setProperty(project, 'runNoOpt')
         TestUtils.applyPlugin(project)
         assertEquals(Utils.resolvePath(project), jsFullPath)
+        Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
         dummyPath = project.file(dummyString).toString()
         TestUtils.setProperty(project, 'o', dummyString)
         TestUtils.applyPlugin(project)
         assertEquals(Utils.resolvePath(project), dummyPath)
+        Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
         dummyPath = project.file(dummyString).toString()
         TestUtils.setProperty(project, 'output', dummyString)
         TestUtils.applyPlugin(project)
         assertEquals(Utils.resolvePath(project), dummyPath)
+        Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
         dummyPath = project.file(dummyString).toString()
@@ -62,6 +68,7 @@ class UtilsTest extends GroovyTestCase {
         TestUtils.setProperty(project, 'output', 'blabla/bla.js')
         TestUtils.applyPlugin(project)
         assertEquals(Utils.resolvePath(project), dummyPath)
+        Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
         dummyPath = project.file(dummyString).toString()
@@ -69,6 +76,7 @@ class UtilsTest extends GroovyTestCase {
         TestUtils.setProperty(project, 'runFull')
         TestUtils.applyPlugin(project)
         assertEquals(Utils.resolvePath(project), dummyPath)
+        Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
         dummyPath = project.file(dummyString).toString()
@@ -76,6 +84,7 @@ class UtilsTest extends GroovyTestCase {
         TestUtils.setProperty(project, 'runFull')
         TestUtils.applyPlugin(project)
         assertEquals(Utils.resolvePath(project), dummyPath)
+        Utils.deleteRecursive(project.projectDir)
 
     }
 
@@ -86,16 +95,20 @@ class UtilsTest extends GroovyTestCase {
         Project project = TestUtils.getFreshProject()
         TestUtils.applyPlugin(project)
         assertEquals(NodeJSEnv.class, Utils.resolveEnv(project).getClass())
+        Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
         TestUtils.setProperty(project, rhino)
         TestUtils.applyPlugin(project)
         assertEquals(RhinoJSEnv.class, Utils.resolveEnv(project).getClass())
+        Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
         TestUtils.setProperty(project, phantom)
         TestUtils.applyPlugin(project)
         assertEquals(PhantomJSEnv.class, Utils.resolveEnv(project).getClass())
+        Utils.deleteRecursive(project.projectDir)
+
     }
 
     @Test
@@ -107,23 +120,28 @@ class UtilsTest extends GroovyTestCase {
         assertEquals(Level.Info$.MODULE$, Utils.resolveLogLevel(project, log, Level.Info$.MODULE$))
         assertEquals(Level.Warn$.MODULE$, Utils.resolveLogLevel(project, log, Level.Warn$.MODULE$))
         assertEquals(Level.Error$.MODULE$, Utils.resolveLogLevel(project, log, Level.Error$.MODULE$))
+        Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
         TestUtils.setProperty(project, log, "Warn")
         TestUtils.applyPlugin(project)
         assertEquals(Level.Warn$.MODULE$, Utils.resolveLogLevel(project, log, Level.Debug$.MODULE$))
+        Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
         TestUtils.setProperty(project, log, "Error")
         assertEquals(Level.Error$.MODULE$, Utils.resolveLogLevel(project, log, Level.Debug$.MODULE$))
+        Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
         TestUtils.setProperty(project, log, "Debug")
         assertEquals(Level.Debug$.MODULE$, Utils.resolveLogLevel(project, log, Level.Warn$.MODULE$))
+        Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
         TestUtils.setProperty(project, log, "Info")
         assertEquals(Level.Info$.MODULE$, Utils.resolveLogLevel(project, log, Level.Debug$.MODULE$))
+        Utils.deleteRecursive(project.projectDir)
     }
 
     @Test
@@ -145,5 +163,6 @@ class UtilsTest extends GroovyTestCase {
         final def seq = Utils.getMinimalDependencySeq(project)
         assertEquals(1, seq.size())
         assertEquals(jsFastPath, seq.apply(0).lib().name())
+        Utils.deleteRecursive(project.projectDir)
     }
 }
