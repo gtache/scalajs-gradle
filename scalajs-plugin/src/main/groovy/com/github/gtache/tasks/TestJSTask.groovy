@@ -14,7 +14,7 @@ import org.scalajs.testadapter.ScalaJSFramework
 import sbt.testing.*
 import scala.collection.mutable.Seq
 
-final class TestJSTask extends DefaultTask {
+public class TestJSTask extends DefaultTask {
     final String description = "Runs tests"
 
     /**

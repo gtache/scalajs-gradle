@@ -13,7 +13,7 @@ import scala.collection.JavaConverters
 /**
  * Task used to compile sjsir and classes file to a js file.
  */
-public final class CompileJSTask extends DefaultTask {
+public class CompileJSTask extends DefaultTask {
     final String description = "Compiles all sjsir files into a single javascript file"
     private final Scalajsld.Options options
     @OutputFile

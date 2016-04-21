@@ -8,7 +8,7 @@ import org.gradle.api.tasks.TaskAction
 /**
  * Task used to delete everything in a given FileCollection
  */
-public final class CleanAllTask extends DefaultTask {
+public class CleanAllTask extends DefaultTask {
     final String description = "Deletes all files given in toDelete."
 
     FileCollection toDelete
