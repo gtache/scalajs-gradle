@@ -120,7 +120,7 @@ class PluginTest extends GroovyTestCase {
         Utils.deleteRecursive(project.projectDir)
     }
 
-    private class CheckRunnable implements Runnable {
+    private final class CheckRunnable implements Runnable {
         private final ArrayList<Set<String>> p
         private final int id
         private final int numThreads
