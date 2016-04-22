@@ -1,10 +1,8 @@
-package main.scala
-
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 
 @JSExport
-object Test extends js.JSApp {
+object DummyObject extends js.JSApp {
 
   @JSExport
   def main(): Unit = {

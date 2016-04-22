@@ -1,9 +1,7 @@
-package main.scala
-import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 import scalatags.Text.all._
 @JSExport
-object ScalaTagTest {
+object DummyScalaTag {
   @JSExport
   def main(): Unit = {
     val page = html(

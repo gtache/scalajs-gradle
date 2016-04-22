@@ -1,3 +1,3 @@
-main.scala.ScalaTagTest().main()
-main.scala.Test().main()
-main.scala.Test().printSomething("blabla")
+DummyScalaTag().main()
+DummyObject().main()
+DummyObject().printSomething("blabla")

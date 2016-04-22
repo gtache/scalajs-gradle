@@ -14,12 +14,12 @@ script:
     - cd ../scalajs-plugin-test/
     - chmod +x gradlew
 
-    - ./gradlew RunJS -Pclassname="main.scala.Test" -Pmethname="printSomething(\"blabla\")" -Prhino
-    - ./gradlew RunJS -Pclassname="main.scala.ScalaTagTest" -Pphantom
+    - ./gradlew RunJS -Pclassname="DummyObject" -Pmethname="printSomething(\"blabla\")" -Prhino
+    - ./gradlew RunJS -Pclassname="DummyScalaTag" -Pphantom
     - ./gradlew CleanAll
-    - ./gradlew RunJS -PtoExec="main.scala.ScalaTagTest().main()" -PrunFull -Prhino
+    - ./gradlew RunJS -PtoExec="DummyScalaTag().main()" -PrunFull -Prhino
     - ./gradlew CleanAll
-    - ./gradlew RunJS -PtoExec="main.scala.Test().main()" -Pclassname="main.scala.ScalaTagTest" -PrunNoOpt
+    - ./gradlew RunJS -PtoExec="DummyObject().main()" -Pclassname="DummyScalaTag" -PrunNoOpt
     - ./gradlew CleanAll
     - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js" -PrunFull -Pphantom
     - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js" -PrunNoOpt -Prhino
