@@ -98,6 +98,7 @@ object ClassScanner {
     def parseClasses(url: URL): Array[Class[_]] = {
       val f = Paths.get(url.toURI).toFile
       val packageName = {
+        //FIXME more urls
         if (url != classL.getURLs()(0)) {
           classL.getURLs()(0).toURI.relativize(url.toURI).toString.replace('/', '.')
         } else {

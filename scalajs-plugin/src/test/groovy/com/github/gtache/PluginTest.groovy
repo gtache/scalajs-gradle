@@ -162,7 +162,7 @@ class PluginTest extends GroovyTestCase {
                 }
             }
             TestUtils.applyPlugin(project)
-            project.evaluate() //Internal method, didn't find a way to do it via public API
+            project.evaluate() //Internal method, didn't find a way to do it (easily) via public API
             if (p.isEmpty()) {
                 checkDefault(project)
             }

@@ -178,9 +178,9 @@ class UtilsTest extends GroovyTestCase {
         dir2.mkdir()
         final File file3 = project.file('test/dir1/1')
         final File file4 = project.file('test/dir1/2')
-        final Set<File> allFiles = [root,dir1,dir2,file1,file2,file3,file4].toSet()
+        final Set<File> allFiles = [root, dir1, dir2, file1, file2, file3, file4].toSet()
         allFiles.each {
-            if (it.isDirectory()){
+            if (it.isDirectory()) {
                 assertTrue(it.exists())
             } else {
                 assertFalse(it.exists())
@@ -190,9 +190,9 @@ class UtilsTest extends GroovyTestCase {
         file2.createNewFile()
         file3.createNewFile()
         file4.createNewFile()
-        assertEquals(4,root.listFiles().size())
-        assertEquals(2,dir1.listFiles().size())
-        assertEquals(0,dir2.listFiles().size())
+        assertEquals(4, root.listFiles().size())
+        assertEquals(2, dir1.listFiles().size())
+        assertEquals(0, dir2.listFiles().size())
         allFiles.each {
             assertTrue(it.exists())
         }

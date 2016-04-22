@@ -49,6 +49,10 @@ public class CompileJSTask extends DefaultTask {
         this.noOpt = true
     }
 
+    /**
+     * Parse the options
+     * @return
+     */
     def configure() {
         options = parseOptions()
     }

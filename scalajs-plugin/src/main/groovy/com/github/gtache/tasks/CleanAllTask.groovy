@@ -14,7 +14,7 @@ public class CleanAllTask extends DefaultTask {
     FileCollection toDelete
 
     /**
-     * Main method of the task, simply calls deleteFile on toDelete
+     * Main method of the task, simply calls deleteRecursive on toDelete
      */
     @TaskAction
     def run() {

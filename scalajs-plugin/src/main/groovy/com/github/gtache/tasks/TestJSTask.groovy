@@ -18,18 +18,20 @@ public class TestJSTask extends DefaultTask {
     final String description = "Runs tests"
 
     /**
-     * The action of the task : Instantiates a framework, a runner, and executes all tests found
+     * The action of the task : Instantiates a framework, a runner, and executes all tests found, with the fingerprints
+     * given by the framework
      */
+    //TODO
     @TaskAction
     def run() {
         final Seq dependencySeq = Utils.getMinimalDependencySeq(project)
         final def libEnv = (ComJSEnv) Utils.resolveEnv(project).loadLibs(dependencySeq)
 
-        logger.debug("dependencySeq size : "+dependencySeq.size())
+        logger.debug("dependencySeq size : " + dependencySeq.size())
         final def name = dependencySeq.apply(0).lib().name()
         final def content = dependencySeq.apply(0).lib().content()
-        logger.debug("lib name : "+name)
-        logger.debug("lib content : "+content)
+        logger.debug("lib name : " + name)
+        logger.debug("lib content : " + content)
 
         final Framework framework = new ScalaJSFramework(
                 "ScalaJS Testing framework",

@@ -107,6 +107,11 @@ public final class Utils {
         return path
     }
 
+    /**
+     * Returns the minimal ResolvedDependency Seq, which is comprised of only the generated js file.
+     * @param project The project
+     * @return the (mutable) seq of only one element
+     */
     public static Seq getMinimalDependencySeq(Project project) {
         final FileVirtualJSFile file = new FileVirtualJSFile(project.file(resolvePath(project)))
         final ResolvedJSDependency fileD = ResolvedJSDependency.minimal(file)
@@ -115,6 +120,10 @@ public final class Utils {
         dependencySeq
     }
 
+    /**
+     * Deletes a file, if it is a folder, deletes it recursively.
+     * @param file The file to delete
+     */
     public static void deleteRecursive(File file) {
         if (file.exists()) {
             if (file.isDirectory()) {
@@ -128,7 +137,7 @@ public final class Utils {
                 }
             }
             catch (AccessDeniedException e) {
-                //Files.isWritable doesnt work 100% apparently
+                //Files.isWritable doesnt work 100% apparently => can't use project.delete, throws exception sometimes
             }
         }
     }
