@@ -61,7 +61,7 @@ public class CompileJSTask extends DefaultTask {
         final def curOptions = Scalajsld.options()
         if (!options.equals(curOptions)) {
             Scalajsld.setOptions(options)
-            logger.debug('Options changed, linker recreated')
+            logger.info('Options changed, linker recreated')
         }
         logger.info('Running linker with ' + options.toString())
         Scalajsld.exec()

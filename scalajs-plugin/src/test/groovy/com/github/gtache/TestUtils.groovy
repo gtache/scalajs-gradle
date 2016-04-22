@@ -16,7 +16,7 @@ class TestUtils {
                 mavenCentral()
             }
             dependencies {
-                classpath 'com.github.gtache:scalajs-plugin:0.1.2'
+                classpath 'com.github.gtache:scalajs-plugin:0.2.0'
             }
         }
         proj.repositories {
