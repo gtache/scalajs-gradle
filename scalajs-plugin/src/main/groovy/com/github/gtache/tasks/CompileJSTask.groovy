@@ -3,6 +3,8 @@ package com.github.gtache.tasks
 import com.github.gtache.Scalajsld
 import com.github.gtache.Utils
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.linker.backend.OutputMode
@@ -16,6 +18,8 @@ import scala.collection.JavaConverters
 public class CompileJSTask extends DefaultTask {
     final String description = "Compiles all sjsir files into a single javascript file"
     private Scalajsld.Options options
+    @InputFiles
+    FileCollection srcFiles
     @OutputFile
     File destFile
     private Boolean fullOpt = false

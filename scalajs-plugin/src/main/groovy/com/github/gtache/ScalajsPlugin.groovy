@@ -87,6 +87,7 @@ public final class ScalajsPlugin implements Plugin<Project> {
         project.afterEvaluate {
             tasks.withType(CompileJSTask) {
                 it.configure()
+                it.srcFiles = project.files(project.sourceSets.main.runtimeClasspath)
             }
             tasks.withType(ScalaCompile) {
                 scalaCompileOptions.additionalParameters = ["-Xplugin:" + project.configurations.scalaCompilePlugin.asPath]
