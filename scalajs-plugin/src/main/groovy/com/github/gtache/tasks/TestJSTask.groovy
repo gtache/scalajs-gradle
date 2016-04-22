@@ -21,7 +21,7 @@ public class TestJSTask extends DefaultTask {
      * The action of the task : Instantiates a framework, a runner, and executes all tests found, with the fingerprints
      * given by the framework
      */
-    //TODO
+    //TODO not functioning
     @TaskAction
     def run() {
         final Seq dependencySeq = Utils.getMinimalDependencySeq(project)
