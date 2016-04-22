@@ -6,10 +6,12 @@ import com.github.gtache.testing.ScalaJSEventHandler$
 import com.github.gtache.testing.ScalaJSTestStatus$
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
+import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.logging.ScalaConsoleLogger
 import org.scalajs.jsenv.ComJSEnv
 import org.scalajs.jsenv.ConsoleJSConsole$
+import org.scalajs.jsenv.JSEnv
 import org.scalajs.testadapter.ScalaJSFramework
 import sbt.testing.*
 import scala.collection.mutable.Seq
@@ -24,14 +26,8 @@ public class TestJSTask extends DefaultTask {
     //TODO not functioning
     @TaskAction
     def run() {
-        final Seq dependencySeq = Utils.getMinimalDependencySeq(project)
+        final Seq<ResolvedJSDependency> dependencySeq = Utils.getMinimalDependencySeq(project)
         final def libEnv = (ComJSEnv) Utils.resolveEnv(project).loadLibs(dependencySeq)
-
-        logger.debug("dependencySeq size : " + dependencySeq.size())
-        final def name = dependencySeq.apply(0).lib().name()
-        final def content = dependencySeq.apply(0).lib().content()
-        logger.debug("lib name : " + name)
-        logger.debug("lib content : " + content)
 
         final Framework framework = new ScalaJSFramework(
                 "ScalaJS Testing framework",
