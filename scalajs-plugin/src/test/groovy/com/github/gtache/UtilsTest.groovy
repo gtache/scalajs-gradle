@@ -152,7 +152,6 @@ class UtilsTest extends GroovyTestCase {
         assertEquals(OutputMode.ECMAScript51Global$.MODULE$, Utils.getOutputMode(one))
         assertEquals(OutputMode.ECMAScript51Isolated$.MODULE$, Utils.getOutputMode(two))
         assertEquals(OutputMode.ECMAScript6$.MODULE$, Utils.getOutputMode(three))
-
     }
 
     @Test
@@ -163,6 +162,44 @@ class UtilsTest extends GroovyTestCase {
         final def seq = Utils.getMinimalDependencySeq(project)
         assertEquals(1, seq.size())
         assertEquals(jsFastPath, seq.apply(0).lib().name())
+        Utils.deleteRecursive(project.projectDir)
+    }
+
+    @Test
+    public void testDeleteRecursive() {
+        final Project project = TestUtils.getFreshProject()
+        final File root = project.file('test')
+        root.mkdir()
+        final File file1 = project.file('test/1')
+        final File file2 = project.file('test/2')
+        final File dir1 = project.file('test/dir1')
+        final File dir2 = project.file('test/dir2')
+        dir1.mkdir()
+        dir2.mkdir()
+        final File file3 = project.file('test/dir1/1')
+        final File file4 = project.file('test/dir1/2')
+        final Set<File> allFiles = [root,dir1,dir2,file1,file2,file3,file4].toSet()
+        allFiles.each {
+            if (it.isDirectory()){
+                assertTrue(it.exists())
+            } else {
+                assertFalse(it.exists())
+            }
+        }
+        file1.createNewFile()
+        file2.createNewFile()
+        file3.createNewFile()
+        file4.createNewFile()
+        assertEquals(4,root.listFiles().size())
+        assertEquals(2,dir1.listFiles().size())
+        assertEquals(0,dir2.listFiles().size())
+        allFiles.each {
+            assertTrue(it.exists())
+        }
+        Utils.deleteRecursive(root)
+        allFiles.each {
+            assertFalse(it.exists())
+        }
         Utils.deleteRecursive(project.projectDir)
     }
 }
