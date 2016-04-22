@@ -4,8 +4,6 @@ import com.github.gtache.tasks.CompileJSTask
 import com.google.common.collect.Sets
 import org.gradle.api.Project
 import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
-import org.gradle.api.tasks.Copy
-import org.junit.BeforeClass
 import org.junit.Test
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.sem.Semantics
@@ -22,16 +20,6 @@ class PluginTest extends GroovyTestCase {
     static final def R_FILE = 'bla.js'
     static final def REL_FILE = 'blabla.js'
     static final def LOG_LEVEL = 'Debug'
-
-    @BeforeClass
-    public static void setUp(){
-        final def project = TestUtils.getFreshProject()
-        TestUtils.applyPlugin(project)
-        project.evaluate()
-        Copy libCopy = (Copy) project.tasks.findByName('copyToLib')
-        libCopy.execute()
-        Utils.deleteRecursive(project.projectDir)
-    }
 
     @Test
     public void testAllConfigurations() {
@@ -153,7 +141,7 @@ class PluginTest extends GroovyTestCase {
         @Override
         public void run() {
             final int lowerBound = numOps * id
-            final int upperBound = (id == numThreads - 1) ? p.size() : (numOps * (id + 1))
+            final int upperBound = (id == (numThreads - 1)) ? p.size() : (numOps * (id + 1))
             for (int i = lowerBound; i < upperBound; ++i) {
                 checkProperties(p.get(i))
                 counter += 1
@@ -185,7 +173,6 @@ class PluginTest extends GroovyTestCase {
         }
 
         private void checkDefault(Project project) {
-            println("testDefault")
             final def jsDir = project.file('js/')
             final def jsFile = project.file(jsDir.path + '/' + project.name + '.js')
             final def jsFastFile = project.file(jsDir.path + '/' + project.name + '_fastopt.js')
