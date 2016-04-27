@@ -85,6 +85,8 @@ public final class ScalajsPlugin implements Plugin<Project> {
         project.afterEvaluate {
             tasks.withType(CompileJSTask) {
                 if (project.tasks.findByPath('TestJS')!=null){
+                    project.logger.info("Testing")
+                    project.logger.info("Testcp : "+project.sourceSets.test.runtimeClasspath)
                     it.dependsOn('testClasses')
                     it.configure(true)
                 } else {

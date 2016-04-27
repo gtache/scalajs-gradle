@@ -14,7 +14,7 @@ class UtilsTest extends GroovyTestCase {
     public void testResolvePath() {
         Project project = TestUtils.getFreshProject()
         final def dummyString = 'foo/bar.js'
-        def jsDir = project.file('js/')
+        def jsDir = project.file(project.buildDir.absolutePath+'/js/')
         def jsPath = project.file(jsDir.path + '/' + project.name + '.js').path
         def jsFastPath = project.file(jsDir.path + '/' + project.name + '_fastopt.js').path
         def jsFullPath = project.file(jsDir.path + '/' + project.name + '_fullopt.js').path
@@ -24,7 +24,9 @@ class UtilsTest extends GroovyTestCase {
         Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
-        jsDir = project.file('js/')
+        jsDir = project.file(project.buildDir.absolutePath+'/js/')
+        jsPath = project.file(jsDir.path + '/' + project.name + '.js').path
+        jsFastPath = project.file(jsDir.path + '/' + project.name + '_fastopt.js').path
         jsFullPath = project.file(jsDir.path + '/' + project.name + '_fullopt.js').path
         TestUtils.setProperty(project, 'runFull')
         TestUtils.applyPlugin(project)
@@ -32,15 +34,19 @@ class UtilsTest extends GroovyTestCase {
         Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
-        jsDir = project.file('js/')
+        jsDir = project.file(project.buildDir.absolutePath+'/js/')
         jsPath = project.file(jsDir.path + '/' + project.name + '.js').path
+        jsFastPath = project.file(jsDir.path + '/' + project.name + '_fastopt.js').path
+        jsFullPath = project.file(jsDir.path + '/' + project.name + '_fullopt.js').path
         TestUtils.setProperty(project, 'runNoOpt')
         TestUtils.applyPlugin(project)
         assertEquals(jsPath, Utils.resolvePath(project))
         Utils.deleteRecursive(project.projectDir)
 
         project = TestUtils.getFreshProject()
-        jsDir = project.file('js/')
+        jsDir = project.file(project.buildDir.absolutePath+'/js/')
+        jsPath = project.file(jsDir.path + '/' + project.name + '.js').path
+        jsFastPath = project.file(jsDir.path + '/' + project.name + '_fastopt.js').path
         jsFullPath = project.file(jsDir.path + '/' + project.name + '_fullopt.js').path
         TestUtils.setProperty(project, 'runFull')
         TestUtils.setProperty(project, 'runNoOpt')
