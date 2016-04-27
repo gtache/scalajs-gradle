@@ -53,7 +53,10 @@ public class CompileJSTask extends DefaultTask {
      * Parse the options
      * @return
      */
-    def configure() {
+    def configure(boolean includeTest) {
+        if (includeTest){
+            options=parseOptions(project.sourceSets.test.runtimeClasspath)
+        }
         options = parseOptions()
     }
 
@@ -83,9 +86,12 @@ public class CompileJSTask extends DefaultTask {
      * Configure the options given the project properties (given by user)
      * @return The configured options
      */
-    private def Scalajsld.Options parseOptions() {
+    private def Scalajsld.Options parseOptions(FileCollection testCp = null) {
         final def classpath = project.files(project.buildscript.configurations.getByName('classpath').asPath.split(File.pathSeparator))
-        final def cp = classpath + project.configurations.runtime + project.sourceSets.main.runtimeClasspath
+        def cp = classpath + project.configurations.runtime + project.sourceSets.main.runtimeClasspath
+        if (testCp!=null){
+            cp += testCp
+        }
         def options = Scalajsld.defaultOptions().withClasspath(
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
 

@@ -107,16 +107,19 @@ public final class Utils {
      */
     public static String resolvePath(Project project) {
         def path
+        final def buildPath = project.buildDir.absolutePath
+        final def jsPath = buildPath+'/js/'
+        final def baseFilename = jsPath+project.name
         if (project.hasProperty('o')) {
             path = project.file(project.property('o'))
         } else if (project.hasProperty('output')) {
             path = project.file(project.property('output'))
         } else if (project.hasProperty('runFull')) {
-            path = project.file('js/' + project.name + '_fullopt.js').absolutePath
+            path = project.file(baseFilename + '_fullopt.js').absolutePath
         } else if (project.hasProperty('runNoOpt')) {
-            path = project.file('js/' + project.name + '.js').absolutePath
+            path = project.file(baseFilename + '.js').absolutePath
         } else {
-            path = project.file('js/' + project.name + '_fastopt.js').absolutePath
+            path = project.file(baseFilename + '_fastopt.js').absolutePath
         }
         return path
     }

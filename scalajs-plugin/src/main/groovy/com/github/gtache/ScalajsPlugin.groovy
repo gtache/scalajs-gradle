@@ -32,8 +32,10 @@ public final class ScalajsPlugin implements Plugin<Project> {
             scalaCompilePlugin
         }
         project.logger.info('Adding scalajs-library and scalajs-compiler dependencies')
-        project.dependencies.add('compile', 'org.scala-js:scalajs-library_'+scalaVersion+':'+scalajsVersion)
-        project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_'+scalaVersion+'.'+compilerVersion+':'+scalajsVersion)
+        project.dependencies.add('compile', 'org.scala-js:scalajs-library_'
+                +scalaVersion+':'+scalajsVersion)
+        project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_'
+                +scalaVersion+'.'+compilerVersion+':'+scalajsVersion)
         project.logger.info('Dependencies added')
         final def jsDir = project.file(project.buildDir.absolutePath+'/js/')
         final def jsFile = project.file(jsDir.path + '/' + project.name + '.js')
@@ -82,8 +84,13 @@ public final class ScalajsPlugin implements Plugin<Project> {
 
         project.afterEvaluate {
             tasks.withType(CompileJSTask) {
-                it.dependsOn('classes')
-                it.configure()
+                if (project.tasks.findByPath('TestJS')!=null){
+                    it.dependsOn('testClasses')
+                    it.configure(true)
+                } else {
+                    it.dependsOn('classes')
+                    it.configure(false)
+                }
                 it.srcFiles = project.files(project.sourceSets.main.runtimeClasspath)
             }
             tasks.withType(ScalaCompile) {
