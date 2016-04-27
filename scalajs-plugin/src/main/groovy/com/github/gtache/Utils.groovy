@@ -20,6 +20,20 @@ import java.nio.file.Files
 
 public final class Utils {
 
+    private static Map<String, Object> savedProperties = null;
+
+    public static void saveProperties(Project project){
+        project.properties.each {
+            savedProperties.put(it.key, it.value)
+        }
+    }
+
+    public static void restoreProperties(Project project){
+        savedProperties.each {
+            project.properties.put(it.key,it.value)
+        }
+    }
+
     private Utils() {}
 
     /**

@@ -13,6 +13,10 @@ import org.gradle.api.tasks.scala.ScalaCompile
  */
 public final class ScalajsPlugin implements Plugin<Project> {
 
+    public static final String scalaVersion = "2.11"
+    public static final String compilerVersion = "8"
+    public static final String scalajsVersion = "0.6.8"
+
     /**
      * Applies the plugin to the given project
      * @param project The project it will apply the plugin to
@@ -28,8 +32,8 @@ public final class ScalajsPlugin implements Plugin<Project> {
             scalaCompilePlugin
         }
         project.logger.info('Adding scalajs-library and scalajs-compiler dependencies')
-        project.dependencies.add('compile', 'org.scala-js:scalajs-library_2.11:0.6.8')
-        project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_2.11.8:0.6.8')
+        project.dependencies.add('compile', 'org.scala-js:scalajs-library_'+scalaVersion+':'+scalajsVersion)
+        project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_'+scalaVersion+'.'+compilerVersion+':'+scalajsVersion)
         project.logger.info('Dependencies added')
         final def jsDir = project.file(project.buildDir.absolutePath+'/js/')
         final def jsFile = project.file(jsDir.path + '/' + project.name + '.js')

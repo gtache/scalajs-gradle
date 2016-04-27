@@ -82,8 +82,7 @@ class PluginTest extends GroovyTestCase {
                 "FastOptJS",
                 "FullOptJS",
                 "RunJS",
-                "NoOptJS",
-                "CleanAll"
+                "NoOptJS"
         ]
         allTasks.each {
             assertTrue(project.tasks.findByPath(it) != null)
