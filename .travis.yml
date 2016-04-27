@@ -16,11 +16,11 @@ script:
 
     - ./gradlew RunJS -Pclassname="DummyObject" -Pmethname="printSomething(\"blabla\")" -Prhino
     - ./gradlew RunJS -Pclassname="DummyScalaTag" -Pphantom
-    - ./gradlew CleanAll
+    - ./gradlew clean
     - ./gradlew RunJS -PtoExec="DummyScalaTag().main()" -PrunFull -Prhino
-    - ./gradlew CleanAll
+    - ./gradlew clean
     - ./gradlew RunJS -PtoExec="DummyObject().main()" -Pclassname="DummyScalaTag" -PrunNoOpt
-    - ./gradlew CleanAll
+    - ./gradlew clean
     - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js" -PrunFull -Pphantom
     - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js" -PrunNoOpt -Prhino
     - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js"
