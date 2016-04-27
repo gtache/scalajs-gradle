@@ -11,7 +11,6 @@ import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.logging.ScalaConsoleLogger
 import org.scalajs.jsenv.ComJSEnv
 import org.scalajs.jsenv.ConsoleJSConsole$
-import org.scalajs.jsenv.JSEnv
 import org.scalajs.testadapter.ScalaJSFramework
 import sbt.testing.*
 import scala.collection.mutable.Seq
@@ -48,6 +47,7 @@ public class TestJSTask extends DefaultTask {
             t.execute(eventHandler, [framework.logger()] as Logger[])
             memory.all_$eq(memory.all() + t)
         }
+
     }
 
 

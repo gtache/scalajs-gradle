@@ -1,6 +1,7 @@
 package com.github.gtache
 
 import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
 import org.scalajs.core.tools.io.FileVirtualJSFile
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.linker.backend.OutputMode
@@ -22,15 +23,15 @@ public final class Utils {
 
     private static Map<String, Object> savedProperties = null;
 
-    public static void saveProperties(Project project){
+    public static void saveProperties(Project project) {
         project.properties.each {
             savedProperties.put(it.key, it.value)
         }
     }
 
-    public static void restoreProperties(Project project){
+    public static void restoreProperties(Project project) {
         savedProperties.each {
-            project.properties.put(it.key,it.value)
+            project.properties.put(it.key, it.value)
         }
     }
 
@@ -108,8 +109,8 @@ public final class Utils {
     public static String resolvePath(Project project) {
         def path
         final def buildPath = project.buildDir.absolutePath
-        final def jsPath = buildPath+'/js/'
-        final def baseFilename = jsPath+project.name
+        final def jsPath = buildPath + '/js/'
+        final def baseFilename = jsPath + project.name
         if (project.hasProperty('o')) {
             path = project.file(project.property('o'))
         } else if (project.hasProperty('output')) {
@@ -156,6 +157,22 @@ public final class Utils {
             catch (AccessDeniedException e) {
                 //Files.isWritable doesnt work 100% apparently => can't use project.delete, throws exception sometimes
             }
+        }
+    }
+
+    public static void listRecursive(File file, Project project) {
+        if (file.isDirectory()) {
+            file.listFiles().each {
+                listRecursive(it, project)
+            }
+        } else {
+            project.logger.info(file.name)
+        }
+    }
+
+    public static void listRecursive(FileCollection file, Project project) {
+        file.files.each {
+            listRecursive(it, project)
         }
     }
 }

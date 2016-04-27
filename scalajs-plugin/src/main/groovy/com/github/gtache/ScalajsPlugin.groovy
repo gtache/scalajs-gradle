@@ -33,11 +33,11 @@ public final class ScalajsPlugin implements Plugin<Project> {
         }
         project.logger.info('Adding scalajs-library and scalajs-compiler dependencies')
         project.dependencies.add('compile', 'org.scala-js:scalajs-library_'
-                +scalaVersion+':'+scalajsVersion)
+                + scalaVersion + ':' + scalajsVersion)
         project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_'
-                +scalaVersion+'.'+compilerVersion+':'+scalajsVersion)
+                + scalaVersion + '.' + compilerVersion + ':' + scalajsVersion)
         project.logger.info('Dependencies added')
-        final def jsDir = project.file(project.buildDir.absolutePath+'/js/')
+        final def jsDir = project.file(project.buildDir.absolutePath + '/js/')
         final def jsFile = project.file(jsDir.path + '/' + project.name + '.js')
         final def jsFastFile = project.file(jsDir.path + '/' + project.name + '_fastopt.js')
         final def jsFullFile = project.file(jsDir.path + '/' + project.name + '_fullopt.js')
@@ -84,16 +84,15 @@ public final class ScalajsPlugin implements Plugin<Project> {
 
         project.afterEvaluate {
             tasks.withType(CompileJSTask) {
-                if (project.tasks.findByPath('TestJS')!=null){
-                    project.logger.info("Testing")
-                    project.logger.info("Testcp : "+project.sourceSets.test.runtimeClasspath)
+                //FIXME always true
+                if (project.tasks.findByPath('TestJS') != null) {
                     it.dependsOn('testClasses')
-                    it.configure(true)
+                    it.srcFiles = project.files(project.sourceSets.test.runtimeClasspath)
                 } else {
                     it.dependsOn('classes')
-                    it.configure(false)
+                    it.srcFiles = project.files(project.sourceSets.main.runtimeClasspath)
                 }
-                it.srcFiles = project.files(project.sourceSets.main.runtimeClasspath)
+                it.configure()
             }
             tasks.withType(ScalaCompile) {
                 scalaCompileOptions.additionalParameters = ["-Xplugin:" + project.configurations.scalaCompilePlugin.asPath]

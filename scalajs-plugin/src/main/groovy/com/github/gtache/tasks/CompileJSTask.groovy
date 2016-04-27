@@ -11,6 +11,7 @@ import org.scalajs.core.tools.linker.backend.OutputMode
 import org.scalajs.core.tools.logging.Level
 import scala.Option
 import scala.collection.JavaConverters
+import scala.collection.Seq
 
 /**
  * Task used to compile sjsir and classes file to a js file.
@@ -53,10 +54,7 @@ public class CompileJSTask extends DefaultTask {
      * Parse the options
      * @return
      */
-    def configure(boolean includeTest) {
-        if (includeTest){
-            options=parseOptions(project.sourceSets.test.runtimeClasspath)
-        }
+    def configure() {
         options = parseOptions()
     }
 
@@ -86,12 +84,10 @@ public class CompileJSTask extends DefaultTask {
      * Configure the options given the project properties (given by user)
      * @return The configured options
      */
-    private def Scalajsld.Options parseOptions(FileCollection testCp = null) {
-        final def classpath = project.files(project.buildscript.configurations.getByName('classpath').asPath.split(File.pathSeparator))
-        def cp = classpath + project.configurations.runtime + project.sourceSets.main.runtimeClasspath
-        if (testCp!=null){
-            cp += testCp
-        }
+    private def Scalajsld.Options parseOptions() {
+        final
+        def classpath = project.files(project.buildscript.configurations.getByName('classpath').asPath.split(File.pathSeparator))
+        final def cp = classpath + project.configurations.runtime + srcFiles
         def options = Scalajsld.defaultOptions().withClasspath(
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
 
