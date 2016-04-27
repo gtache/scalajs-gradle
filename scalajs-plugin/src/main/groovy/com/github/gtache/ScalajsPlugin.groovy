@@ -1,6 +1,6 @@
 package com.github.gtache
 
-import com.github.gtache.tasks.CleanAllTask
+
 import com.github.gtache.tasks.CompileJSTask
 import com.github.gtache.tasks.RunJSTask
 import com.github.gtache.tasks.TestJSTask
@@ -31,7 +31,7 @@ public final class ScalajsPlugin implements Plugin<Project> {
         project.dependencies.add('compile', 'org.scala-js:scalajs-library_2.11:0.6.8')
         project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_2.11.8:0.6.8')
         project.logger.info('Dependencies added')
-        final def jsDir = project.file('js/')
+        final def jsDir = project.file(project.buildDir.absolutePath+'/js/')
         final def jsFile = project.file(jsDir.path + '/' + project.name + '.js')
         final def jsFastFile = project.file(jsDir.path + '/' + project.name + '_fastopt.js')
         final def jsFullFile = project.file(jsDir.path + '/' + project.name + '_fullopt.js')
@@ -44,11 +44,6 @@ public final class ScalajsPlugin implements Plugin<Project> {
         }
 
         final def tasks = project.tasks;
-
-        final def cleanAll = tasks.create('CleanAll', CleanAllTask.class)
-        cleanAll.dependsOn('clean')
-        cleanAll.toDelete = project.files(jsDir)
-        project.logger.info('CleanAll task added')
 
         final def noOptJS = tasks.create('NoOptJS', CompileJSTask.class)
         noOptJS.destFile = jsFile
