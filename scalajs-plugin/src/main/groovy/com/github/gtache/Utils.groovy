@@ -123,7 +123,7 @@ public final class Utils {
         final def buildPath = project.buildDir.absolutePath
         final def jsPath = buildPath + JS_REL_DIR
         final def baseFilename = jsPath + project.name
-        final def hasTest = checkTaskInStartParameter(project, 'testjs')
+        final def hasTest = isTaskInStartParameter(project, 'testjs')
 
         final def o = 'o'
         final def output = 'output'
@@ -220,7 +220,7 @@ public final class Utils {
      * @param task The name task to be checked
      */
     //FIXME Doesn't work if user doesn't explicitely writes the name of the task
-    public static boolean checkTaskInStartParameter(Project project, String task) {
+    public static boolean isTaskInStartParameter(Project project, String task) {
         List<String> tasks = project.gradle.startParameter.taskNames.collect { it.toLowerCase() }
         return tasks.contains(task.toLowerCase())
     }

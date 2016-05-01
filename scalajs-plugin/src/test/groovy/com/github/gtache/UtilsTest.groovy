@@ -208,4 +208,16 @@ class UtilsTest extends GroovyTestCase {
         }
         Utils.deleteRecursive(project.projectDir)
     }
+
+    @Test
+    public void testTaskInStartParameter(){
+        final Project project = TestUtils.getFreshProject()
+        List<String> tasks = new ArrayList<>();
+        tasks.add("TeSTJs")
+        tasks.add("blaJS")
+        project.gradle.startParameter.setTaskNames(tasks)
+        assertTrue(Utils.isTaskInStartParameter(project,"testjs"))
+        assertTrue(Utils.isTaskInStartParameter(project,"blaJS"))
+        assertFalse(Utils.isTaskInStartParameter(project,"something"))
+    }
 }

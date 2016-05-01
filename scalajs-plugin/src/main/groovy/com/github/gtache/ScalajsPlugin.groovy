@@ -93,7 +93,7 @@ public final class ScalajsPlugin implements Plugin<Project> {
             tasks.withType(CompileJSTask) {
                 it.dependsOn(classes)
                 it.mustRunAfter(testClasses, classes)
-                if (checkTaskInStartParameter(project, testJS.name)) {
+                if (isTaskInStartParameter(project, testJS.name)) {
                     if (it == fastOptJS) {
                         it.destFile = jsTestFastFile
                     } else if (it == fullOptJS) {
