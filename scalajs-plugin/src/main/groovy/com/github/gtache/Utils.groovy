@@ -219,6 +219,7 @@ public final class Utils {
      * @param project The project whose startparameters we want to use
      * @param task The name task to be checked
      */
+    //FIXME Doesn't work if user doesn't explicitely writes the name of the task
     public static boolean checkTaskInStartParameter(Project project, String task) {
         List<String> tasks = project.gradle.startParameter.taskNames.collect { it.toLowerCase() }
         return tasks.contains(task.toLowerCase())
