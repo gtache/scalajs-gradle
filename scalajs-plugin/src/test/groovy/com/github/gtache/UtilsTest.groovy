@@ -219,5 +219,6 @@ class UtilsTest extends GroovyTestCase {
         assertTrue(Utils.isTaskInStartParameter(project,"testjs"))
         assertTrue(Utils.isTaskInStartParameter(project,"blaJS"))
         assertFalse(Utils.isTaskInStartParameter(project,"something"))
+        Utils.deleteRecursive(project.projectDir)
     }
 }
