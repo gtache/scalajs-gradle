@@ -94,7 +94,6 @@ public final class ScalajsPlugin implements Plugin<Project> {
                 it.dependsOn(classes)
                 it.mustRunAfter(testClasses, classes)
                 if (checkTaskInStartParameter(project, testJS.name)) {
-                    project.logger.info('IN STARTPARAMETER')
                     if (it == fastOptJS) {
                         it.destFile = jsTestFastFile
                     } else if (it == fullOptJS) {
@@ -106,7 +105,6 @@ public final class ScalajsPlugin implements Plugin<Project> {
                     }
                     it.srcFiles = project.files(project.sourceSets.test.runtimeClasspath)
                 } else {
-                    project.logger.info('NOT IN STARTPARAMETER')
                     it.srcFiles = project.files(project.sourceSets.main.runtimeClasspath)
                 }
                 it.configure()
