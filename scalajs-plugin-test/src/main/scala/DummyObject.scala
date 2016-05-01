@@ -5,7 +5,7 @@ import scala.scalajs.js.annotation.JSExport
 object DummyObject extends js.JSApp {
 
   @JSExport
-  def main(): Unit = {
+  override def main(): Unit = {
     val squared = square(10)
     println("Hello ! Square of 10 is " + squared)
   }
