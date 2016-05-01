@@ -19,6 +19,12 @@ public class RunJSTask extends DefaultTask {
             "Needs Node.js / PhantomJS on PATH, or use Rhino.\n" +
             "Use -Prhino (highest priority) or -Pphantom. Default : node"
 
+    private static final String LOG_LEVEL = 'runLogLevel'
+    private static final String EXEC_FILE = 'fileToExec'
+    private static final String EXEC_CODE = 'toExec'
+    private static final String CLASSNAME = 'classname'
+    private static final String METHNAME = 'methname'
+
     /**
      * The main method of the task, resolves the environment and the code to execute, and runs it
      */
@@ -29,8 +35,7 @@ public class RunJSTask extends DefaultTask {
             logger.error('Nothing to execute')
         } else {
             final JSEnv env = Utils.resolveEnv(project)
-            final String path = Utils.resolvePath(project)
-            final Level logLevel = Utils.resolveLogLevel(project, 'runLogLevel', Level.Debug$.MODULE$)
+            final Level logLevel = Utils.resolveLogLevel(project, LOG_LEVEL, Level.Debug$.MODULE$)
 
             VirtualJSFile code
             if (toExec.first) {
@@ -56,17 +61,17 @@ public class RunJSTask extends DefaultTask {
     private Tuple2<Boolean, String> resolveToExec() {
         def toExec = null
         def isFile = false
-        if (project.hasProperty('fileToExec')) {
-            toExec = project.property('fileToExec')
+        if (project.hasProperty(EXEC_FILE)) {
+            toExec = project.property(EXEC_FILE)
             isFile = true
-        } else if (project.hasProperty('toExec')) {
-            toExec = project.property('toExec')
-        } else if (project.hasProperty('classname')) {
-            final def classname = project.property('classname');
-            if (!project.hasProperty('methname')) {
+        } else if (project.hasProperty(EXEC_CODE)) {
+            toExec = project.property(EXEC_CODE)
+        } else if (project.hasProperty(CLASSNAME)) {
+            final def classname = project.property(CLASSNAME);
+            if (!project.hasProperty(METHNAME)) {
                 toExec = classname + '().main()'
             } else {
-                toExec = classname + '().' + project.property('methname')
+                toExec = classname + '().' + project.property(METHNAME)
             }
         }
         return new Tuple(isFile, toExec)

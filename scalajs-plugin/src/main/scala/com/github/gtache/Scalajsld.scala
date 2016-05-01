@@ -211,7 +211,7 @@ object Scalajsld {
       * @return a string
       */
     override def toString: String = {
-      "cp : " + cp.foldLeft("")((acc : String, c : File) => acc+"\n"+c.getAbsolutePath) + "\n" +
+      "cp : " + cp.foldLeft("")((acc: String, c: File) => acc + "\n" + c.getAbsolutePath) + "\n" +
         "output : " + output + " jsoutput : " + jsoutput + "\n" +
         "semantics : " + semantics + "\n" +
         "outputMode : " + outputMode + "\n" +

@@ -11,13 +11,15 @@ import org.scalajs.core.tools.linker.backend.OutputMode
 import org.scalajs.core.tools.logging.Level
 import scala.Option
 import scala.collection.JavaConverters
-import scala.collection.Seq
 
 /**
  * Task used to compile sjsir and classes file to a js file.
  */
 public class CompileJSTask extends DefaultTask {
     final String description = "Compiles all sjsir files into a single javascript file"
+
+    private static final String LOG_LEVEL = 'linkLogLevel'
+
     private Scalajsld.Options options
     @InputFiles
     FileCollection srcFiles
@@ -91,10 +93,13 @@ public class CompileJSTask extends DefaultTask {
         def options = Scalajsld.defaultOptions().withClasspath(
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
 
-        if (project.hasProperty('o')) {
-            destFile = project.file(project.property('o'))
-        } else if (project.hasProperty('output')) {
-            destFile = project.file(project.property('output'))
+        final def o = 'o'
+        final def output = 'output'
+
+        if (project.hasProperty(o)) {
+            destFile = project.file(project.property(o))
+        } else if (project.hasProperty(output)) {
+            destFile = project.file(project.property(output))
         }
         options = options.withOutput(destFile)
 
@@ -118,21 +123,24 @@ public class CompileJSTask extends DefaultTask {
             options = options.withCompliantsSemantics()
         }
 
-        if (project.hasProperty('m')) {
-            String modeS = project.property('m')
+        final def m = 'm'
+        final def outputMode = 'outputMode'
+
+        if (project.hasProperty(m)) {
+            String modeS = project.property(m)
             OutputMode mode = Utils.getOutputMode(modeS)
             if (mode != null) {
                 options = options.withOutputMode(mode)
             } else {
-                logger.error("Unknown outputMode")
+                logger.error("Unknown output mode")
             }
-        } else if (project.hasProperty('outputMode')) {
-            String modeS = project.property('outputMode')
+        } else if (project.hasProperty(outputMode)) {
+            String modeS = project.property(outputMode)
             OutputMode mode = Utils.getOutputMode(modeS)
             if (mode != null) {
                 options = options.withOutputMode(mode)
             } else {
-                logger.error("Unknown outputMode")
+                logger.error("Unknown output mode")
             }
         }
 
@@ -140,13 +148,16 @@ public class CompileJSTask extends DefaultTask {
             options = options.withCheckIR(true)
         }
 
-        if (project.hasProperty('r')) {
-            options = options.withRelativizeSourceMap(Option.apply(new URI((String) project.property('r'))))
-        } else if (project.hasProperty('relativizeSourceMap')) {
-            options = options.withRelativizeSourceMap(Option.apply(new URI((String) project.property('relativizeSourceMap'))))
+        final def r = 'r'
+        final def relativizeSourceMap = 'relativizeSourceMap'
+
+        if (project.hasProperty(r)) {
+            options = options.withRelativizeSourceMap(Option.apply(new URI((String) project.property(r))))
+        } else if (project.hasProperty(relativizeSourceMap)) {
+            options = options.withRelativizeSourceMap(Option.apply(new URI((String) project.property(relativizeSourceMap))))
         }
 
-        Level level = Utils.resolveLogLevel(project, 'linkLogLevel', Level.Info$.MODULE$)
+        Level level = Utils.resolveLogLevel(project, LOG_LEVEL, Level.Info$.MODULE$)
         if (project.hasProperty('d') || project.hasProperty('debug')) {
             level = Level.Debug$.MODULE$
         } else if (project.hasProperty('q') || project.hasProperty('quiet')) {

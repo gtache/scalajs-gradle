@@ -18,6 +18,8 @@ import scala.collection.mutable.Seq
 public class TestJSTask extends DefaultTask {
     final String description = "Runs tests"
 
+    private static final String LOG_LEVEL = 'testLogLevel'
+
     /**
      * The action of the task : Instantiates a framework, a runner, and executes all tests found, with the fingerprints
      * given by the framework
@@ -31,7 +33,7 @@ public class TestJSTask extends DefaultTask {
         final Framework framework = new ScalaJSFramework(
                 "ScalaJS Testing framework",
                 libEnv,
-                new ScalaConsoleLogger(Utils.resolveLogLevel(project, 'testLogLevel', Level.Debug$.MODULE$)),
+                new ScalaConsoleLogger(Utils.resolveLogLevel(project, LOG_LEVEL, Level.Debug$.MODULE$)),
                 ConsoleJSConsole$.MODULE$)
         final Runner runner = framework.runner(new String[0], new String[0], null)
         final URLClassLoader classL = new URLClassLoader(project.buildDir.toURI().toURL())

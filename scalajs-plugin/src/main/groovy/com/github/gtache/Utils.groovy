@@ -1,6 +1,8 @@
 package com.github.gtache
 
 import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.file.FileCollection
 import org.scalajs.core.tools.io.FileVirtualJSFile
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency
@@ -21,19 +23,31 @@ import java.nio.file.Files
 
 public final class Utils {
 
-    private static Map<String, Object> savedProperties = null;
+    public static final String SCALA_VERSION = "2.11"
+    public static final String COMPILER_VERSION = "8"
+    public static final String SCALAJS_VERSION = "0.6.9"
 
-    public static void saveProperties(Project project) {
-        project.properties.each {
-            savedProperties.put(it.key, it.value)
-        }
-    }
+    public static final String JS_REL_DIR = File.separator+'js'+File.separator
+    public static final String EXT = '.js'
+    public static final String FULLOPT_SUFFIX = '_fullopt' + EXT
+    public static final String FASTOPT_SUFFIX = '_fastopt' + EXT
+    public static final String TEST_SUFFIX = '_test'
+    public static final String NOOPT_TEST_SUFFIX = TEST_SUFFIX + EXT
+    public static final String FULLOPT_TEST_SUFFIX = TEST_SUFFIX + FULLOPT_SUFFIX
+    public static final String FASTOPT_TEST_SUFFIX = TEST_SUFFIX + FASTOPT_SUFFIX
 
-    public static void restoreProperties(Project project) {
-        savedProperties.each {
-            project.properties.put(it.key, it.value)
-        }
-    }
+    public static final String RUN_FULL = 'runFull'
+    public static final String RUN_NOOPT = 'runNoOpt'
+
+    //Envs
+    public static final String RHINO = 'rhino'
+    public static final String PHANTOM = 'phantom'
+
+    //LogLevel
+    public static final String ERROR_LVL = 'Error'
+    public static final String WARN_LVL = 'Warn'
+    public static final String INFO_LVL = 'Info'
+    public static final String DEBUG_LVL = 'Debug'
 
     private Utils() {}
 
@@ -47,16 +61,16 @@ public final class Utils {
         def level = base
         if (project.hasProperty(property)) {
             switch (project.property(property)) {
-                case 'Error':
+                case ERROR_LVL:
                     level = Level.Error$.MODULE$
                     break
-                case 'Warn':
+                case WARN_LVL:
                     level = Level.Warn$.MODULE$
                     break
-                case 'Info':
+                case INFO_LVL:
                     level = Level.Info$.MODULE$
                     break
-                case 'Debug':
+                case DEBUG_LVL:
                     level = Level.Debug$.MODULE$
                     break
                 default:
@@ -74,9 +88,9 @@ public final class Utils {
      */
     public static JSEnv resolveEnv(Project project) {
         def env
-        if (project.hasProperty('rhino')) {
+        if (project.hasProperty(RHINO)) {
             env = new RhinoJSEnv(Scalajsld$.MODULE$.options().semantics(), false)
-        } else if (project.hasProperty('phantom')) {
+        } else if (project.hasProperty(PHANTOM)) {
             env = new PhantomJSEnv("phantomjs", List$.MODULE$.empty(), Map$.MODULE$.empty(), true, null)
         } else {
             env = new NodeJSEnv("node", Seq$.MODULE$.empty(), Map$.MODULE$.empty())
@@ -109,18 +123,34 @@ public final class Utils {
     public static String resolvePath(Project project) {
         def path
         final def buildPath = project.buildDir.absolutePath
-        final def jsPath = buildPath + '/js/'
+        final def jsPath = buildPath + JS_REL_DIR
         final def baseFilename = jsPath + project.name
-        if (project.hasProperty('o')) {
-            path = project.file(project.property('o'))
-        } else if (project.hasProperty('output')) {
-            path = project.file(project.property('output'))
-        } else if (project.hasProperty('runFull')) {
-            path = project.file(baseFilename + '_fullopt.js').absolutePath
-        } else if (project.hasProperty('runNoOpt')) {
-            path = project.file(baseFilename + '.js').absolutePath
+        final def hasTest = checkTaskOnGraph(project, ':TestJS')
+
+        final def o = 'o'
+        final def output = 'output'
+        if (project.hasProperty(o)) {
+            path = project.file(project.property(o))
+        } else if (project.hasProperty(output)) {
+            path = project.file(project.property(output))
+        } else if (project.hasProperty(RUN_FULL)) {
+            if (hasTest) {
+                path = project.file(baseFilename + FULLOPT_TEST_SUFFIX).absolutePath
+            } else {
+                path = project.file(baseFilename + FULLOPT_SUFFIX).absolutePath
+            }
+        } else if (project.hasProperty(RUN_NOOPT)) {
+            if (hasTest) {
+                path = project.file(baseFilename + NOOPT_TEST_SUFFIX).absolutePath
+            } else {
+                path = project.file(baseFilename + EXT).absolutePath
+            }
         } else {
-            path = project.file(baseFilename + '_fastopt.js').absolutePath
+            if (hasTest) {
+                path = project.file(baseFilename + FASTOPT_TEST_SUFFIX).absolutePath
+            } else {
+                path = project.file(baseFilename + FASTOPT_SUFFIX).absolutePath
+            }
         }
         return path
     }
@@ -160,6 +190,11 @@ public final class Utils {
         }
     }
 
+    /**
+     * Prints file if it is a file, or all the files contained in file if it is a directory
+     * @param file The file to print
+     * @param project For logging (printing)
+     */
     public static void listRecursive(File file, Project project) {
         if (file.isDirectory()) {
             file.listFiles().each {
@@ -170,9 +205,36 @@ public final class Utils {
         }
     }
 
+    /**
+     * Prints all the files in a FileCollection (as well as subfiles if there are directories)
+     * @param file The FileCollection
+     * @param project For logging (printing)
+     */
     public static void listRecursive(FileCollection file, Project project) {
         file.files.each {
             listRecursive(it, project)
+        }
+    }
+
+    /**
+     * Checks if there is a task on the TaskGraph
+     * @param project The project whose TaskGraph we want to use
+     * @param task The task to be checked
+     */
+    public static void checkTaskOnGraph(Project project, Task task) {
+        project.getGradle().taskGraph.whenReady { TaskExecutionGraph graph ->
+            return graph.hasTask(task)
+        }
+    }
+
+    /**
+     * Checks if there is a task on the TaskGraph
+     * @param project The project whose TaskGraph we want to use
+     * @param task The path of the task to be checked
+     */
+    public static void checkTaskOnGraph(Project project, String task) {
+        project.getGradle().taskGraph.whenReady { TaskExecutionGraph graph ->
+            return graph.hasTask(task)
         }
     }
 }
