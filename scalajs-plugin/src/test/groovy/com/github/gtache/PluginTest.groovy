@@ -98,8 +98,8 @@ class PluginTest extends GroovyTestCase {
             assertTrue(project.plugins.findPlugin(it) != null)
         }
 
-        def libDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-library_'+Utils.SCALA_VERSION, Utils.SCALAJS_VERSION)
-        def compDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-compiler_'+Utils.SCALA_VERSION+'.'+Utils.COMPILER_VERSION, Utils.SCALAJS_VERSION)
+        def libDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-library_' + Utils.SCALA_VERSION, Utils.SCALAJS_VERSION)
+        def compDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-compiler_' + Utils.SCALA_VERSION + '.' + Utils.COMPILER_VERSION, Utils.SCALAJS_VERSION)
         def compileIt = project.configurations.getByName('compile').dependencies.iterator()
         def libDepFound = false
         while (compileIt.hasNext() && !libDepFound) {

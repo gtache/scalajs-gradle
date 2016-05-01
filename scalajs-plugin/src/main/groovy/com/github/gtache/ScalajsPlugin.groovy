@@ -58,17 +58,17 @@ public final class ScalajsPlugin implements Plugin<Project> {
         final def noOptJS = tasks.create('NoOptJS', CompileJSTask.class)
         noOptJS.destFile = jsFile
         noOptJS.noOpt()
-        project.logger.info(noOptJS.name +' task added')
+        project.logger.info(noOptJS.name + ' task added')
 
         final def fastOptJS = tasks.create('FastOptJS', CompileJSTask.class)
         fastOptJS.destFile = jsFastFile
         fastOptJS.fastOpt()
-        project.logger.info(fastOptJS.name+' task added')
+        project.logger.info(fastOptJS.name + ' task added')
 
         final def fullOptJS = tasks.create('FullOptJS', CompileJSTask.class)
         fullOptJS.destFile = jsFullFile
         fullOptJS.fullOpt()
-        project.logger.info(fullOptJS.name +' task added')
+        project.logger.info(fullOptJS.name + ' task added')
 
         final def runJS = tasks.create('RunJS', RunJSTask.class)
 
@@ -87,13 +87,14 @@ public final class ScalajsPlugin implements Plugin<Project> {
             testJS.dependsOn(fastOptJS)
             runJS.dependsOn(fastOptJS)
         }
-        project.logger.info(testJS.name+' task added')
+        project.logger.info(testJS.name + ' task added')
 
         project.afterEvaluate {
             tasks.withType(CompileJSTask) {
                 it.dependsOn(classes)
                 it.mustRunAfter(testClasses, classes)
-                if (checkTaskOnGraph(project, testJS)) {
+                if (checkTaskInStartParameter(project, testJS.name)) {
+                    project.logger.info('IN STARTPARAMETER')
                     if (it == fastOptJS) {
                         it.destFile = jsTestFastFile
                     } else if (it == fullOptJS) {
@@ -104,11 +105,11 @@ public final class ScalajsPlugin implements Plugin<Project> {
                         throw new IllegalStateException("Unknown task : " + it.name)
                     }
                     it.srcFiles = project.files(project.sourceSets.test.runtimeClasspath)
-                    it.configure()
                 } else {
+                    project.logger.info('NOT IN STARTPARAMETER')
                     it.srcFiles = project.files(project.sourceSets.main.runtimeClasspath)
-                    it.configure()
                 }
+                it.configure()
             }
             tasks.withType(ScalaCompile) {
                 scalaCompileOptions.additionalParameters = ["-Xplugin:" + project.configurations.scalaCompilePlugin.asPath]

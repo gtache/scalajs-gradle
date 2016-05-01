@@ -1,8 +1,6 @@
 package com.github.gtache
 
 import org.gradle.api.Project
-import org.gradle.api.Task
-import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.file.FileCollection
 import org.scalajs.core.tools.io.FileVirtualJSFile
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency
@@ -27,7 +25,7 @@ public final class Utils {
     public static final String COMPILER_VERSION = "8"
     public static final String SCALAJS_VERSION = "0.6.9"
 
-    public static final String JS_REL_DIR = File.separator+'js'+File.separator
+    public static final String JS_REL_DIR = File.separator + 'js' + File.separator
     public static final String EXT = '.js'
     public static final String FULLOPT_SUFFIX = '_fullopt' + EXT
     public static final String FASTOPT_SUFFIX = '_fastopt' + EXT
@@ -125,7 +123,7 @@ public final class Utils {
         final def buildPath = project.buildDir.absolutePath
         final def jsPath = buildPath + JS_REL_DIR
         final def baseFilename = jsPath + project.name
-        final def hasTest = checkTaskOnGraph(project, ':TestJS')
+        final def hasTest = checkTaskInStartParameter(project, 'testjs')
 
         final def o = 'o'
         final def output = 'output'
@@ -217,24 +215,13 @@ public final class Utils {
     }
 
     /**
-     * Checks if there is a task on the TaskGraph
-     * @param project The project whose TaskGraph we want to use
-     * @param task The task to be checked
+     * Checks if there is a task is to be executed (explicitely specified)
+     * @param project The project whose startparameters we want to use
+     * @param task The name task to be checked
      */
-    public static void checkTaskOnGraph(Project project, Task task) {
-        project.getGradle().taskGraph.whenReady { TaskExecutionGraph graph ->
-            return graph.hasTask(task)
-        }
+    public static boolean checkTaskInStartParameter(Project project, String task) {
+        List<String> tasks = project.gradle.startParameter.taskNames.collect { it.toLowerCase() }
+        return tasks.contains(task.toLowerCase())
     }
 
-    /**
-     * Checks if there is a task on the TaskGraph
-     * @param project The project whose TaskGraph we want to use
-     * @param task The path of the task to be checked
-     */
-    public static void checkTaskOnGraph(Project project, String task) {
-        project.getGradle().taskGraph.whenReady { TaskExecutionGraph graph ->
-            return graph.hasTask(task)
-        }
-    }
 }
