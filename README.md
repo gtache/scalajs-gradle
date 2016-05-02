@@ -26,14 +26,14 @@ as well as dependencies on **scalajs-library 2.11:0.6.9** and **scalajs-compiler
 ## Usage
 `gradlew FastOptJS`, `gradlew FullOptJS` or `gradlew NoOptJS` to compile everything.
 
-You can run the generated javascript file with `gradlew RunJS`.
+You can run the generated javascript file with `gradlew RunJS`.    
 You can run tests with `gradlew TestJS`.
 
 ### Options for RunJS
--`-Pclassname` is the fully qualified name of the class to run
--`-Pmethname` is the method of classname to run.
--`-PtoExec` (has higher priority than `-Pclassname`) will run the given explicit command
--`-PfileToExec` (has highest priority) will run the given js file.
+-`-Pclassname` is the fully qualified name of the class to run    
+-`-Pmethname` is the method of classname to run.    
+-`-PtoExec` (has higher priority than `-Pclassname`) will run the given explicit command    
+-`-PfileToExec` (has highest priority) will run the given js file.    
 -Adding `-PrunNoOpt` will run the unoptimized file   
 -Adding `-PrunFull` will run the fully optimized file (overrides `-PrunNoOpt` if both are used)   
 -It will run the fast optimized file by default.  
