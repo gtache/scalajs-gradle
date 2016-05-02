@@ -1,7 +1,6 @@
 package com.github.gtache.tasks
 
 import com.github.gtache.Utils
-
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.io.FileVirtualJSFile

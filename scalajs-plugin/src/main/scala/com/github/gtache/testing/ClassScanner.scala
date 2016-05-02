@@ -1,6 +1,5 @@
 package com.github.gtache.testing
 
-import java.io.File
 import java.lang.annotation.Annotation
 import java.net.{URL, URLClassLoader}
 import java.nio.file.Paths
@@ -96,7 +95,7 @@ object ClassScanner {
     * @return the classes
     */
   def parseClasses(classL: URLClassLoader): Array[Class[_]] = {
-    def parseClasses(url: URL, idx : Int): Array[Class[_]] = {
+    def parseClasses(url: URL, idx: Int): Array[Class[_]] = {
       val f = Paths.get(url.toURI).toFile
       val packageName = {
         if (url != classL.getURLs()(idx)) {
@@ -112,7 +111,7 @@ object ClassScanner {
             val name = file.getName
             buffer += classL.loadClass(packageName + name.substring(0, name.indexOf('.')))
           } else if (file.isDirectory) {
-            parseClasses(file.toURI.toURL,idx).foreach(c => {
+            parseClasses(file.toURI.toURL, idx).foreach(c => {
               buffer += c
             })
           }
@@ -135,7 +134,7 @@ object ClassScanner {
         val name = f.getName
         buffer += classL.loadClass(name.substring(0, name.indexOf('.')))
       } else if (f.isDirectory) {
-        parseClasses(url._1,url._2).foreach(c => {
+        parseClasses(url._1, url._2).foreach(c => {
           buffer += c
         })
       }

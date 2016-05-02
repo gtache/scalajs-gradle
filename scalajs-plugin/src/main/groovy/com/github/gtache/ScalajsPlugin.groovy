@@ -15,7 +15,6 @@ import static com.github.gtache.Utils.*
  */
 public final class ScalajsPlugin implements Plugin<Project> {
 
-
     /**
      * Applies the plugin to the given project
      * @param project The project it will apply the plugin to

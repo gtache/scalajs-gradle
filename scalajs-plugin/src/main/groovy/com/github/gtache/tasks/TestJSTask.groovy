@@ -1,7 +1,6 @@
 package com.github.gtache.tasks
 
 import com.github.gtache.Utils
-
 import com.github.gtache.testing.ClassScanner
 import com.github.gtache.testing.ScalaJSEventHandler$
 import com.github.gtache.testing.ScalaJSTestStatus$

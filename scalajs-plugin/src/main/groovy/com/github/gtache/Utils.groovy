@@ -56,8 +56,8 @@ public final class Utils {
      * Prepares the TaskExecutionGraph for the given project
      * @param project
      */
-    public static void prepareGraph(Project project){
-        project.gradle.taskGraph.whenReady {graph=it}
+    public static void prepareGraph(Project project) {
+        project.gradle.taskGraph.whenReady { graph = it }
     }
 
     /**
@@ -134,12 +134,12 @@ public final class Utils {
         final def buildPath = project.buildDir.absolutePath
         final def jsPath = buildPath + JS_REL_DIR
         final def baseFilename = jsPath + project.name
-        if (graph==null){
+        if (graph == null) {
             project.logger.warn('TaskGraph not ready yet : Possible error when computing output file\n' +
                     'Run with TestJS explicitely to be sure it works')
         }
         //Performs suboptimal check if TaskExecutionGraph not ready
-        final def hasTest = graph!=null ? graph.hasTask(':TestJS') : isTaskInStartParameter(project, 'testjs')
+        final def hasTest = graph != null ? graph.hasTask(':TestJS') : isTaskInStartParameter(project, 'testjs')
 
         final def o = 'o'
         final def output = 'output'
