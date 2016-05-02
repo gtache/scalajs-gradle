@@ -1,6 +1,7 @@
 package com.github.gtache
 
 import org.gradle.api.Project
+import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.file.FileCollection
 import org.scalajs.core.tools.io.FileVirtualJSFile
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency
@@ -153,6 +154,51 @@ public final class Utils {
         return path
     }
 
+    public static void resolvePathAsync(Project project, UtilsListener listener, isUtils = false){
+        project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
+            String path
+            final def buildPath = project.buildDir.absolutePath
+            final def jsPath = buildPath + JS_REL_DIR
+            final def baseFilename = jsPath + project.name
+            final def hasTest = graph.hasTask(':TestJS')
+
+            final def o = 'o'
+            final def output = 'output'
+            if (project.hasProperty(o)) {
+                path = project.file(project.property(o))
+            } else if (project.hasProperty(output)) {
+                path = project.file(project.property(output))
+            } else if (project.hasProperty(RUN_FULL)) {
+                if (hasTest) {
+                    path = project.file(baseFilename + FULLOPT_TEST_SUFFIX).absolutePath
+                } else {
+                    path = project.file(baseFilename + FULLOPT_SUFFIX).absolutePath
+                }
+            } else if (project.hasProperty(RUN_NOOPT)) {
+                if (hasTest) {
+                    path = project.file(baseFilename + NOOPT_TEST_SUFFIX).absolutePath
+                } else {
+                    path = project.file(baseFilename + EXT).absolutePath
+                }
+            } else {
+                if (hasTest) {
+                    path = project.file(baseFilename + FASTOPT_TEST_SUFFIX).absolutePath
+                } else {
+                    path = project.file(baseFilename + FASTOPT_SUFFIX).absolutePath
+                }
+            }
+            if(isUtils){
+                returnDependencySeq(project, path,listener)
+            } else {
+                listener.getResult(path)
+            }
+        }
+    }
+
+    public static void getMinimalDependencySeqAsync(Project project, UtilsListener listener){
+        resolvePathAsync(project, listener, true)
+    }
+
     /**
      * Returns the minimal ResolvedDependency Seq, which is comprised of only the generated js file.
      * @param project The project
@@ -225,4 +271,11 @@ public final class Utils {
         return tasks.contains(task.toLowerCase())
     }
 
+    private static void returnDependencySeq(Project project, String result, UtilsListener listener) {
+        final FileVirtualJSFile file = new FileVirtualJSFile(project.file(result))
+        final ResolvedJSDependency fileD = ResolvedJSDependency.minimal(file)
+        final Seq<ResolvedJSDependency> dependencySeq = new ArraySeq<>(1)
+        dependencySeq.update(0, fileD)
+        listener.getResult(dependencySeq)
+    }
 }

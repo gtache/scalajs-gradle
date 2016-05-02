@@ -1,6 +1,7 @@
 package com.github.gtache.tasks
 
 import com.github.gtache.Utils
+import com.github.gtache.UtilsListener
 import com.github.gtache.testing.ClassScanner
 import com.github.gtache.testing.ScalaJSEventHandler$
 import com.github.gtache.testing.ScalaJSTestStatus$
@@ -15,10 +16,12 @@ import org.scalajs.testadapter.ScalaJSFramework
 import sbt.testing.*
 import scala.collection.mutable.Seq
 
-public class TestJSTask extends DefaultTask {
+public class TestJSTask extends DefaultTask implements UtilsListener<Seq<ResolvedJSDependency>>{
     final String description = "Runs tests"
 
     private static final String LOG_LEVEL = 'testLogLevel'
+
+    private Seq<ResolvedJSDependency> dependencySeq = null
 
     /**
      * The action of the task : Instantiates a framework, a runner, and executes all tests found, with the fingerprints
@@ -27,7 +30,6 @@ public class TestJSTask extends DefaultTask {
     //TODO not functioning
     @TaskAction
     def run() {
-        final Seq<ResolvedJSDependency> dependencySeq = Utils.getMinimalDependencySeq(project)
         final def libEnv = (ComJSEnv) Utils.resolveEnv(project).loadLibs(dependencySeq)
 
         final Framework framework = new ScalaJSFramework(
@@ -52,5 +54,12 @@ public class TestJSTask extends DefaultTask {
 
     }
 
+    def callUtils() {
+        Utils.getMinimalDependencySeqAsync(project,this)
+    }
 
+    @Override
+    public void getResult(Seq<ResolvedJSDependency> result) {
+        this.dependencySeq=result
+    }
 }

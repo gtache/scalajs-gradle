@@ -5,6 +5,7 @@ import com.github.gtache.tasks.RunJSTask
 import com.github.gtache.tasks.TestJSTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.tasks.scala.ScalaCompile
 
 import static com.github.gtache.Utils.*
@@ -13,6 +14,7 @@ import static com.github.gtache.Utils.*
  * The main class for the plugin
  */
 public final class ScalajsPlugin implements Plugin<Project> {
+
 
     /**
      * Applies the plugin to the given project
@@ -71,12 +73,15 @@ public final class ScalajsPlugin implements Plugin<Project> {
         project.logger.info(fullOptJS.name + ' task added')
 
         final def runJS = tasks.create('RunJS', RunJSTask.class)
+        runJS.callUtils()
 
         final def classes = 'classes'
         final def testClasses = 'testClasses'
 
         final def testJS = tasks.create('TestJS', TestJSTask.class)
+        testJS.callUtils()
         testJS.dependsOn(testClasses)
+
         if (runFull) {
             testJS.dependsOn(fullOptJS)
             runJS.dependsOn(fullOptJS)
@@ -93,21 +98,24 @@ public final class ScalajsPlugin implements Plugin<Project> {
             tasks.withType(CompileJSTask) {
                 it.dependsOn(classes)
                 it.mustRunAfter(testClasses, classes)
-                if (isTaskInStartParameter(project, testJS.name)) {
-                    if (it == fastOptJS) {
-                        it.destFile = jsTestFastFile
-                    } else if (it == fullOptJS) {
-                        it.destFile = jsTestFullFile
-                    } else if (it == noOptJS) {
-                        it.destFile = jsTestFile
-                    } else {
-                        throw new IllegalStateException("Unknown task : " + it.name)
-                    }
-                    it.srcFiles = project.files(project.sourceSets.test.runtimeClasspath)
-                } else {
-                    it.srcFiles = project.files(project.sourceSets.main.runtimeClasspath)
-                }
                 it.configure()
+            }
+            project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
+                if (graph.hasTask(testJS)) {
+                    tasks.withType(CompileJSTask) {
+                        if (it == fastOptJS) {
+                            it.destFile = jsTestFastFile
+                        } else if (it == fullOptJS) {
+                            it.destFile = jsTestFullFile
+                        } else if (it == noOptJS) {
+                            it.destFile = jsTestFile
+                        } else {
+                            throw new IllegalStateException("Unknown task : " + it.name)
+                        }
+                        it.srcFiles = project.files(project.sourceSets.test.runtimeClasspath)
+                        it.configure()
+                    }
+                }
             }
             tasks.withType(ScalaCompile) {
                 scalaCompileOptions.additionalParameters = ["-Xplugin:" + project.configurations.scalaCompilePlugin.asPath]
@@ -116,5 +124,5 @@ public final class ScalajsPlugin implements Plugin<Project> {
             project.logger.info('ScalajsPlugin applied')
         }
     }
-
 }
+
