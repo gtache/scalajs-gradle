@@ -1,6 +1,7 @@
 package com.github.gtache.testing
 
-import java.net.URLClassLoader
+import java.io.File
+import java.net.{URL, URLClassLoader}
 
 import org.junit.Assert._
 import org.junit.Test
@@ -33,7 +34,8 @@ class ClassScannerTest {
     }
 
     val fingerprints: Array[Fingerprint] = Array(annFingerprint, subFingerprint, subFingerprint2)
-    val loader = new URLClassLoader(Array(this.getClass.getResource("../../../../")))
+    val test : URL = this.getClass.getResource("../../../../")
+    val loader = new URLClassLoader(Array(test))
     val taskDefs = ClassScanner.scan(loader, fingerprints)
 
     val nameTasks = taskDefs.map(t => t.fullyQualifiedName())

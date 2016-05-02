@@ -1,5 +1,6 @@
 package com.github.gtache.testing
 
+import java.io.File
 import java.lang.annotation.Annotation
 import java.net.{URL, URLClassLoader}
 import java.nio.file.Paths
@@ -95,12 +96,11 @@ object ClassScanner {
     * @return the classes
     */
   def parseClasses(classL: URLClassLoader): Array[Class[_]] = {
-    def parseClasses(url: URL): Array[Class[_]] = {
+    def parseClasses(url: URL, idx : Int): Array[Class[_]] = {
       val f = Paths.get(url.toURI).toFile
       val packageName = {
-        //FIXME more urls
-        if (url != classL.getURLs()(0)) {
-          classL.getURLs()(0).toURI.relativize(url.toURI).toString.replace('/', '.')
+        if (url != classL.getURLs()(idx)) {
+          classL.getURLs()(idx).toURI.relativize(url.toURI).toString.replace('/', '.')
         } else {
           ""
         }
@@ -112,7 +112,7 @@ object ClassScanner {
             val name = file.getName
             buffer += classL.loadClass(packageName + name.substring(0, name.indexOf('.')))
           } else if (file.isDirectory) {
-            parseClasses(file.toURI.toURL).foreach(c => {
+            parseClasses(file.toURI.toURL,idx).foreach(c => {
               buffer += c
             })
           }
@@ -129,13 +129,13 @@ object ClassScanner {
     }
 
     val buffer = ArrayBuffer.empty[Class[_]]
-    classL.getURLs.foreach(url => {
-      val f = Paths.get(url.toURI).toFile
+    classL.getURLs.zipWithIndex.foreach(url => {
+      val f = Paths.get(url._1.toURI).toFile
       if (!f.isDirectory && f.getName.endsWith(".class")) {
         val name = f.getName
         buffer += classL.loadClass(name.substring(0, name.indexOf('.')))
       } else if (f.isDirectory) {
-        parseClasses(url).foreach(c => {
+        parseClasses(url._1,url._2).foreach(c => {
           buffer += c
         })
       }

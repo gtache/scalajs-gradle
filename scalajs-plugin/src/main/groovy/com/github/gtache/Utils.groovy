@@ -52,7 +52,10 @@ public final class Utils {
 
     private Utils() {}
 
-
+    /**
+     * Prepares the TaskExecutionGraph for the given project
+     * @param project
+     */
     public static void prepareGraph(Project project){
         project.gradle.taskGraph.whenReady {graph=it}
     }
@@ -135,6 +138,7 @@ public final class Utils {
             project.logger.warn('TaskGraph not ready yet : Possible error when computing output file\n' +
                     'Run with TestJS explicitely to be sure it works')
         }
+        //Performs suboptimal check if TaskExecutionGraph not ready
         final def hasTest = graph!=null ? graph.hasTask(':TestJS') : isTaskInStartParameter(project, 'testjs')
 
         final def o = 'o'
@@ -231,7 +235,6 @@ public final class Utils {
      * @param project The project whose startparameters we want to use
      * @param task The name task to be checked
      */
-    //FIXME Doesn't work if user doesn't explicitely writes the name of the task
     public static boolean isTaskInStartParameter(Project project, String task) {
         List<String> tasks = project.gradle.startParameter.taskNames.collect { it.toLowerCase() }
         return tasks.contains(task.toLowerCase())
