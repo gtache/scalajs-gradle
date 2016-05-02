@@ -1,7 +1,7 @@
 import org.junit.Test
 import org.junit.Assert._
 
-class DummyObjectTest {
+class JUnitTest {
 
   @Test
   def dummyTest(): Unit = {
