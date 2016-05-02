@@ -98,6 +98,7 @@ public final class ScalajsPlugin implements Plugin<Project> {
             tasks.withType(CompileJSTask) {
                 it.dependsOn(classes)
                 it.mustRunAfter(testClasses, classes)
+                it.srcFiles = project.files(project.sourceSets.main.runtimeClasspath)
                 it.configure()
             }
             project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
