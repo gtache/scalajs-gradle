@@ -48,7 +48,14 @@ public final class Utils {
     public static final String INFO_LVL = 'Info'
     public static final String DEBUG_LVL = 'Debug'
 
+    private static TaskExecutionGraph graph;
+
     private Utils() {}
+
+
+    public static void prepareGraph(Project project){
+        project.gradle.taskGraph.whenReady {graph=it}
+    }
 
     /**
      * Resolves the level of logging, depending on the project properties
@@ -124,7 +131,11 @@ public final class Utils {
         final def buildPath = project.buildDir.absolutePath
         final def jsPath = buildPath + JS_REL_DIR
         final def baseFilename = jsPath + project.name
-        final def hasTest = isTaskInStartParameter(project, 'testjs')
+        if (graph==null){
+            project.logger.warn('TaskGraph not ready yet : Possible error when computing output file\n' +
+                    'Run with TestJS explicitely to be sure it works')
+        }
+        final def hasTest = graph!=null ? graph.hasTask(':TestJS') : isTaskInStartParameter(project, 'testjs')
 
         final def o = 'o'
         final def output = 'output'
@@ -152,51 +163,6 @@ public final class Utils {
             }
         }
         return path
-    }
-
-    public static void resolvePathAsync(Project project, UtilsListener listener, isUtils = false){
-        project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
-            String path
-            final def buildPath = project.buildDir.absolutePath
-            final def jsPath = buildPath + JS_REL_DIR
-            final def baseFilename = jsPath + project.name
-            final def hasTest = graph.hasTask(':TestJS')
-
-            final def o = 'o'
-            final def output = 'output'
-            if (project.hasProperty(o)) {
-                path = project.file(project.property(o))
-            } else if (project.hasProperty(output)) {
-                path = project.file(project.property(output))
-            } else if (project.hasProperty(RUN_FULL)) {
-                if (hasTest) {
-                    path = project.file(baseFilename + FULLOPT_TEST_SUFFIX).absolutePath
-                } else {
-                    path = project.file(baseFilename + FULLOPT_SUFFIX).absolutePath
-                }
-            } else if (project.hasProperty(RUN_NOOPT)) {
-                if (hasTest) {
-                    path = project.file(baseFilename + NOOPT_TEST_SUFFIX).absolutePath
-                } else {
-                    path = project.file(baseFilename + EXT).absolutePath
-                }
-            } else {
-                if (hasTest) {
-                    path = project.file(baseFilename + FASTOPT_TEST_SUFFIX).absolutePath
-                } else {
-                    path = project.file(baseFilename + FASTOPT_SUFFIX).absolutePath
-                }
-            }
-            if(isUtils){
-                returnDependencySeq(project, path,listener)
-            } else {
-                listener.getResult(path)
-            }
-        }
-    }
-
-    public static void getMinimalDependencySeqAsync(Project project, UtilsListener listener){
-        resolvePathAsync(project, listener, true)
     }
 
     /**
@@ -269,13 +235,5 @@ public final class Utils {
     public static boolean isTaskInStartParameter(Project project, String task) {
         List<String> tasks = project.gradle.startParameter.taskNames.collect { it.toLowerCase() }
         return tasks.contains(task.toLowerCase())
-    }
-
-    private static void returnDependencySeq(Project project, String result, UtilsListener listener) {
-        final FileVirtualJSFile file = new FileVirtualJSFile(project.file(result))
-        final ResolvedJSDependency fileD = ResolvedJSDependency.minimal(file)
-        final Seq<ResolvedJSDependency> dependencySeq = new ArraySeq<>(1)
-        dependencySeq.update(0, fileD)
-        listener.getResult(dependencySeq)
     }
 }

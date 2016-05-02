@@ -22,6 +22,7 @@ public final class ScalajsPlugin implements Plugin<Project> {
      */
     @Override
     public void apply(Project project) {
+        prepareGraph(project)
         project.logger.info('Applying java plugin')
         project.pluginManager.apply('java')
         project.logger.info('Applying scala plugin')
@@ -73,13 +74,11 @@ public final class ScalajsPlugin implements Plugin<Project> {
         project.logger.info(fullOptJS.name + ' task added')
 
         final def runJS = tasks.create('RunJS', RunJSTask.class)
-        runJS.callUtils()
 
         final def classes = 'classes'
         final def testClasses = 'testClasses'
 
         final def testJS = tasks.create('TestJS', TestJSTask.class)
-        testJS.callUtils()
         testJS.dependsOn(testClasses)
 
         if (runFull) {

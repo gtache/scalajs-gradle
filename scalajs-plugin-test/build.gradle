@@ -33,3 +33,12 @@ defaultTasks += 'FastOptJS'
 task wrapper(type: Wrapper){
 	gradleVersion = '2.11'
 }
+
+task extTest(type: TestJS.class){
+}
+extTest.dependsOn('FastOptJS')
+
+task afterTest<<{
+    println('bla')
+}
+afterTest.dependsOn('TestJS')

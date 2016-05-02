@@ -1,7 +1,7 @@
 package com.github.gtache.tasks
 
 import com.github.gtache.Utils
-import com.github.gtache.UtilsListener
+
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.io.FileVirtualJSFile
@@ -17,7 +17,7 @@ import scala.collection.Seq
 /**
  * Task used to run a js file
  */
-public class RunJSTask extends DefaultTask implements UtilsListener<Seq<ResolvedJSDependency>> {
+public class RunJSTask extends DefaultTask {
     final String description = "Runs the generated js file.\n" +
             "Needs Node.js / PhantomJS on PATH, or use Rhino.\n" +
             "Use -Prhino (highest priority) or -Pphantom. Default : node"
@@ -27,8 +27,6 @@ public class RunJSTask extends DefaultTask implements UtilsListener<Seq<Resolved
     private static final String EXEC_CODE = 'toExec'
     private static final String CLASSNAME = 'classname'
     private static final String METHNAME = 'methname'
-
-    private Seq<ResolvedJSDependency> dependencySeq=null
 
     /**
      * The main method of the task, resolves the environment and the code to execute, and runs it
@@ -41,6 +39,8 @@ public class RunJSTask extends DefaultTask implements UtilsListener<Seq<Resolved
         } else {
             final JSEnv env = Utils.resolveEnv(project)
             final Level logLevel = Utils.resolveLogLevel(project, LOG_LEVEL, Level.Debug$.MODULE$)
+            final Seq<ResolvedJSDependency> dependencySeq = Utils.getMinimalDependencySeq(project)
+
 
             VirtualJSFile code
             if (toExec.first) {
@@ -79,14 +79,5 @@ public class RunJSTask extends DefaultTask implements UtilsListener<Seq<Resolved
             }
         }
         return new Tuple(isFile, toExec)
-    }
-
-    def callUtils(){
-        Utils.getMinimalDependencySeqAsync(project,this)
-    }
-
-    @Override
-    public void getResult(Seq<ResolvedJSDependency> result) {
-        this.dependencySeq=dependencySeq
     }
 }
