@@ -49,7 +49,8 @@ public class CompileJSTask extends DefaultTask {
      */
     @TaskAction
     def exec() {
-        FileCollection classpath = project.files(project.buildscript.configurations.getByName('classpath').asPath.split(';'))
+        String separator = System.getProperty("path.separator")
+        FileCollection classpath = project.files(project.buildscript.configurations.getByName('classpath').asPath.split(separator))
         FileCollection cp = classpath + project.configurations.runtime + project.sourceSets.main.runtimeClasspath
         Scalajsld.Options curOptions = Scalajsld.options()
         Scalajsld.Options options = curOptions.withOutput(destFile).withClasspath(
