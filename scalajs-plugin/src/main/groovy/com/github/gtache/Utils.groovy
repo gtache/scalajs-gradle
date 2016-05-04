@@ -20,6 +20,9 @@ import scala.collection.mutable.Seq
 import java.nio.file.AccessDeniedException
 import java.nio.file.Files
 
+import static com.github.gtache.tasks.CompileJSTask.MIN_OUTPUT
+import static com.github.gtache.tasks.CompileJSTask.OUTPUT
+
 public final class Utils {
 
     public static final String SCALA_VERSION = "2.11"
@@ -57,7 +60,7 @@ public final class Utils {
      * @param project
      */
     public static void prepareGraph(Project project) {
-        graph=null
+        graph = null
         project.gradle.taskGraph.whenReady { graph = it }
     }
 
@@ -142,12 +145,10 @@ public final class Utils {
         //Performs suboptimal check if TaskExecutionGraph not ready
         final def hasTest = graph != null ? graph.hasTask(':TestJS') : isTaskInStartParameter(project, 'testjs')
 
-        final def o = 'o'
-        final def output = 'output'
-        if (project.hasProperty(o)) {
-            path = project.file(project.property(o))
-        } else if (project.hasProperty(output)) {
-            path = project.file(project.property(output))
+        if (project.hasProperty(MIN_OUTPUT)) {
+            path = project.file(project.property(MIN_OUTPUT))
+        } else if (project.hasProperty(OUTPUT)) {
+            path = project.file(project.property(OUTPUT))
         } else if (project.hasProperty(RUN_FULL)) {
             if (hasTest) {
                 path = project.file(baseFilename + FULLOPT_TEST_SUFFIX).absolutePath

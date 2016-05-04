@@ -9,6 +9,7 @@ import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.tasks.scala.ScalaCompile
 
 import static com.github.gtache.Utils.*
+import static com.github.gtache.tasks.CompileJSTask.*
 
 /**
  * The main class for the plugin
@@ -51,9 +52,7 @@ public final class ScalajsPlugin implements Plugin<Project> {
         final def runNoOpt = project.hasProperty(RUN_NOOPT)
         final def runFull = project.hasProperty(RUN_FULL)
 
-        if (runNoOpt && runFull) {
-            project.logger.warn(RUN_NOOPT + ' and ' + RUN_FULL + ' both declared : Assuming ' + RUN_FULL)
-        }
+        warnUser(project)
 
         final def tasks = project.tasks;
 
@@ -122,6 +121,32 @@ public final class ScalajsPlugin implements Plugin<Project> {
             project.logger.info('Xplugin for compiler added')
             project.logger.info('ScalajsPlugin applied')
         }
+    }
+
+    private void warnUser(Project project) {
+        Set<String> opt = new HashSet<>()
+        Set<String> output = new HashSet<>()
+        Set<String> outputMode = new HashSet<>()
+        Set<String> relSM = new HashSet<>()
+        Set<String> logLevel = new HashSet<>()
+
+        opt.add(RUN_FULL)
+        opt.add(RUN_NOOPT)
+        output.add(MIN_OUTPUT)
+        output.add(OUTPUT)
+        outputMode.add(MIN_OUTPUTMODE)
+        outputMode.add(OUTPUT)
+        relSM.add(MIN_RELSM)
+        relSM.add(RELSM)
+        logLevel.add(MIN_DEBUG)
+        logLevel.add(DEBUG)
+        logLevel.add(MIN_WARN)
+        logLevel.add(WARN)
+        logLevel.add(MIN_ERR)
+        logLevel.add(ERR)
+        logLevel.add(LOG_LEVEL)
+
+
     }
 }
 

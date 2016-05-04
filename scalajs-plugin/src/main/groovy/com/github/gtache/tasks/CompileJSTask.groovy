@@ -18,7 +18,27 @@ import scala.collection.JavaConverters
 public class CompileJSTask extends DefaultTask {
     final String description = "Compiles all sjsir files into a single javascript file"
 
-    private static final String LOG_LEVEL = 'linkLogLevel'
+    //Linker configs
+    public static final String MIN_OUTPUT = 'o'
+    public static final String OUTPUT = 'output'
+    public static final String MIN_PRETTY = 'p'
+    public static final String PRETTY = 'prettyPrint'
+    public static final String MIN_SOURCEMAP = 's'
+    public static final String SOURCEMAP = 'sourceMap'
+    public static final String COMPLIANT = 'compliantAsInstanceOfs'
+    public static final String MIN_OUTPUTMODE = 'm'
+    public static final String OUTPUTMODE = 'outputMode'
+    public static final String MIN_CHECKIR = 'c'
+    public static final String CHECKIR = 'checkIR'
+    public static final String MIN_RELSM = 'r'
+    public static final String RELSM = 'relativizeSourceMap'
+    public static final String LOG_LEVEL = 'linkLogLevel'
+    public static final String MIN_DEBUG = 'd'
+    public static final String DEBUG = 'debug'
+    public static final String MIN_WARN = 'q'
+    public static final String WARN = 'quiet'
+    public static final String MIN_ERR = 'qq'
+    public static final String ERR = 'really-quiet'
 
     private Scalajsld.Options options
     @InputFiles
@@ -93,13 +113,11 @@ public class CompileJSTask extends DefaultTask {
         def options = Scalajsld.defaultOptions().withClasspath(
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
 
-        final def o = 'o'
-        final def output = 'output'
 
-        if (project.hasProperty(o)) {
-            destFile = project.file(project.property(o))
-        } else if (project.hasProperty(output)) {
-            destFile = project.file(project.property(output))
+        if (project.hasProperty(MIN_OUTPUT)) {
+            destFile = project.file(project.property(MIN_OUTPUT))
+        } else if (project.hasProperty(OUTPUT)) {
+            destFile = project.file(project.property(OUTPUT))
         }
         options = options.withOutput(destFile)
 
@@ -111,31 +129,29 @@ public class CompileJSTask extends DefaultTask {
             options = options.withFastOpt()
         }
 
-        if (project.hasProperty('p') || project.hasProperty('prettyPrint')) {
+        if (project.hasProperty(MIN_PRETTY) || project.hasProperty(PRETTY)) {
             options = options.withPrettyPrint(true)
         }
 
-        if (project.hasProperty('s') || project.hasProperty('sourceMap')) {
+        if (project.hasProperty(MIN_SOURCEMAP) || project.hasProperty(SOURCEMAP)) {
             options = options.withSourceMap(true)
         }
 
-        if (project.hasProperty('compliantAsInstanceOfs')) {
+        if (project.hasProperty(COMPLIANT)) {
             options = options.withCompliantsSemantics()
         }
 
-        final def m = 'm'
-        final def outputMode = 'outputMode'
 
-        if (project.hasProperty(m)) {
-            String modeS = project.property(m)
+        if (project.hasProperty(MIN_OUTPUTMODE)) {
+            String modeS = project.property(MIN_OUTPUTMODE)
             OutputMode mode = Utils.getOutputMode(modeS)
             if (mode != null) {
                 options = options.withOutputMode(mode)
             } else {
                 logger.error("Unknown output mode")
             }
-        } else if (project.hasProperty(outputMode)) {
-            String modeS = project.property(outputMode)
+        } else if (project.hasProperty(OUTPUTMODE)) {
+            String modeS = project.property(OUTPUTMODE)
             OutputMode mode = Utils.getOutputMode(modeS)
             if (mode != null) {
                 options = options.withOutputMode(mode)
@@ -144,25 +160,23 @@ public class CompileJSTask extends DefaultTask {
             }
         }
 
-        if (project.hasProperty('c') || project.hasProperty('checkIR')) {
+        if (project.hasProperty(MIN_CHECKIR) || project.hasProperty(CHECKIR)) {
             options = options.withCheckIR(true)
         }
 
-        final def r = 'r'
-        final def relativizeSourceMap = 'relativizeSourceMap'
 
-        if (project.hasProperty(r)) {
-            options = options.withRelativizeSourceMap(Option.apply(new URI((String) project.property(r))))
-        } else if (project.hasProperty(relativizeSourceMap)) {
-            options = options.withRelativizeSourceMap(Option.apply(new URI((String) project.property(relativizeSourceMap))))
+        if (project.hasProperty(MIN_RELSM)) {
+            options = options.withRelativizeSourceMap(Option.apply(new URI((String) project.property(MIN_RELSM))))
+        } else if (project.hasProperty(RELSM)) {
+            options = options.withRelativizeSourceMap(Option.apply(new URI((String) project.property(RELSM))))
         }
 
         Level level = Utils.resolveLogLevel(project, LOG_LEVEL, Level.Info$.MODULE$)
-        if (project.hasProperty('d') || project.hasProperty('debug')) {
+        if (project.hasProperty(MIN_DEBUG) || project.hasProperty(DEBUG)) {
             level = Level.Debug$.MODULE$
-        } else if (project.hasProperty('q') || project.hasProperty('quiet')) {
+        } else if (project.hasProperty(MIN_WARN) || project.hasProperty(WARN)) {
             level = Level.Warn$.MODULE$
-        } else if (project.hasProperty('qq') || project.hasProperty('really-quiet')) {
+        } else if (project.hasProperty(MIN_ERR) || project.hasProperty(ERR)) {
             level = Level.Error$.MODULE$
         }
         if (level != Level.Info$.MODULE$) {
