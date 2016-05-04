@@ -57,6 +57,7 @@ public final class Utils {
      * @param project
      */
     public static void prepareGraph(Project project) {
+        graph=null
         project.gradle.taskGraph.whenReady { graph = it }
     }
 
