@@ -107,9 +107,7 @@ public class CompileJSTask extends DefaultTask {
      * @return The configured options
      */
     private def Scalajsld.Options parseOptions() {
-        final
-        def classpath = project.files(project.buildscript.configurations.getByName('classpath').asPath.split(File.pathSeparator))
-        final def cp = classpath + project.configurations.runtime + srcFiles
+        final def cp = project.configurations.runtime + srcFiles
         def options = Scalajsld.defaultOptions().withClasspath(
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
 
