@@ -26,7 +26,7 @@ import static com.github.gtache.tasks.CompileJSTask.OUTPUT
 public final class Utils {
 
     public static final String SCALA_VERSION = "2.11"
-    public static final String COMPILER_VERSION = "8"
+    public static final String SUB_VERSION = "8"
     public static final String SCALAJS_VERSION = "0.6.9"
 
     public static final String JS_REL_DIR = File.separator + 'js' + File.separator

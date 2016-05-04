@@ -37,7 +37,7 @@ public final class ScalajsPlugin implements Plugin<Project> {
         project.dependencies.add('compile', 'org.scala-js:scalajs-library_'
                 + SCALA_VERSION + ':' + SCALAJS_VERSION)
         project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_'
-                + SCALA_VERSION + '.' + COMPILER_VERSION + ':' + SCALAJS_VERSION)
+                + SCALA_VERSION + '.' + SUB_VERSION + ':' + SCALAJS_VERSION)
         project.logger.info('Dependencies added')
 
         final def jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR)
@@ -146,7 +146,7 @@ public final class ScalajsPlugin implements Plugin<Project> {
         logLevel.add(MIN_ERR)
         logLevel.add(ERR)
         logLevel.add(LOG_LEVEL)
-        
+
         linkedProperties.add(opt)
         linkedProperties.add(output)
         linkedProperties.add(outputMode)

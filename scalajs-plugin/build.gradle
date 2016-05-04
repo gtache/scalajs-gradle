@@ -1,6 +1,10 @@
 group 'com.github.gtache'
 version '0.2.0'
 
+String scalaVersion = '2.11'
+String subVersion = '8'
+String scalaJSVersion = '0.6.9'
+
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 apply plugin: 'scala'
@@ -17,11 +21,11 @@ repositories {
 dependencies {
     compile gradleApi()
     compile 'org.codehaus.groovy:groovy-all:2.4.4'
-    compile 'org.scala-lang:scala-compiler:2.11.8'
-    compile 'org.scala-lang:scala-library:2.11.8'
-    compile group: 'org.scala-js', name: 'scalajs-sbt-test-adapter_2.11', version: '0.6.9'
-    compile group: 'org.scala-js', name: 'scalajs-js-envs_2.11', version: '0.6.9'
-    compile group: 'org.scala-js', name: 'scalajs-tools_2.11', version: '0.6.9'
+    compile 'org.scala-lang:scala-compiler:'+scalaVersion+'.'+subVersion
+    compile 'org.scala-lang:scala-library:'+scalaVersion+'.'+subVersion
+    compile group: 'org.scala-js', name: 'scalajs-sbt-test-adapter_'+scalaVersion, version: scalaJSVersion
+    compile group: 'org.scala-js', name: 'scalajs-js-envs_'+scalaVersion, version: scalaJSVersion
+    compile group: 'org.scala-js', name: 'scalajs-tools_'+scalaVersion, version: scalaJSVersion
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'com.google.guava', name: 'guava', version: '19.0'
 }
