@@ -50,8 +50,8 @@ object ClassScanner {
         fingerprints.foreach {
           case aF: AnnotatedFingerprint => {
             try {
-              if (c.isAnnotationPresent(Class.forName(aF.annotationName()).asInstanceOf[Class[_ <: Annotation]])) {
-                buffer += new TaskDef(c.getCanonicalName, aF, false, Array.empty)
+              if (c.isAnnotationPresent(Class.forName(aF.annotationName(),false, classL).asInstanceOf[Class[_ <: Annotation]])) {
+                buffer += new TaskDef(c.getName, aF, false, Array.empty)
               }
             } catch {
               case e: ClassNotFoundException => {
@@ -62,7 +62,7 @@ object ClassScanner {
           case sF: SubclassFingerprint => {
             if (checkSuperclasses(c, sF)) {
               if (!sF.requireNoArgConstructor || (sF.requireNoArgConstructor && checkZeroArgsConstructor(c))) {
-                buffer += new TaskDef(c.getCanonicalName, sF, false, Array.empty)
+                buffer += new TaskDef(c.getName, sF, false, Array.empty)
               }
             }
           }

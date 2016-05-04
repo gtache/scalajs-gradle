@@ -25,6 +25,6 @@ object ScalaJSEventHandler extends EventHandler {
     if (ScalaJSTestStatus.all.length == totLength) {
       ScalaJSTestStatus.testingFinished()
     }
-    println(ScalaJSTestStatus)
+    println("\n"+ScalaJSTestStatus+"\n")
   }
 }
