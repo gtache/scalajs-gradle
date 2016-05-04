@@ -124,11 +124,12 @@ public final class ScalajsPlugin implements Plugin<Project> {
     }
 
     private void warnUser(Project project) {
-        Set<String> opt = new HashSet<>()
-        Set<String> output = new HashSet<>()
-        Set<String> outputMode = new HashSet<>()
-        Set<String> relSM = new HashSet<>()
-        Set<String> logLevel = new HashSet<>()
+        Set<List<String>> linkedProperties = new HashSet<>()
+        List<String> opt = new ArrayList<>()
+        List<String> output = new ArrayList<>()
+        List<String> outputMode = new ArrayList<>()
+        List<String> relSM = new ArrayList<>()
+        List<String> logLevel = new ArrayList<>()
 
         opt.add(RUN_FULL)
         opt.add(RUN_NOOPT)
@@ -145,8 +146,30 @@ public final class ScalajsPlugin implements Plugin<Project> {
         logLevel.add(MIN_ERR)
         logLevel.add(ERR)
         logLevel.add(LOG_LEVEL)
+        
+        linkedProperties.add(opt)
+        linkedProperties.add(output)
+        linkedProperties.add(outputMode)
+        linkedProperties.add(relSM)
+        linkedProperties.add(logLevel)
 
-
+        for (List<String> l : linkedProperties){
+            Set<Integer> declared = new HashSet<>()
+            int shortestIndex = -1
+            for (int i = 0; i < l.size() ; ++i){
+                if (project.hasProperty(l.get(i))){
+                    if (shortestIndex == -1){
+                        shortestIndex=i
+                    }
+                    declared.add(i)
+                }
+            }
+            if (declared.size()>1){
+                String message = declared.collect{ x -> l.get(x) }.inject({acc,word -> acc+', '+word})
+                message = "Declaring "+message+" ; Assuming "+l.get(shortestIndex)
+                project.logger.warn(message)
+            }
+        }
     }
 }
 

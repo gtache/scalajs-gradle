@@ -31,7 +31,7 @@ public class TestJSTask extends DefaultTask {
         final def libEnv = (ComJSEnv) Utils.resolveEnv(project).loadLibs(dependencySeq)
 
         final Framework framework = new ScalaJSFramework(
-                "ScalaJS Testing framework",
+                'com.novocode.junit.JUnitFramework',
                 libEnv,
                 new ScalaConsoleLogger(Utils.resolveLogLevel(project, LOG_LEVEL, Level.Debug$.MODULE$)),
                 ConsoleJSConsole$.MODULE$)
