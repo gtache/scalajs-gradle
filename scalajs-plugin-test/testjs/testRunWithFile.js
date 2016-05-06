@@ -1,3 +1,3 @@
-DummyScalaTag().main()
-DummyObject().main()
-DummyObject().printSomething("blabla")
+com.github.gtache.DummyScalaTag().main()
+com.github.gtache.DummyObject().main()
+com.github.gtache.DummyObject().printSomething("blabla")

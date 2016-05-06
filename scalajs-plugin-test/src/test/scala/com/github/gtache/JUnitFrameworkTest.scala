@@ -3,8 +3,9 @@ package com.github.gtache
 import org.junit.Assert._
 import org.junit.Test
 
+
 @Test
-class JUnitTest {
+class JUnitFrameworkTest {
 
   @Test
   def dummyTest(): Unit = {
