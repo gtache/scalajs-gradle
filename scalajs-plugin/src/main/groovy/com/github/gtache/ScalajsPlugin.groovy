@@ -153,20 +153,20 @@ public final class ScalajsPlugin implements Plugin<Project> {
         linkedProperties.add(relSM)
         linkedProperties.add(logLevel)
 
-        for (List<String> l : linkedProperties){
+        for (List<String> l : linkedProperties) {
             Set<Integer> declared = new HashSet<>()
             int shortestIndex = -1
-            for (int i = 0; i < l.size() ; ++i){
-                if (project.hasProperty(l.get(i))){
-                    if (shortestIndex == -1){
-                        shortestIndex=i
+            for (int i = 0; i < l.size(); ++i) {
+                if (project.hasProperty(l.get(i))) {
+                    if (shortestIndex == -1) {
+                        shortestIndex = i
                     }
                     declared.add(i)
                 }
             }
-            if (declared.size()>1){
-                String message = declared.collect{ x -> l.get(x) }.inject({acc,word -> acc+', '+word})
-                message = "Declaring "+message+" ; Assuming "+l.get(shortestIndex)
+            if (declared.size() > 1) {
+                String message = declared.collect { x -> l.get(x) }.inject({ acc, word -> acc + ', ' + word })
+                message = "Declaring " + message + " ; Assuming " + l.get(shortestIndex)
                 project.logger.warn(message)
             }
         }

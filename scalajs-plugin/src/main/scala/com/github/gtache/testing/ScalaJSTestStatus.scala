@@ -1,8 +1,9 @@
 package com.github.gtache.testing
 
+import org.scalajs.testadapter.ScalaJSFramework
 import sbt.testing.{Runner, Task, TaskDef}
 
-object ScalaJSTestStatus {
+final class ScalaJSTestStatus(framework: ScalaJSFramework) {
   var runner: Runner = null
   var all: List[Task] = List.empty
   var errored: List[TaskDef] = List.empty
@@ -20,7 +21,7 @@ object ScalaJSTestStatus {
   }
 
   override def toString: String = {
-    "ScalaJSTestStatus : " +
+    "ScalaJSTestStatus for " + framework.name + " : " +
       "\nRunner : " + runner +
       "\nAll : " + all.map(t => t.taskDef().fullyQualifiedName()).mkString +
       "\nSuccess : " + succeeded.map(t => t.fullyQualifiedName()).mkString +

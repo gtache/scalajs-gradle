@@ -50,7 +50,7 @@ object ClassScanner {
         fingerprints.foreach {
           case aF: AnnotatedFingerprint => {
             try {
-              if (c.isAnnotationPresent(Class.forName(aF.annotationName(),false, classL).asInstanceOf[Class[_ <: Annotation]])) {
+              if (c.isAnnotationPresent(Class.forName(aF.annotationName(), false, classL).asInstanceOf[Class[_ <: Annotation]])) {
                 buffer += new TaskDef(c.getName, aF, false, Array.empty)
               }
             } catch {
