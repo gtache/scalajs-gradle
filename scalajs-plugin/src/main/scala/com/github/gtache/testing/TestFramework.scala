@@ -16,6 +16,10 @@ object TestFrameworks {
   val allFrameworks = Seq(ScalaCheck, ScalaTest, Specs, Specs2, JUnit)
 }
 
+/**
+  * A simple container for a list of string representing implementing classes for a TestFramework
+  * @param classNames The names of the class which correspond to a framework
+  */
 class TestFramework(val classNames: String*) {
 
 }

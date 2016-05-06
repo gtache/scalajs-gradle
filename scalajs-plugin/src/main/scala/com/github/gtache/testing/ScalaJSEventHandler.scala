@@ -2,6 +2,10 @@ package com.github.gtache.testing
 
 import sbt.testing.{Event, EventHandler, TaskDef}
 
+/**
+  * Handles events fired by a Framework
+  * @param testStatus The ScalaJSTestStatus used to store the results
+  */
 final class ScalaJSEventHandler(testStatus: ScalaJSTestStatus) extends EventHandler {
   override def handle(event: Event): Unit = {
     val fingerprint = event.fingerprint()

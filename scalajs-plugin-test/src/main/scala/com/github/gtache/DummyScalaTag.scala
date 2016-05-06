@@ -1,3 +1,5 @@
+package com.github.gtache
+
 import scala.scalajs.js.annotation.JSExport
 import scalatags.Text.all._
 @JSExport

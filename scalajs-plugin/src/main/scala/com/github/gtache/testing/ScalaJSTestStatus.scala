@@ -3,6 +3,10 @@ package com.github.gtache.testing
 import org.scalajs.testadapter.ScalaJSFramework
 import sbt.testing.{Runner, Task, TaskDef}
 
+/**
+  * A class storing informations about a TestFramework (results of test)
+  * @param framework The framework which corresponds to this instance
+  */
 final class ScalaJSTestStatus(framework: ScalaJSFramework) {
   var runner: Runner = null
   var all: List[Task] = List.empty
@@ -14,6 +18,9 @@ final class ScalaJSTestStatus(framework: ScalaJSFramework) {
   var canceled: List[TaskDef] = List.empty
   var pending: List[TaskDef] = List.empty
 
+  /**
+    * Tells the runner / framework that the testing is finished
+    */
   def testingFinished(): Unit = {
     if (runner != null) {
       runner.done()

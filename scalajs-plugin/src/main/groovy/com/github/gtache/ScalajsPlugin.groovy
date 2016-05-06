@@ -123,7 +123,11 @@ public final class ScalajsPlugin implements Plugin<Project> {
         }
     }
 
-    private void warnUser(Project project) {
+    /**
+     * Warns the user if conflicting parameters are set for the given project
+     * @param project
+     */
+    private static void warnUser(Project project) {
         Set<List<String>> linkedProperties = new HashSet<>()
         List<String> opt = new ArrayList<>()
         List<String> output = new ArrayList<>()
@@ -158,7 +162,7 @@ public final class ScalajsPlugin implements Plugin<Project> {
             int shortestIndex = -1
             for (int i = 0; i < l.size(); ++i) {
                 if (project.hasProperty(l.get(i))) {
-                    if (shortestIndex == -1) {
+                    if (shortestIndex < 0) {
                         shortestIndex = i
                     }
                     declared.add(i)

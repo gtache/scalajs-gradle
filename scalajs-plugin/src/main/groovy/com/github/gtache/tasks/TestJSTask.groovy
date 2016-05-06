@@ -38,17 +38,21 @@ public class TestJSTask extends DefaultTask {
 
         /*
         final Framework framework = new ScalaJSFramework(
-                'org.scalatest.tools.ScalaTestFramework',
+                'com.novocode.junit.JUnitFramework',
                 libEnv,
                 new ScalaConsoleLogger(Utils.resolveLogLevel(project,LOG_LEVEL, Level.Debug$.MODULE$)),
                 ConsoleJSConsole$.MODULE$)
         */
-        final URL[] urls = project.sourceSets.test.runtimeClasspath.collect { it.toURI().toURL() }.toArray(new URL[0])
+        final URL[] urls = project.sourceSets.test.runtimeClasspath.collect { it.toURI().toURL() } as URL[]
         final URLClassLoader classL = new URLClassLoader(urls)
 
         frameworks.each { ScalaJSFramework framework ->
             final Runner runner = framework.runner(new String[0], new String[0], null)
             final Fingerprint[] fingerprints = framework.fingerprints()
+            ClassScanner.scan(classL, fingerprints).each {
+                println(it.fullyQualifiedName())
+                println(it.fingerprint())
+            }
             final Task[] tasks = runner.tasks(ClassScanner.scan(classL, fingerprints))
             final ScalaJSTestStatus testStatus = new ScalaJSTestStatus(framework)
             final EventHandler eventHandler = new ScalaJSEventHandler(testStatus)
@@ -58,7 +62,7 @@ public class TestJSTask extends DefaultTask {
             tasks.each { println(it.taskDef().fullyQualifiedName()) }
             for (Task t : tasks) {
                 testStatus.all_$eq(testStatus.all().$colon$colon(t))
-                t.execute(eventHandler, [new LoggerWrapper(framework.logger())] as Logger[])
+                t.execute(eventHandler, [new SimpleLogger()] as Logger[])
             }
         }
     }
