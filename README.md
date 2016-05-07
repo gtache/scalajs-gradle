@@ -37,7 +37,7 @@ You can run tests with `gradlew TestJS`.
 -Adding `-PrunNoOpt` will run the unoptimized file   
 -Adding `-PrunFull` will run the fully optimized file (overrides `-PrunNoOpt` if both are used)   
 -It will run the fast optimized file by default.  
-RunJS will depend on FastOptJS (default), FullOptJS or NoOptJS accordingly.
+RunJS will depend on FastOptJS (default), FullOptJS or NoOptJS accordingly.    
 -Adding `-Pphantom` will run the file in a phantomjs environment (needs phantomjs on path).    
 -Adding `-Prhino` will run the file in a rhino environment.    
 
