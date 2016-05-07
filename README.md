@@ -38,17 +38,19 @@ You can run tests with `gradlew TestJS`.
 -Adding `-PrunFull` will run the fully optimized file (overrides `-PrunNoOpt` if both are used)   
 -It will run the fast optimized file by default.  
 RunJS will depend on FastOptJS (default), FullOptJS or NoOptJS accordingly.
+-Adding `-Pphantom` will run the file in a phantomjs environment (needs phantomjs on path).
+-Adding `-Prhino` will run the file in a rhino environment.
 
 Examples : `gradlew RunJS -Pclassname="main.scala.DummyObject"` will compile everything and run DummyObject().main()
 
 `gradlew RunJS -Pclassname="main.scala.DummyObject" -Pmethname="printSomething(\"blabla\")" -PrunFull` will compile the fully optimized version of the files and will run DummyObject().printSomething("blabla")
 
-`gradlew RunJS -PtoExec="main.scala.DummyObject().main()"` will compile everything and run DummyObject().main()
+`gradlew RunJS -PtoExec="main.scala.DummyObject().main() -Pphantom"` will compile everything and run DummyObject().main() in a phantomjs environment.
 
 `gradlew RunJS -PfileToExec="testjs/TestRunWithFile.js"` will run TestRunWithFile.js with the environment loaded with the compiled js file.
 
 ### Options for TestJS
--`-PrunFull` and `-PrunNoOpt` have the same behavior as with RunJS.
+-`-PrunFull`, `-PrunNoOpt`, `-Pphantom` and `-Prhino` have the same behavior as with RunJS.
 
 
 ## Changelog    
