@@ -1,7 +1,6 @@
 package com.github.gtache.testing
 
 import java.lang.annotation.Annotation
-import java.lang.reflect.Modifier
 import java.net.{URL, URLClassLoader}
 import java.nio.file.Paths
 
@@ -23,14 +22,14 @@ object ClassScanner {
     def checkSuperclasses(c: Class[_], sF: SubclassFingerprint): Boolean = {
 
       def checkName(c: Class[_], fName: String): Boolean = {
-        if(c.getName == fName || c.getSimpleName == fName || c.getCanonicalName == fName){
+        if (c.getName == fName || c.getSimpleName == fName || c.getCanonicalName == fName) {
         }
         c.getName == fName || c.getSimpleName == fName || c.getCanonicalName == fName
       }
 
 
-      def checkRec(c: Class[_], fName : String) : Boolean = {
-        if (checkName(c, fName)){
+      def checkRec(c: Class[_], fName: String): Boolean = {
+        if (checkName(c, fName)) {
           true
         } else {
           var sC = c.getSuperclass
@@ -41,8 +40,8 @@ object ClassScanner {
               sC = sC.getSuperclass
             }
           }
-          c.getInterfaces.foreach( interf => {
-            if(checkRec(interf,fName)){
+          c.getInterfaces.foreach(interf => {
+            if (checkRec(interf, fName)) {
               return true
             }
           })
@@ -51,7 +50,7 @@ object ClassScanner {
       }
 
       val fName = sF.superclassName()
-      checkRec(c,fName)
+      checkRec(c, fName)
     }
 
     val classes = parseClasses(classL)

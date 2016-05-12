@@ -9,12 +9,11 @@ import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.logging.ScalaConsoleLogger
 import org.scalajs.jsenv.ComJSEnv
 import org.scalajs.jsenv.ConsoleJSConsole$
-import org.scalajs.testadapter.FingerprintSerializers
 import org.scalajs.testadapter.ScalaJSFramework
 import sbt.testing.*
 import scala.collection.JavaConverters
-import scala.collection.mutable.ArrayBuffer
 import scala.collection.Seq
+import scala.collection.mutable.ArrayBuffer
 
 public class TestJSTask extends DefaultTask {
     final String description = "Runs tests"
@@ -38,7 +37,7 @@ public class TestJSTask extends DefaultTask {
         }
         final Seq<TestFramework> defaultFrameworks = TestFrameworks.defaultFrameworks()
         //TODO improve
-        for (int i = 0; i < defaultFrameworks.length() ; ++i){
+        for (int i = 0; i < defaultFrameworks.length(); ++i) {
             allFrameworks.$plus$eq(defaultFrameworks.apply(i))
         }
         final List<ScalaJSFramework> frameworks = JavaConverters.asJavaIterableConverter(new FrameworkDetector(libEnv).instantiatedScalaJSFrameworks(
@@ -48,17 +47,10 @@ public class TestJSTask extends DefaultTask {
                 ConsoleJSConsole$.MODULE$
         )).asJava().toList()
 
-        /*
-        final Framework framework = new ScalaJSFramework(
-                'com.novocode.junit.JUnitFramework',
-                libEnv,
-                new ScalaConsoleLogger(Utils.resolveLogLevel(project,LOG_LEVEL, Level.Debug$.MODULE$)),
-                ConsoleJSConsole$.MODULE$)
-        */
         final URL[] urls = project.sourceSets.test.runtimeClasspath.collect { it.toURI().toURL() } as URL[]
         final URLClassLoader classL = new URLClassLoader(urls)
 
-        frameworks.each {ScalaJSFramework framework ->
+        frameworks.each { ScalaJSFramework framework ->
             println("Framework found : " + framework.name())
         }
 
@@ -69,8 +61,8 @@ public class TestJSTask extends DefaultTask {
             final ScalaJSTestStatus testStatus = new ScalaJSTestStatus(framework)
             final EventHandler eventHandler = new ScalaJSEventHandler(testStatus)
             testStatus.runner_$eq(runner)
-            println("Executing "+framework.name())
-            tasks.each { println(it.taskDef().fullyQualifiedName())}
+            println("Executing " + framework.name())
+            tasks.each { println(it.taskDef().fullyQualifiedName()) }
             tasks.each { Task t ->
                 testStatus.all_$eq(testStatus.all().$colon$colon(t))
                 t.execute(eventHandler, [new SimpleLogger()] as Logger[])

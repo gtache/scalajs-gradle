@@ -6,9 +6,14 @@ import sbt.testing.Logger
 
 final class SimpleLogger extends Logger {
   def ansiCodesSupported(): Boolean = false
+
   def error(msg: String): Unit = println(msg)
+
   def warn(msg: String): Unit = println(msg)
+
   def info(msg: String): Unit = println(msg)
+
   def debug(msg: String): Unit = println(msg)
+
   def trace(t: Throwable): Unit = t.printStackTrace()
 }

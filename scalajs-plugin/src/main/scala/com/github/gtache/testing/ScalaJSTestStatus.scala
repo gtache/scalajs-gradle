@@ -5,6 +5,7 @@ import sbt.testing.{Runner, Task, TaskDef}
 
 /**
   * A class storing informations about a TestFramework (results of test)
+  *
   * @param framework The framework which corresponds to this instance
   */
 final class ScalaJSTestStatus(framework: ScalaJSFramework) {

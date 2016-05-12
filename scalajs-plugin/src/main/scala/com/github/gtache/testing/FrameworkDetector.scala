@@ -12,6 +12,7 @@ import scala.collection.mutable
 /* see https://github.com/scala-js/scala-js/blob/master/sbt-plugin/src/main/scala/scala/scalajs/sbtplugin/FrameworkDetector.scala */
 /**
   * A class used to detect all available common TestFramework in a js file
+  *
   * @param jsEnv The environment to use
   */
 final class FrameworkDetector(jsEnv: JSEnv) {
@@ -24,10 +25,11 @@ final class FrameworkDetector(jsEnv: JSEnv) {
 
   /**
     * Returns a list of instantiated ScalaJSFramework (one for each detected TestFramework). Calls detect()
+    *
     * @param frameworks The list of TestFramework to search
-    * @param comJSEnv The environment to use to instantiate the ScalaJSFrameworks
-    * @param logger The logger to use
-    * @param console The jsConsole to use
+    * @param comJSEnv   The environment to use to instantiate the ScalaJSFrameworks
+    * @param logger     The logger to use
+    * @param console    The jsConsole to use
     * @return The list of ScalaJSFramework
     */
   def instantiatedScalaJSFrameworks(frameworks: Seq[TestFramework], comJSEnv: ComJSEnv, logger: Logger, console: JSConsole): List[ScalaJSFramework] = {
@@ -42,6 +44,7 @@ final class FrameworkDetector(jsEnv: JSEnv) {
 
   /**
     * Detects the TestFramework in a jsEnv, given a list of them.
+    *
     * @param frameworks The frameworks to detect
     * @return A map linking a framework to it's common name
     */

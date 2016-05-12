@@ -251,13 +251,14 @@ public final class Utils {
      * @param project The project
      * @return A list of TestFramework
      */
-    public static List<TestFramework> resolveTestFrameworks(Project project){
-        if (project.hasProperty(TEST_FRAMEWORKS)){
+    public static List<TestFramework> resolveTestFrameworks(Project project) {
+        if (project.hasProperty(TEST_FRAMEWORKS)) {
             final List<String> frameworksName = (List<String>) project.property(TEST_FRAMEWORKS)
-            return frameworksName.collect{
+            return frameworksName.collect {
                 final ArrayBuffer<String> seq = new ArrayBuffer<>()
                 seq.$plus$eq(it)
-                new TestFramework(seq.toSeq())}
+                new TestFramework(seq.toSeq())
+            }
         } else {
             return new ArrayList<>()
         }
