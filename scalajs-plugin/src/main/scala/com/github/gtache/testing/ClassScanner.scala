@@ -49,8 +49,7 @@ object ClassScanner {
         }
       }
 
-      val fName = sF.superclassName()
-      checkRec(c, fName)
+      checkRec(c, sF.superclassName())
     }
 
     val classes = parseClasses(classL)
