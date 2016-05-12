@@ -1,5 +1,6 @@
 package com.github.gtache
 
+import com.github.gtache.testing.TestFramework
 import org.gradle.api.Project
 import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.file.FileCollection
@@ -14,6 +15,7 @@ import org.scalajs.jsenv.rhino.RhinoJSEnv
 import scala.collection.Map$
 import scala.collection.Seq$
 import scala.collection.immutable.List$
+import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.ArraySeq
 import scala.collection.mutable.Seq
 
@@ -50,6 +52,8 @@ public final class Utils {
     public static final String WARN_LVL = 'Warn'
     public static final String INFO_LVL = 'Info'
     public static final String DEBUG_LVL = 'Debug'
+
+    public static final String TEST_FRAMEWORKS = 'testFrameworks'
 
     private static TaskExecutionGraph graph;
 
@@ -240,5 +244,22 @@ public final class Utils {
     public static boolean isTaskInStartParameter(Project project, String task) {
         List<String> tasks = project.gradle.startParameter.taskNames.collect { it.toLowerCase() }
         return tasks.contains(task.toLowerCase())
+    }
+
+    /**
+     * Returns the list of custom TestFrameworks added by the user
+     * @param project The project
+     * @return A list of TestFramework
+     */
+    public static List<TestFramework> resolveTestFrameworks(Project project){
+        if (project.hasProperty(TEST_FRAMEWORKS)){
+            final List<String> frameworksName = (List<String>) project.property(TEST_FRAMEWORKS)
+            return frameworksName.collect{
+                final ArrayBuffer<String> seq = new ArrayBuffer<>()
+                seq.$plus$eq(it)
+                new TestFramework(seq.toSeq())}
+        } else {
+            return new ArrayList<>()
+        }
     }
 }

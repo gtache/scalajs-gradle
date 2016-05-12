@@ -4,7 +4,7 @@ import org.scalatest._
 
 import scala.collection.mutable
 
-class ScalaTestFrameworkTest extends Suite with FlatSpecLike {
+object ScalaTestFrameworkTest extends Suite with FlatSpecLike {
 
   "A Stack" should "pop values in last-in-first-out order" in {
     val stack = new mutable.Stack[Int]

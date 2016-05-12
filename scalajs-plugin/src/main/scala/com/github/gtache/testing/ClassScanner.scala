@@ -1,6 +1,7 @@
 package com.github.gtache.testing
 
 import java.lang.annotation.Annotation
+import java.lang.reflect.Modifier
 import java.net.{URL, URLClassLoader}
 import java.nio.file.Paths
 
@@ -22,23 +23,35 @@ object ClassScanner {
     def checkSuperclasses(c: Class[_], sF: SubclassFingerprint): Boolean = {
 
       def checkName(c: Class[_], fName: String): Boolean = {
+        if(c.getName == fName || c.getSimpleName == fName || c.getCanonicalName == fName){
+        }
         c.getName == fName || c.getSimpleName == fName || c.getCanonicalName == fName
       }
 
-      val fName = sF.superclassName()
-      if (checkName(c, fName)) {
-        true
-      } else {
-        var sC = c.getSuperclass
-        while (sC != null) {
-          if (checkName(sC, fName)) {
-            return true
-          } else {
-            sC = sC.getSuperclass
+
+      def checkRec(c: Class[_], fName : String) : Boolean = {
+        if (checkName(c, fName)){
+          true
+        } else {
+          var sC = c.getSuperclass
+          while (sC != null) {
+            if (checkName(sC, fName)) {
+              return true
+            } else {
+              sC = sC.getSuperclass
+            }
           }
+          c.getInterfaces.foreach( interf => {
+            if(checkRec(interf,fName)){
+              return true
+            }
+          })
+          false
         }
-        false
       }
+
+      val fName = sF.superclassName()
+      checkRec(c,fName)
     }
 
     val classes = parseClasses(classL)
@@ -61,7 +74,7 @@ object ClassScanner {
           }
           case sF: SubclassFingerprint => {
             if (checkSuperclasses(c, sF)) {
-              if (!sF.requireNoArgConstructor || (sF.requireNoArgConstructor && checkZeroArgsConstructor(c))) {
+              if (!sF.requireNoArgConstructor || c.isInterface || (sF.requireNoArgConstructor && checkZeroArgsConstructor(c))) {
                 buffer += new TaskDef(c.getName, sF, false, Array.empty)
               }
             }
@@ -80,7 +93,8 @@ object ClassScanner {
     * @return true or false
     */
   def checkZeroArgsConstructor(c: Class[_]): Boolean = {
-    c.getConstructors.foreach(cons => {
+    println(c.getName)
+    c.getDeclaredConstructors.foreach(cons => {
       if (cons.getParameterCount == 0) {
         return true
       }

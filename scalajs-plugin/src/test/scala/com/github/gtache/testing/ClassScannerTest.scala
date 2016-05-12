@@ -32,13 +32,22 @@ class ClassScannerTest {
       override def superclassName(): String = "com.github.gtache.testing.G"
     }
 
-    val fingerprints: Array[Fingerprint] = Array(annFingerprint, subFingerprint, subFingerprint2)
+    val subFingerprint3 = new SubclassFingerprint {
+      override def requireNoArgConstructor(): Boolean = true
+
+      override def isModule: Boolean = true
+
+      override def superclassName(): String = "com.github.gtache.testing.K"
+    }
+
+    val fingerprints: Array[Fingerprint] = Array(annFingerprint, subFingerprint, subFingerprint2, subFingerprint3)
     val test: URL = this.getClass.getResource("../../../../")
     val loader = new URLClassLoader(Array(test))
     val taskDefs = ClassScanner.scan(loader, fingerprints)
 
     val nameTasks = taskDefs.map(t => t.fullyQualifiedName())
     assertTrue(nameTasks.contains("com.github.gtache.testing.A"))
+    assertTrue(nameTasks.contains("com.github.gtache.testing.A$"))
     assertTrue(nameTasks.contains("com.github.gtache.testing.B"))
     assertTrue(nameTasks.contains("com.github.gtache.testing.C"))
     assertTrue(nameTasks.contains("com.github.gtache.testing.D"))
@@ -47,19 +56,27 @@ class ClassScannerTest {
     assertTrue(nameTasks.contains("com.github.gtache.testing.G"))
     assertTrue(nameTasks.contains("com.github.gtache.testing.H"))
     assertFalse(nameTasks.contains("com.github.gtache.testing.I"))
+    assertTrue(nameTasks.contains("com.github.gtache.testing.J"))
+    assertTrue(nameTasks.contains("com.github.gtache.testing.K"))
+    assertFalse(nameTasks.contains("com.github.gtache.testing.L"))
 
     val map = nameTasks.zip(taskDefs).toMap
     assertTrue(map.get("com.github.gtache.testing.A").get.fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map.get("com.github.gtache.testing.A$").get.fingerprint.isInstanceOf[SubclassFingerprint])
     assertTrue(map.get("com.github.gtache.testing.B").get.fingerprint.isInstanceOf[SubclassFingerprint])
     assertTrue(map.get("com.github.gtache.testing.C").get.fingerprint.isInstanceOf[SubclassFingerprint])
     assertTrue(map.get("com.github.gtache.testing.D").get.fingerprint.isInstanceOf[AnnotatedFingerprint])
     assertTrue(map.get("com.github.gtache.testing.F").get.fingerprint.isInstanceOf[AnnotatedFingerprint])
     assertTrue(map.get("com.github.gtache.testing.G").get.fingerprint.isInstanceOf[SubclassFingerprint])
     assertTrue(map.get("com.github.gtache.testing.H").get.fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map.get("com.github.gtache.testing.J").get.fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map.get("com.github.gtache.testing.K").get.fingerprint.isInstanceOf[SubclassFingerprint])
   }
 }
 
 class A
+
+object A extends I with J
 
 class B extends A
 
@@ -82,3 +99,9 @@ class G(s: String)
 class H(s: String, i: Int) extends G(s)
 
 class I
+
+trait J extends K
+
+trait K
+
+trait L
