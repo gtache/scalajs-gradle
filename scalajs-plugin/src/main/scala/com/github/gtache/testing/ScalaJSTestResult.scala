@@ -1,16 +1,10 @@
 package com.github.gtache.testing
 
-import org.scalajs.testadapter.ScalaJSFramework
-import sbt.testing.{Runner, Task, TaskDef}
+import sbt.testing.TaskDef
 
-/**
-  * A class storing informations about a TestFramework (results of test)
-  *
-  * @param framework The framework which corresponds to this instance
-  */
-final class ScalaJSTestStatus(framework: ScalaJSFramework) {
-  var runner: Runner = null
-  var all: List[Task] = List.empty
+
+object ScalaJSTestResult {
+  var all: List[TaskDef] = List.empty
   var errored: List[TaskDef] = List.empty
   var failed: List[TaskDef] = List.empty
   var succeeded: List[TaskDef] = List.empty
@@ -19,19 +13,32 @@ final class ScalaJSTestStatus(framework: ScalaJSFramework) {
   var canceled: List[TaskDef] = List.empty
   var pending: List[TaskDef] = List.empty
 
-  /**
-    * Tells the runner / framework that the testing is finished
-    */
-  def testingFinished(): Unit = {
-    if (runner != null) {
-      //runner.done()
-    }
+  def isSuccess : Boolean = {
+    succeeded.size == all.size
+  }
+
+  def successfulClassnames : Set[String] = {
+    succeeded.map(t => t.fullyQualifiedName()).toSet
+  }
+
+  def failedClassnames : Set[String] = {
+    (errored++failed).map(t => t.fullyQualifiedName()).toSet
+  }
+
+  def clear : Unit = {
+    all = List.empty
+    errored = List.empty
+    failed = List.empty
+    succeeded = List.empty
+    skipped = List.empty
+    ignored = List.empty
+    canceled = List.empty
+    pending = List.empty
   }
 
   override def toString: String = {
-    "ScalaJSTestStatus for " + framework.name + " : " +
-      "\nRunner : " + runner +
-      "\nAll : " + all.map(t => t.taskDef().fullyQualifiedName()).mkString +
+    "Testing result : " +
+      "\nAll : " + all.map(t => t.fullyQualifiedName()).mkString +
       "\nSuccess : " + succeeded.map(t => t.fullyQualifiedName()).mkString +
       "\nError : " + errored.map(t => t.fullyQualifiedName()).mkString +
       "\nFail : " + failed.map(t => t.fullyQualifiedName()).mkString +

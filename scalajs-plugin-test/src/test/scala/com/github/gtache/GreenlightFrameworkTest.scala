@@ -3,6 +3,8 @@ package com.github.gtache
 import com.greencatsoft.greenlight._
 import com.greencatsoft.greenlight.grammar.Statement
 
+import scala.scalajs.js.annotation.{JSExport, JSExportAll}
+
 object GreenlightFrameworkTest extends TestSuite {
 
   "The framework" should "be able to test equality" in {

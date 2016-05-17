@@ -54,10 +54,24 @@ public class TestJSTask extends DefaultTask {
             println("Framework found : " + framework.name())
         }
 
+        Set<String> explicitelySpecified = new HashSet<>();
+        scala.collection.immutable.Set<String> excluded = new scala.collection.immutable.HashSet<String>();
+        if (project.hasProperty('test-only')) {
+            explicitelySpecified = ((String) project.property('test-only')).split(File.pathSeparator).toList().toSet()
+        } else if (project.hasProperty('test-quick')) {
+            explicitelySpecified = ((String) project.property('test-quick')).split(File.pathSeparator).toList().toSet()
+            excluded = ScalaJSTestResult$.MODULE$.successfulClassnames()
+        } else if (project.hasProperty('retest')){
+            excluded = ScalaJSTestResult$.MODULE$.successfulClassnames()
+        }
+        scala.collection.immutable.Set<String> explicitelySpecifiedScala = JavaConverters.asScalaSetConverter(explicitelySpecified).asScala().toSet()
+        ScalaJSTestResult$.MODULE$.clear()
+
+        Logger[] simpleLoggerArray = new SimpleLogger() as Logger[]
         frameworks.each { ScalaJSFramework framework ->
             final Runner runner = framework.runner(new String[0], new String[0], null)
             final Fingerprint[] fingerprints = framework.fingerprints()
-            final Task[] tasks = runner.tasks(ClassScanner.scan(classL, fingerprints))
+            final Task[] tasks = runner.tasks(ClassScanner.scan(classL, fingerprints, explicitelySpecifiedScala, excluded))
             final ScalaJSTestStatus testStatus = new ScalaJSTestStatus(framework)
             final EventHandler eventHandler = new ScalaJSEventHandler(testStatus)
             testStatus.runner_$eq(runner)
@@ -65,8 +79,14 @@ public class TestJSTask extends DefaultTask {
             tasks.each { println(it.taskDef().fullyQualifiedName()) }
             tasks.each { Task t ->
                 testStatus.all_$eq(testStatus.all().$colon$colon(t))
-                t.execute(eventHandler, [new SimpleLogger()] as Logger[])
+                t.execute(eventHandler, simpleLoggerArray)
             }
+        }
+
+        if (ScalaJSTestResult$.MODULE$.isSuccess()) {
+            project.logger.lifecycle(ScalaJSTestResult$.MODULE$.toString() + "\nAll tests passed")
+        } else {
+            project.logger.lifecycle(ScalaJSTestResult$.MODULE$.toString() + "\nSome tests failed")
         }
     }
 }

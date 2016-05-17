@@ -1,5 +1,6 @@
 package com.github.gtache.testing
 
+import java.io.File
 import java.lang.annotation.Annotation
 import java.net.{URL, URLClassLoader}
 import java.nio.file.Paths
@@ -11,13 +12,16 @@ import scala.collection.mutable.ArrayBuffer
 object ClassScanner {
 
   /**
-    * Finds all classes contained in an URLClassLoader which match to a fingerprint
+    * Finds all classes contained in an URLClassLoader which match to a fingerprint, or only those specified in explicitelySpecified
+    * minus the ones in excluded
     *
-    * @param classL       The URLClassLoader
-    * @param fingerprints The fingerprints to
+    * @param classL               The URLClassLoader
+    * @param fingerprints         The fingerprints to
+    * @param explicitelySpecified A set of String to use as regex
+    * @param excluded             A set of String to use as regex
     * @return The TaskDefs found by the scan
     */
-  def scan(classL: URLClassLoader, fingerprints: Array[Fingerprint], explicitelySpecified: Array[String] = Array.empty): Array[TaskDef] = {
+  def scan(classL: URLClassLoader, fingerprints: Array[Fingerprint], explicitelySpecified: Set[String] = Set.empty, excluded: Set[String] = Set.empty): Array[TaskDef] = {
 
     def checkSuperclasses(c: Class[_], sF: SubclassFingerprint): Boolean = {
 
@@ -52,33 +56,29 @@ object ClassScanner {
       checkRec(c, sF.superclassName())
     }
 
-    val classes = parseClasses(classL)
+    val classes = parseClasses(classL, explicitelySpecified, excluded)
     val buffer = ArrayBuffer[TaskDef]()
     classes.foreach(c => {
-      if (explicitelySpecified.contains(c.getCanonicalName)) {
-        buffer += new TaskDef(c.getCanonicalName, null, false, Array.empty)
-      } else {
-        fingerprints.foreach {
-          case aF: AnnotatedFingerprint => {
-            try {
-              if (c.isAnnotationPresent(Class.forName(aF.annotationName(), false, classL).asInstanceOf[Class[_ <: Annotation]])) {
-                buffer += new TaskDef(c.getName, aF, false, Array.empty)
-              }
-            } catch {
-              case e: ClassNotFoundException => {
-                Console.err.println("Class not found for annotation : " + aF.annotationName())
-              }
+      fingerprints.foreach {
+        case aF: AnnotatedFingerprint => {
+          try {
+            if (c.isAnnotationPresent(Class.forName(aF.annotationName(), false, classL).asInstanceOf[Class[_ <: Annotation]])) {
+              buffer += new TaskDef(c.getName, aF, explicitelySpecified.nonEmpty, Array.empty)
+            }
+          } catch {
+            case e: ClassNotFoundException => {
+              Console.err.println("Class not found for annotation : " + aF.annotationName())
             }
           }
-          case sF: SubclassFingerprint => {
-            if (checkSuperclasses(c, sF)) {
-              if (!sF.requireNoArgConstructor || c.isInterface || (sF.requireNoArgConstructor && checkZeroArgsConstructor(c))) {
-                buffer += new TaskDef(c.getName, sF, false, Array.empty)
-              }
-            }
-          }
-          case _ => throw new IllegalArgumentException("Unsupported Fingerprint type")
         }
+        case sF: SubclassFingerprint => {
+          if (checkSuperclasses(c, sF)) {
+            if (!sF.requireNoArgConstructor || c.isInterface || (sF.requireNoArgConstructor && checkZeroArgsConstructor(c))) {
+              buffer += new TaskDef(c.getName, sF, explicitelySpecified.nonEmpty, Array.empty)
+            }
+          }
+        }
+        case _ => throw new IllegalArgumentException("Unsupported Fingerprint type")
       }
     })
     buffer.toArray
@@ -91,7 +91,6 @@ object ClassScanner {
     * @return true or false
     */
   def checkZeroArgsConstructor(c: Class[_]): Boolean = {
-    println(c.getName)
     c.getDeclaredConstructors.foreach(cons => {
       if (cons.getParameterCount == 0) {
         return true
@@ -101,17 +100,41 @@ object ClassScanner {
   }
 
   /**
-    * Finds all classes in a URLClassLoader
+    * Finds all classes in a URLClassLoader, or only those specified by explicitelySpecified
+    * minus the ones in excluded
     *
-    * @param classL The URLClassLoader
+    * @param classL               The URLClassLoader
+    * @param explicitelySpecified A set of String to use as regex
+    * @param excluded             A set of String to use as regex
     * @return the classes
     */
-  def parseClasses(classL: URLClassLoader): Array[Class[_]] = {
-    def parseClasses(url: URL, idx: Int): Array[Class[_]] = {
+  def parseClasses(classL: URLClassLoader, explicitelySpecified: Set[String] = Set.empty, excluded: Set[String] = Set.empty): Array[Class[_]] = {
+
+    val URIPathSep = '/'
+    val extSep = '.'
+    val ext = extSep + "class"
+
+    def checkSpecific(name : String): Boolean ={
+      !excluded.exists(s => s.r.pattern.matcher(name).matches()) &&
+        (explicitelySpecified.isEmpty || explicitelySpecified.exists(s => s.r.pattern.matcher(name).matches()))
+    }
+
+    def checkAndAddFile(file : File, packageName : String = "", buffer : ArrayBuffer[Class[_]], meth : () => Unit): Unit ={
+      if (!file.isDirectory && file.getName.endsWith(ext)) {
+        val fileName = file.getName
+        val name = packageName + fileName.substring(0, fileName.indexOf(extSep))
+        if (checkSpecific(name)) {
+          buffer += classL.loadClass(name)
+        }
+      } else if (file.isDirectory) {
+        meth()
+      }
+    }
+    def parseClasses(url: URL, idx: Int, explicitelySpecified: Set[String] = Set.empty, excluded: Set[String] = Set.empty): Array[Class[_]] = {
       val f = Paths.get(url.toURI).toFile
       val packageName = {
         if (url != classL.getURLs()(idx)) {
-          classL.getURLs()(idx).toURI.relativize(url.toURI).toString.replace('/', '.')
+          classL.getURLs()(idx).toURI.relativize(url.toURI).toString.replace(URIPathSep, extSep)
         } else {
           ""
         }
@@ -119,20 +142,20 @@ object ClassScanner {
       if (f.isDirectory) {
         val buffer = ArrayBuffer.empty[Class[_]]
         f.listFiles().foreach(file => {
-          if (!file.isDirectory && file.getName.endsWith(".class")) {
-            val name = file.getName
-            buffer += classL.loadClass(packageName + name.substring(0, name.indexOf('.')))
-          } else if (file.isDirectory) {
-            parseClasses(file.toURI.toURL, idx).foreach(c => {
-              buffer += c
-            })
-          }
+          checkAndAddFile(file,packageName,buffer,() => parseClasses(file.toURI.toURL, idx, explicitelySpecified, excluded).foreach(c => {
+            buffer += c
+          }))
         })
         buffer.toArray
       } else {
-        if (f.getName.endsWith(".class")) {
-          val name = f.getName
-          Array(classL.loadClass(packageName + name.substring(0, name.indexOf('.'))))
+        if (f.getName.endsWith(ext)) {
+          val fileName = f.getName
+          val name = fileName.substring(0, fileName.indexOf(extSep))
+          if (checkSpecific(name)) {
+            Array(classL.loadClass(packageName + name.substring(0, name.indexOf(extSep))))
+          } else {
+            Array.empty[Class[_]]
+          }
         } else {
           Array.empty[Class[_]]
         }
@@ -142,14 +165,9 @@ object ClassScanner {
     val buffer = ArrayBuffer.empty[Class[_]]
     classL.getURLs.zipWithIndex.foreach(url => {
       val f = Paths.get(url._1.toURI).toFile
-      if (!f.isDirectory && f.getName.endsWith(".class")) {
-        val name = f.getName
-        buffer += classL.loadClass(name.substring(0, name.indexOf('.')))
-      } else if (f.isDirectory) {
-        parseClasses(url._1, url._2).foreach(c => {
-          buffer += c
-        })
-      }
+      checkAndAddFile(f,"",buffer,() => parseClasses(url._1, url._2, explicitelySpecified, excluded).foreach(c => {
+        buffer += c
+      }))
     })
     buffer.toArray
   }
