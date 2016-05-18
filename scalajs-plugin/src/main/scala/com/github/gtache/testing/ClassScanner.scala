@@ -26,8 +26,6 @@ object ClassScanner {
     def checkSuperclasses(c: Class[_], sF: SubclassFingerprint): Boolean = {
 
       def checkName(c: Class[_], fName: String): Boolean = {
-        if (c.getName == fName || c.getSimpleName == fName || c.getCanonicalName == fName) {
-        }
         c.getName == fName || c.getSimpleName == fName || c.getCanonicalName == fName
       }
 
@@ -38,7 +36,7 @@ object ClassScanner {
         } else {
           var sC = c.getSuperclass
           while (sC != null) {
-            if (checkName(sC, fName)) {
+            if (checkRec(sC, fName)) {
               return true
             } else {
               sC = sC.getSuperclass
@@ -63,7 +61,8 @@ object ClassScanner {
       fingerprints.foreach {
         case aF: AnnotatedFingerprint => {
           try {
-            if (c.isAnnotationPresent(Class.forName(aF.annotationName(), false, classL).asInstanceOf[Class[_ <: Annotation]])) {
+            if (c.isAnnotationPresent(Class.forName(aF.annotationName(), false, classL).asInstanceOf[Class[_ <: Annotation]])
+             && (aF.isModule || (!aF.isModule && !c.getName.endsWith(objSuffix)))) {
               buffer += new TaskDef(c.getName.stripSuffix(objSuffix), aF, explicitelySpecified.nonEmpty, Array.empty)
             }
           } catch {
@@ -74,7 +73,8 @@ object ClassScanner {
         }
         case sF: SubclassFingerprint => {
           if (checkSuperclasses(c, sF)) {
-            if (!sF.requireNoArgConstructor || c.isInterface || (sF.requireNoArgConstructor && checkZeroArgsConstructor(c))) {
+            if (!sF.requireNoArgConstructor || c.isInterface || (sF.requireNoArgConstructor && checkZeroArgsConstructor(c))
+            && (sF.isModule || (!sF.isModule && !c.getName.endsWith(objSuffix)))) {
               buffer += new TaskDef(c.getName.stripSuffix(objSuffix), sF, explicitelySpecified.nonEmpty, Array.empty)
             }
           }
@@ -82,7 +82,7 @@ object ClassScanner {
         case _ => throw new IllegalArgumentException("Unsupported Fingerprint type")
       }
     })
-    buffer.toArray
+    buffer.toArray.distinct
   }
 
   /**
