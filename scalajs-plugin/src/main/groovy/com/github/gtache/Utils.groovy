@@ -263,4 +263,37 @@ public final class Utils {
             return new ArrayList<>()
         }
     }
+
+    /**
+     * Takes a wildcard and returns a regex corresponding to it
+     * Example : com.github.* => com\\.github\\..*
+     * @param s The string to transform
+     * @return The regex
+     */
+    public static String toRegex(String s) {
+        s.collectReplacements { Character c ->
+            switch (c) {
+                case '*':
+                    '.*'
+                    break
+                case '?':
+                    '.'
+                    break
+                case '.':
+                case '[':
+                case ']':
+                case '(':
+                case ')':
+                case '^':
+                case '$':
+                case '|':
+                case '\\':
+                    '\\' + c
+                    break
+                default:
+                    null
+                    break
+            }
+        }
+    }
 }

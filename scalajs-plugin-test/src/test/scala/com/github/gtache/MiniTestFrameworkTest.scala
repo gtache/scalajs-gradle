@@ -1,4 +1,4 @@
-package com.github.gtache
+/*package com.github.gtache
 
 import minitest._
 
@@ -25,4 +25,4 @@ object MiniTestFrameworkTest extends SimpleTestSuite {
       "hello" + " " + "world"
     }
   }
-}
+}*/

@@ -7,23 +7,14 @@ import sbt.testing.{Runner, TaskDef}
   * An object containing the previous testing results.
   */
 object ScalaJSTestResult {
-  var statuses : Set[ScalaJSTestStatus] = Set.empty
-
-  /**
-    * Checks if testing is finished
-    *
-    * @return true or false
-    */
-  def isFinished : Boolean = {
-    !statuses.exists(s => !s.isFinished)
-  }
+  var statuses: Set[ScalaJSTestStatus] = Set.empty
 
   /**
     * Checks if all tests were successful
     *
     * @return true or false
     */
-  def isSuccess : Boolean = {
+  def isSuccess: Boolean = {
     if (isFinished) {
       getAll.size == getSuccessful.size
     } else {
@@ -34,11 +25,28 @@ object ScalaJSTestResult {
   }
 
   /**
+    * Checks if testing is finished
+    *
+    * @return true or false
+    */
+  def isFinished: Boolean = {
+    !statuses.exists(s => !s.isFinished)
+  }
+
+  private def getAll: Set[String] = {
+    statuses.flatMap(s => s.all).map(t => t.fullyQualifiedName())
+  }
+
+  private def getSuccessful: Set[String] = {
+    statuses.flatMap(s => s.succeeded).map(t => t.fullyQualifiedName())
+  }
+
+  /**
     * Returns all successful classes
     *
     * @return A set of classnames
     */
-  def successfulClassnames : Set[String] = {
+  def successfulClassnames: Set[String] = {
     if (isFinished) {
       getSuccessful
     } else {
@@ -52,64 +60,58 @@ object ScalaJSTestResult {
     *
     * @return A set of classnames
     */
-  def failedClassnames : Set[String] = {
+  def failedClassnames: Set[String] = {
     if (isFinished) {
-      getErrored++getFailed
+      getErrored ++ getFailed
     } else {
       println("Testing is not finished")
       Set.empty
     }
   }
 
+  private def getFailed: Set[String] = {
+    statuses.flatMap(s => s.failed).map(t => t.fullyQualifiedName())
+  }
+
+  private def getErrored: Set[String] = {
+    statuses.flatMap(s => s.errored).map(t => t.fullyQualifiedName())
+  }
+
   /**
     * Clears the results
     */
-  def clear() : Unit = {
+  def clear(): Unit = {
     statuses = Set.empty
   }
 
-  private def getAll : Set[String] = {
-      statuses.flatMap(s => s.all).map(t => t.fullyQualifiedName())
-  }
-
-  private def getSuccessful : Set[String] = {
-      statuses.flatMap(s => s.succeeded).map(t => t.fullyQualifiedName())
-  }
-
-  private def getFailed : Set[String] = {
-      statuses.flatMap(s => s.failed).map(t => t.fullyQualifiedName())
-  }
-
-  private def getErrored : Set[String] = {
-      statuses.flatMap(s => s.errored).map(t => t.fullyQualifiedName())
-  }
-
-  private def getSkipped : Set[String] = {
-      statuses.flatMap(s => s.skipped).map(t => t.fullyQualifiedName())
-  }
-
-  private def getIgnored : Set[String] = {
-      statuses.flatMap(s => s.ignored).map(t => t.fullyQualifiedName())
-  }
-
-  private def getCanceled : Set[String] = {
-      statuses.flatMap(s => s.canceled).map(t => t.fullyQualifiedName())
-  }
-
-  private def getPending : Set[String] = {
-      statuses.flatMap(s => s.pending).map(t => t.fullyQualifiedName())
-  }
-
   override def toString: String = {
-      "Testing result "+ (if (!isFinished) {"(testing is not finished !)"})+" : " +
-        "\nAll : " + getAll.mkString +
-        "\nSuccess : " + getSuccessful.mkString +
-        "\nError : " + getErrored.mkString +
-        "\nFail : " + getFailed.mkString +
-        "\nSkip : " + getSkipped.mkString +
-        "\nIgnored : " + getIgnored.mkString +
-        "\nCanceled : " + getCanceled.mkString +
-        "\nPending : " + getPending.mkString
+    "Testing result " + (if (!isFinished) {
+      "(testing is not finished !)"
+    }) + " : " +
+      "\nAll : " + getAll.mkString +
+      "\nSuccess : " + getSuccessful.mkString +
+      "\nError : " + getErrored.mkString +
+      "\nFail : " + getFailed.mkString +
+      "\nSkip : " + getSkipped.mkString +
+      "\nIgnored : " + getIgnored.mkString +
+      "\nCanceled : " + getCanceled.mkString +
+      "\nPending : " + getPending.mkString
+  }
+
+  private def getSkipped: Set[String] = {
+    statuses.flatMap(s => s.skipped).map(t => t.fullyQualifiedName())
+  }
+
+  private def getIgnored: Set[String] = {
+    statuses.flatMap(s => s.ignored).map(t => t.fullyQualifiedName())
+  }
+
+  private def getCanceled: Set[String] = {
+    statuses.flatMap(s => s.canceled).map(t => t.fullyQualifiedName())
+  }
+
+  private def getPending: Set[String] = {
+    statuses.flatMap(s => s.pending).map(t => t.fullyQualifiedName())
   }
 }
 
@@ -135,14 +137,15 @@ final class ScalaJSTestStatus(framework: ScalaJSFramework) {
     */
   def testingFinished(): Unit = {
     if (runner != null && !finished) {
-      println(framework.name +" DONE")
+      println(framework.name + " DONE")
       runner.done()
-      finished=true
+      finished = true
     }
   }
 
   /**
     * Checks if testing is finished
+    *
     * @return true or false
     */
   def isFinished: Boolean = {

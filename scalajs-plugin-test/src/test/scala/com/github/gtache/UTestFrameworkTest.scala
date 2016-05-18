@@ -1,4 +1,4 @@
-package com.github.gtache
+/*package com.github.gtache
 
 import utest._
 
@@ -15,4 +15,4 @@ object UTestFrameworkTest extends TestSuite {
       a(1)==2
     }
   }
-}
+}*/

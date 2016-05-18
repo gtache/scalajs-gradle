@@ -1,4 +1,4 @@
-package com.github.gtache
+/*package com.github.gtache
 
 import nyaya.prop._
 
@@ -10,3 +10,4 @@ object NyayaFrameworkTest {
 
   case class AllThings(timestamp: Long, things: List[Thing])
 }
+*/

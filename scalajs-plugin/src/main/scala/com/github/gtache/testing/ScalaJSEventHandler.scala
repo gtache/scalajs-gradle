@@ -1,6 +1,6 @@
 package com.github.gtache.testing
 
-import sbt.testing.{Event, EventHandler, TaskDef, TestSelector}
+import sbt.testing.{Event, EventHandler, TaskDef}
 
 /**
   * Handles events fired by a Framework
@@ -13,10 +13,10 @@ final class ScalaJSEventHandler(testStatus: ScalaJSTestStatus) extends EventHand
     val name = event.fullyQualifiedName()
     val status = event.status()
     val selector = event.selector()
-    println("FP : "+fingerprint)
-    println("name : "+name)
-    println("result : "+status.name)
-    println("selector : "+selector)
+    println("FP : " + fingerprint)
+    println("name : " + name)
+    println("result : " + status.name)
+    println("selector : " + selector)
     val taskDef = new TaskDef(name, fingerprint, false, Array(selector))
     status.name() match {
       case "Success" => {

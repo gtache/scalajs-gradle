@@ -1,4 +1,4 @@
-package com.github.gtache
+/*package com.github.gtache
 
 import com.greencatsoft.greenlight._
 import com.greencatsoft.greenlight.grammar.Statement
@@ -97,4 +97,4 @@ object LifeCycleTest extends TestSuite with BeforeAndAfter {
       it should be("BeforeAndAfter trait can be used to be notified before and after a specification")
     }
   }
-}
+}*/

@@ -11,7 +11,6 @@ import org.scalajs.jsenv.ComJSEnv
 import org.scalajs.jsenv.ConsoleJSConsole$
 import org.scalajs.testadapter.ScalaJSFramework
 import sbt.testing.*
-import scala.Function1
 import scala.collection.JavaConverters
 import scala.collection.Seq
 import scala.collection.mutable.ArrayBuffer
@@ -58,10 +57,12 @@ public class TestJSTask extends DefaultTask {
         scala.collection.immutable.Set<String> excluded = new scala.collection.immutable.HashSet<String>();
         if (project.hasProperty('test-only')) {
             explicitelySpecified = ((String) project.property('test-only')).split(File.pathSeparator).toList().toSet()
+                    .collect { Utils.toRegex(it) }
         } else if (project.hasProperty('test-quick')) {
             explicitelySpecified = ((String) project.property('test-quick')).split(File.pathSeparator).toList().toSet()
+                    .collect { Utils.toRegex(it) }
             excluded = ScalaJSTestResult$.MODULE$.successfulClassnames()
-        } else if (project.hasProperty('retest')){
+        } else if (project.hasProperty('retest')) {
             excluded = ScalaJSTestResult$.MODULE$.successfulClassnames()
         }
         scala.collection.immutable.Set<String> explicitelySpecifiedScala = JavaConverters.asScalaSetConverter(explicitelySpecified).asScala().toSet()
@@ -77,13 +78,13 @@ public class TestJSTask extends DefaultTask {
             final EventHandler eventHandler = new ScalaJSEventHandler(testStatus)
             testStatus.runner_$eq(runner)
             println("Executing " + framework.name())
-            if (tasks.length==0){
+            if (tasks.length == 0) {
                 println("No tasks found")
                 testStatus.testingFinished()
             }
             tasks.each { Task t ->
                 testStatus.all_$eq(testStatus.all().$colon$colon(t.taskDef()))
-                println("With task : "+t.taskDef().fullyQualifiedName())
+                println("With task : " + t.taskDef().fullyQualifiedName())
             }
             tasks.each { Task t ->
                 t.execute(eventHandler, simpleLoggerArray)

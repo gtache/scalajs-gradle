@@ -10,8 +10,8 @@ import org.scalajs.jsenv.phantomjs.PhantomJSEnv
 import org.scalajs.jsenv.rhino.RhinoJSEnv
 import scala.collection.mutable.ArrayBuffer
 
-import static Utils.*
-import static TestUtils.*
+import static com.github.gtache.TestUtils.*
+import static com.github.gtache.Utils.*
 
 class UtilsTest extends GroovyTestCase {
 
@@ -226,7 +226,7 @@ class UtilsTest extends GroovyTestCase {
         assertFalse(isTaskInStartParameter(project, "something"))
         deleteRecursive(project.projectDir)
     }
-    
+
     @Test
     public void testResolveTestFrameworks() {
         Project project = getFreshProject()
@@ -235,27 +235,34 @@ class UtilsTest extends GroovyTestCase {
         project = getFreshProject()
         final List<String> testFrameworks = new ArrayList<>()
         final String test1 = "com.test.Test1"
-        final String test2 ="com.test.Test2"
+        final String test2 = "com.test.Test2"
         testFrameworks.add(test1)
         testFrameworks.add(test2)
-        project.extensions.add(TEST_FRAMEWORKS,testFrameworks)
+        project.extensions.add(TEST_FRAMEWORKS, testFrameworks)
         final List<TestFramework> resolvedFrameworks = resolveTestFrameworks(project)
         assertEquals(2, resolvedFrameworks.size())
-        final List<ArrayBuffer<String>> resolvedFrameworksName = resolvedFrameworks.collect{
+        final List<ArrayBuffer<String>> resolvedFrameworksName = resolvedFrameworks.collect {
             it.classNames()
         }
         boolean found1 = false
         boolean found2 = false
         resolvedFrameworksName.each {
-            if (it.contains(test1)){
-                found1=true
+            if (it.contains(test1)) {
+                found1 = true
             }
-            if (it.contains(test2)){
-                found2=true
+            if (it.contains(test2)) {
+                found2 = true
             }
         }
         assertTrue(found1)
         assertTrue(found2)
         deleteRecursive(project.projectDir)
+    }
+
+    @Test
+    public void testToRegex() {
+        assertEquals("com\\..*", toRegex("com.*"))
+        assertEquals("com\\.github\\.gtache", toRegex("com.github.gtache"))
+        assertEquals(".*", toRegex("*"))
     }
 }

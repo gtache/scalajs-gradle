@@ -1,6 +1,7 @@
-package com.github.gtache
+/*package com.github.gtache
 
 
 class ScalaPropsFrameworkTest {
 
 }
+*/

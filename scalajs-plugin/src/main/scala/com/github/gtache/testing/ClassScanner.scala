@@ -115,12 +115,12 @@ object ClassScanner {
     val extSep = '.'
     val ext = extSep + "class"
 
-    def checkSpecific(name : String): Boolean ={
+    def checkSpecific(name: String): Boolean = {
       !excluded.exists(s => s.r.pattern.matcher(name).matches()) &&
         (explicitelySpecified.isEmpty || explicitelySpecified.exists(s => s.r.pattern.matcher(name).matches()))
     }
 
-    def checkAndAddFile(file : File, buffer : ArrayBuffer[Class[_]], meth : () => Unit,  packageName : String = ""): Unit ={
+    def checkAndAddFile(file: File, buffer: ArrayBuffer[Class[_]], meth: () => Unit, packageName: String = ""): Unit = {
       if (!file.isDirectory && file.getName.endsWith(ext)) {
         val fileName = file.getName
         val name = packageName + fileName.substring(0, fileName.indexOf(extSep))
@@ -143,9 +143,9 @@ object ClassScanner {
       if (f.isDirectory) {
         val buffer = ArrayBuffer.empty[Class[_]]
         f.listFiles().foreach(file => {
-          checkAndAddFile(file,buffer,() => parseClasses(file.toURI.toURL, idx, explicitelySpecified, excluded).foreach(c => {
+          checkAndAddFile(file, buffer, () => parseClasses(file.toURI.toURL, idx, explicitelySpecified, excluded).foreach(c => {
             buffer += c
-          }),packageName)
+          }), packageName)
         })
         buffer.toArray
       } else {
@@ -166,7 +166,7 @@ object ClassScanner {
     val buffer = ArrayBuffer.empty[Class[_]]
     classL.getURLs.zipWithIndex.foreach(url => {
       val f = Paths.get(url._1.toURI).toFile
-      checkAndAddFile(f,buffer,() => parseClasses(url._1, url._2, explicitelySpecified, excluded).foreach(c => {
+      checkAndAddFile(f, buffer, () => parseClasses(url._1, url._2, explicitelySpecified, excluded).foreach(c => {
         buffer += c
       }))
     })
