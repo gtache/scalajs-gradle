@@ -47,16 +47,16 @@ class ClassScannerTest {
   val explicitelySpecified: Set[String] = Set(".*A.*", ".*B", ".*C")
   val excluded = Set(".*C", ".*H")
   val excludedAll: Set[String] = Set("com.*")
-  val all = Set(packageName + "A", packageName + "A$", packageName + "B", packageName + "C", packageName + "D",
+  val all = Set(packageName + "A", packageName + "AB", packageName + "B", packageName + "C", packageName + "D",
     packageName + "E", packageName + "F", packageName + "G", packageName + "H", packageName + "I", packageName + "J",
     packageName + "K", packageName + "L")
 
   def checkContains(nameTasks: Set[String], contained: Set[String], all: Set[String]): Unit = {
     contained.foreach { s =>
-      assertTrue(nameTasks.contains(s))
+      assertTrue(s+" in "+contained.mkString(" ; "),nameTasks.contains(s))
     }
     all.filterNot(contained).foreach { s =>
-      assertFalse(nameTasks.contains(s))
+      assertFalse(s+" not in "+contained.mkString(" ; "),nameTasks.contains(s))
     }
   }
 
@@ -65,14 +65,14 @@ class ClassScannerTest {
     val taskDefs = ClassScanner.scan(loader, fingerprints)
 
     val nameTasks = taskDefs.map(t => t.fullyQualifiedName())
-    val contained = Set(packageName + "A", packageName + "A$", packageName + "B", packageName + "C", packageName + "D", packageName + "F",
+    val contained = Set(packageName + "A", packageName + "AB", packageName + "B", packageName + "C", packageName + "D", packageName + "F",
       packageName + "G", packageName + "H", packageName + "J", packageName + "K")
     checkContains(nameTasks.toSet, contained, all)
 
 
     val map = nameTasks.zip(taskDefs).toMap
     assertTrue(map.get(packageName + "A").get.fingerprint.isInstanceOf[SubclassFingerprint])
-    assertTrue(map.get(packageName + "A$").get.fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map.get(packageName + "AB").get.fingerprint.isInstanceOf[SubclassFingerprint])
     assertTrue(map.get(packageName + "B").get.fingerprint.isInstanceOf[SubclassFingerprint])
     assertTrue(map.get(packageName + "C").get.fingerprint.isInstanceOf[SubclassFingerprint])
     assertTrue(map.get(packageName + "D").get.fingerprint.isInstanceOf[AnnotatedFingerprint])
@@ -87,12 +87,12 @@ class ClassScannerTest {
   def testScannerExplicitely(): Unit = {
     val taskDefs = ClassScanner.scan(loader, fingerprints, explicitelySpecified)
     val nameTasks = taskDefs.map(t => t.fullyQualifiedName())
-    val contained = Set(packageName + "A", packageName + "A$", packageName + "B", packageName + "C")
+    val contained = Set(packageName + "A", packageName + "AB", packageName + "B", packageName + "C")
     checkContains(nameTasks.toSet, contained, all)
 
     val map = nameTasks.zip(taskDefs).toMap
     assertTrue(map.get(packageName + "A").get.fingerprint.isInstanceOf[SubclassFingerprint])
-    assertTrue(map.get(packageName + "A$").get.fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map.get(packageName + "AB").get.fingerprint.isInstanceOf[SubclassFingerprint])
     assertTrue(map.get(packageName + "B").get.fingerprint.isInstanceOf[SubclassFingerprint])
     assertTrue(map.get(packageName + "C").get.fingerprint.isInstanceOf[SubclassFingerprint])
   }
@@ -101,12 +101,12 @@ class ClassScannerTest {
   def testScannerExcluded(): Unit = {
     val taskDefs = ClassScanner.scan(loader, fingerprints, explicitelySpecified, excluded)
     val nameTasks = taskDefs.map(t => t.fullyQualifiedName())
-    val contained = Set(packageName + "A", packageName + "A$", packageName + "B")
+    val contained = Set(packageName + "A", packageName + "AB", packageName + "B")
     checkContains(nameTasks.toSet, contained, all)
 
     val map = nameTasks.zip(taskDefs).toMap
     assertTrue(map.get(packageName + "A").get.fingerprint.isInstanceOf[SubclassFingerprint])
-    assertTrue(map.get(packageName + "A$").get.fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map.get(packageName + "AB").get.fingerprint.isInstanceOf[SubclassFingerprint])
     assertTrue(map.get(packageName + "B").get.fingerprint.isInstanceOf[SubclassFingerprint])
   }
 
@@ -122,8 +122,6 @@ class ClassScannerTest {
 }
 
 class A
-
-object A extends I with J
 
 class B extends A
 
@@ -152,3 +150,5 @@ trait J extends K
 trait K
 
 trait L
+
+object AB extends I with J
