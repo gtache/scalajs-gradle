@@ -11,6 +11,7 @@ import org.scalajs.jsenv.ComJSEnv
 import org.scalajs.jsenv.ConsoleJSConsole$
 import org.scalajs.testadapter.ScalaJSFramework
 import sbt.testing.*
+import scala.Function1
 import scala.collection.JavaConverters
 import scala.collection.Seq
 import scala.collection.mutable.ArrayBuffer
@@ -42,7 +43,6 @@ public class TestJSTask extends DefaultTask {
         }
         final List<ScalaJSFramework> frameworks = JavaConverters.asJavaIterableConverter(new FrameworkDetector(libEnv).instantiatedScalaJSFrameworks(
                 allFrameworks.toSeq(),
-                libEnv,
                 new ScalaConsoleLogger(Utils.resolveLogLevel(project, LOG_LEVEL, Level.Debug$.MODULE$)),
                 ConsoleJSConsole$.MODULE$
         )).asJava().toList()
@@ -73,22 +73,25 @@ public class TestJSTask extends DefaultTask {
             final Fingerprint[] fingerprints = framework.fingerprints()
             final Task[] tasks = runner.tasks(ClassScanner.scan(classL, fingerprints, explicitelySpecifiedScala, excluded))
             final ScalaJSTestStatus testStatus = new ScalaJSTestStatus(framework)
+            ScalaJSTestResult$.MODULE$.statuses_$eq(ScalaJSTestResult$.MODULE$.statuses().$plus(testStatus) as scala.collection.immutable.Set<ScalaJSTestStatus>)
             final EventHandler eventHandler = new ScalaJSEventHandler(testStatus)
             testStatus.runner_$eq(runner)
             println("Executing " + framework.name())
+            if (tasks.length==0){
+                println("No tasks found")
+                testStatus.testingFinished()
+            }
             tasks.each { Task t ->
                 testStatus.all_$eq(testStatus.all().$colon$colon(t.taskDef()))
-                println(t.taskDef().fullyQualifiedName())
+                println("With task : "+t.taskDef().fullyQualifiedName())
             }
             tasks.each { Task t ->
                 t.execute(eventHandler, simpleLoggerArray)
             }
         }
 
-        if (ScalaJSTestResult$.MODULE$.isSuccess()) {
-            project.logger.lifecycle(ScalaJSTestResult$.MODULE$.toString() + "\nAll tests passed")
-        } else {
-            project.logger.lifecycle(ScalaJSTestResult$.MODULE$.toString() + "\nSome tests failed")
-        }
+        project.logger.lifecycle(ScalaJSTestResult$.MODULE$.toString() +
+                (ScalaJSTestResult$.MODULE$.isSuccess() ? "\nAll tests passed" : "\nSome tests failed")
+        )
     }
 }

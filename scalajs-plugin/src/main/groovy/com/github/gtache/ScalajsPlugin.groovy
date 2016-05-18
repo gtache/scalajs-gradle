@@ -116,7 +116,9 @@ public final class ScalajsPlugin implements Plugin<Project> {
                 }
             }
             tasks.withType(ScalaCompile) {
-                scalaCompileOptions.additionalParameters = ["-Xplugin:" + project.configurations.scalaCompilePlugin.asPath]
+                scalaCompileOptions.additionalParameters = ["-Xplugin:" + project.configurations.scalaCompilePlugin.findAll {
+                    it.absolutePath.contains('scalajs-compiler')
+                }.get(0)]
             }
             project.logger.info('Xplugin for compiler added')
             project.logger.info('ScalajsPlugin applied')

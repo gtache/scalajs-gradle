@@ -15,7 +15,7 @@ object ScalaJSTestResult {
     * @return true or false
     */
   def isFinished : Boolean = {
-    !statuses.exists(s => !s.isFinished())
+    !statuses.exists(s => !s.isFinished)
   }
 
   /**
@@ -28,6 +28,7 @@ object ScalaJSTestResult {
       getAll.size == getSuccessful.size
     } else {
       println("Testing is not finished")
+      println(statuses.filter(s => !s.isFinished).flatMap(s => s.all).map(t => t.fullyQualifiedName()).mkString)
       false
     }
   }
@@ -63,7 +64,7 @@ object ScalaJSTestResult {
   /**
     * Clears the results
     */
-  def clear : Unit = {
+  def clear() : Unit = {
     statuses = Set.empty
   }
 
@@ -134,12 +135,17 @@ final class ScalaJSTestStatus(framework: ScalaJSFramework) {
     */
   def testingFinished(): Unit = {
     if (runner != null && !finished) {
-      //runner.done()
+      println(framework.name +" DONE")
+      runner.done()
       finished=true
     }
   }
 
-  def isFinished(): Boolean = {
+  /**
+    * Checks if testing is finished
+    * @return true or false
+    */
+  def isFinished: Boolean = {
     finished
   }
 

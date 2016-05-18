@@ -27,16 +27,15 @@ final class FrameworkDetector(jsEnv: JSEnv) {
     * Returns a list of instantiated ScalaJSFramework (one for each detected TestFramework). Calls detect()
     *
     * @param frameworks The list of TestFramework to search
-    * @param comJSEnv   The environment to use to instantiate the ScalaJSFrameworks
     * @param logger     The logger to use
     * @param console    The jsConsole to use
     * @return The list of ScalaJSFramework
     */
-  def instantiatedScalaJSFrameworks(frameworks: Seq[TestFramework], comJSEnv: ComJSEnv, logger: Logger, console: JSConsole): List[ScalaJSFramework] = {
+  def instantiatedScalaJSFrameworks(frameworks: Seq[TestFramework], logger: Logger, console: JSConsole): List[ScalaJSFramework] = {
     detect(frameworks).map(pair => {
       new ScalaJSFramework(
         pair._2,
-        comJSEnv,
+        jsEnv.asInstanceOf[ComJSEnv],
         logger,
         console)
     }).toList

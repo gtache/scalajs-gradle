@@ -56,6 +56,7 @@ object ClassScanner {
       checkRec(c, sF.superclassName())
     }
 
+    val objSuffix = "$"
     val classes = parseClasses(classL, explicitelySpecified, excluded)
     val buffer = ArrayBuffer[TaskDef]()
     classes.foreach(c => {
@@ -63,7 +64,7 @@ object ClassScanner {
         case aF: AnnotatedFingerprint => {
           try {
             if (c.isAnnotationPresent(Class.forName(aF.annotationName(), false, classL).asInstanceOf[Class[_ <: Annotation]])) {
-              buffer += new TaskDef(c.getName, aF, explicitelySpecified.nonEmpty, Array.empty)
+              buffer += new TaskDef(c.getName.stripSuffix(objSuffix), aF, explicitelySpecified.nonEmpty, Array.empty)
             }
           } catch {
             case e: ClassNotFoundException => {
@@ -74,7 +75,7 @@ object ClassScanner {
         case sF: SubclassFingerprint => {
           if (checkSuperclasses(c, sF)) {
             if (!sF.requireNoArgConstructor || c.isInterface || (sF.requireNoArgConstructor && checkZeroArgsConstructor(c))) {
-              buffer += new TaskDef(c.getName, sF, explicitelySpecified.nonEmpty, Array.empty)
+              buffer += new TaskDef(c.getName.stripSuffix(objSuffix), sF, explicitelySpecified.nonEmpty, Array.empty)
             }
           }
         }
