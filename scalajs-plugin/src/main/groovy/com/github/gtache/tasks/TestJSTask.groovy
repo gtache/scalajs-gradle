@@ -76,9 +76,11 @@ public class TestJSTask extends DefaultTask {
             final EventHandler eventHandler = new ScalaJSEventHandler(testStatus)
             testStatus.runner_$eq(runner)
             println("Executing " + framework.name())
-            tasks.each { println(it.taskDef().fullyQualifiedName()) }
             tasks.each { Task t ->
-                testStatus.all_$eq(testStatus.all().$colon$colon(t))
+                testStatus.all_$eq(testStatus.all().$colon$colon(t.taskDef()))
+                println(t.taskDef().fullyQualifiedName())
+            }
+            tasks.each { Task t ->
                 t.execute(eventHandler, simpleLoggerArray)
             }
         }
