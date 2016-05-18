@@ -63,14 +63,14 @@ object ScalaJSTestResult {
     "Testing result " + (if (!isFinished) {
       "(testing is not finished !)"
     }) + " : " +
-      "\nAll : " + getAll.mkString +
-      "\nSuccess : " + getSuccessful.mkString +
-      "\nError : " + getErrored.mkString +
-      "\nFail : " + getFailed.mkString +
-      "\nSkip : " + getSkipped.mkString +
-      "\nIgnored : " + getIgnored.mkString +
-      "\nCanceled : " + getCanceled.mkString +
-      "\nPending : " + getPending.mkString
+      "\n--All : " + getAll.mkString("\n\t") +
+      "\n--Success : " + getSuccessful.mkString("\n\t") +
+      "\n--Error : " + getErrored.mkString("\n\t") +
+      "\n--Fail : " + getFailed.mkString("\n\t") +
+      "\n--Skip : " + getSkipped.mkString("\n\t") +
+      "\n--Ignored : " + getIgnored.mkString("\n\t") +
+      "\n--Canceled : " + getCanceled.mkString("\n\t") +
+      "\n--Pending : " + getPending.mkString("\n\t")
   }
 
   /**
@@ -154,14 +154,14 @@ final class ScalaJSTestStatus(framework: ScalaJSFramework) {
 
   override def toString: String = {
     "ScalaJSTestStatus for " + framework.name + " : " +
-      "\nRunner : " + runner +
-      "\nAll : " + all.map(t => t.fullyQualifiedName()).mkString +
-      "\nSuccess : " + succeeded.map(t => t.fullyQualifiedName()).mkString +
-      "\nError : " + errored.map(t => t.fullyQualifiedName()).mkString +
-      "\nFail : " + failed.map(t => t.fullyQualifiedName()).mkString +
-      "\nSkip : " + skipped.map(t => t.fullyQualifiedName()).mkString +
-      "\nIgnored : " + ignored.map(t => t.fullyQualifiedName()).mkString +
-      "\nCanceled : " + canceled.map(t => t.fullyQualifiedName()).mkString +
-      "\nPending : " + pending.map(t => t.fullyQualifiedName()).mkString
+      "\n--Runner : " + runner +
+      "\n--All : " + all.map(t => t.fullyQualifiedName()).mkString("\n\t") +
+      "\n--Success : " + succeeded.map(t => t.fullyQualifiedName()).mkString("\n\t") +
+      "\n--Error : " + errored.map(t => t.fullyQualifiedName()).mkString("\n\t") +
+      "\n--Fail : " + failed.map(t => t.fullyQualifiedName()).mkString("\n\t") +
+      "\n--Skip : " + skipped.map(t => t.fullyQualifiedName()).mkString("\n\t") +
+      "\n--Ignored : " + ignored.map(t => t.fullyQualifiedName()).mkString("\n\t") +
+      "\n--Canceled : " + canceled.map(t => t.fullyQualifiedName()).mkString("\n\t") +
+      "\n--Pending : " + pending.map(t => t.fullyQualifiedName()).mkString("\n\t")
   }
 }
