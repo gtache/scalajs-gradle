@@ -1,7 +1,8 @@
 package com.github.gtache
 
-import collection.mutable.Stack
 import org.scalatest._
+
+import scala.collection.mutable.Stack
 
 class ScalaTestFrameworkTest extends FlatSpec with Matchers {
 
@@ -9,13 +10,13 @@ class ScalaTestFrameworkTest extends FlatSpec with Matchers {
     val stack = new Stack[Int]
     stack.push(1)
     stack.push(2)
-    stack.pop() should be (2)
-    stack.pop() should be (1)
+    stack.pop() should be(2)
+    stack.pop() should be(1)
   }
 
   it should "throw NoSuchElementException if an empty stack is popped" in {
     val emptyStack = new Stack[Int]
-    a [NoSuchElementException] should be thrownBy {
+    a[NoSuchElementException] should be thrownBy {
       emptyStack.pop()
     }
   }

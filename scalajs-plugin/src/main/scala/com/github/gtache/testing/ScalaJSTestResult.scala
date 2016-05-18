@@ -25,23 +25,6 @@ object ScalaJSTestResult {
   }
 
   /**
-    * Checks if testing is finished
-    *
-    * @return true or false
-    */
-  def isFinished: Boolean = {
-    !statuses.exists(s => !s.isFinished)
-  }
-
-  private def getAll: Set[String] = {
-    statuses.flatMap(s => s.all).map(t => t.fullyQualifiedName())
-  }
-
-  private def getSuccessful: Set[String] = {
-    statuses.flatMap(s => s.succeeded).map(t => t.fullyQualifiedName())
-  }
-
-  /**
     * Returns all successful classes
     *
     * @return A set of classnames
@@ -69,14 +52,6 @@ object ScalaJSTestResult {
     }
   }
 
-  private def getFailed: Set[String] = {
-    statuses.flatMap(s => s.failed).map(t => t.fullyQualifiedName())
-  }
-
-  private def getErrored: Set[String] = {
-    statuses.flatMap(s => s.errored).map(t => t.fullyQualifiedName())
-  }
-
   /**
     * Clears the results
     */
@@ -96,6 +71,31 @@ object ScalaJSTestResult {
       "\nIgnored : " + getIgnored.mkString +
       "\nCanceled : " + getCanceled.mkString +
       "\nPending : " + getPending.mkString
+  }
+
+  /**
+    * Checks if testing is finished
+    *
+    * @return true or false
+    */
+  def isFinished: Boolean = {
+    !statuses.exists(s => !s.isFinished)
+  }
+
+  private def getAll: Set[String] = {
+    statuses.flatMap(s => s.all).map(t => t.fullyQualifiedName())
+  }
+
+  private def getSuccessful: Set[String] = {
+    statuses.flatMap(s => s.succeeded).map(t => t.fullyQualifiedName())
+  }
+
+  private def getFailed: Set[String] = {
+    statuses.flatMap(s => s.failed).map(t => t.fullyQualifiedName())
+  }
+
+  private def getErrored: Set[String] = {
+    statuses.flatMap(s => s.errored).map(t => t.fullyQualifiedName())
   }
 
   private def getSkipped: Set[String] = {

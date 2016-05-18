@@ -43,7 +43,7 @@ dependencies {
     //TODO can't find it testCompile group: 'com.github.inthenow', name : 'zcheck', version : '0.6.1'
 }
 
-tasks.findByPath('compileTestScala').doFirst{
+tasks.findByPath('compileTestScala').doFirst {
     /*scalaCompileOptions.additionalParameters = scalaCompileOptions.additionalParameters.collect{
         it.replace("-Xplugin:","-Xplugin:" + project.configurations.scalaTestCompile.findAll{it.path.contains("junit-test-plugin")}.get(0)+";")
     }*/
