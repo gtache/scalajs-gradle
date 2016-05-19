@@ -5,7 +5,7 @@ import java.lang.annotation.Annotation
 import java.net.{URL, URLClassLoader}
 import java.nio.file.Paths
 
-import sbt.testing.{AnnotatedFingerprint, Fingerprint, SubclassFingerprint, TaskDef}
+import sbt.testing._
 
 import scala.collection.mutable.ArrayBuffer
 import scala.reflect.runtime.universe._
@@ -23,7 +23,7 @@ object ClassScanner {
     * @return The TaskDefs found by the scan
     */
   def scan(classL: URLClassLoader, fingerprints: Array[Fingerprint], explicitelySpecified: Set[String] = Set.empty, excluded: Set[String] = Set.empty): Array[TaskDef] = {
-
+    
     def checkSuperclasses(c: Class[_], sF: SubclassFingerprint): Boolean = {
 
       def checkName(c: Class[_], fName: String): Boolean = {
@@ -68,7 +68,7 @@ object ClassScanner {
             if ((c.isAnnotationPresent(Class.forName(aF.annotationName(), false, classL).asInstanceOf[Class[_ <: Annotation]])
               || annotations.exists(a => a.tree.tpe.toString == aF.annotationName()))
               && (aF.isModule || (!aF.isModule && !c.getName.endsWith(objSuffix)))) {
-              buffer += new TaskDef(c.getName.stripSuffix(objSuffix), aF, explicitelySpecified.nonEmpty, Array.empty)
+              buffer += new TaskDef(c.getName.stripSuffix(objSuffix), aF, explicitelySpecified.nonEmpty, Array(new SuiteSelector))
             }
           } catch {
             case e: ClassNotFoundException => {
@@ -80,7 +80,7 @@ object ClassScanner {
           if (checkSuperclasses(c, sF)) {
             if (!sF.requireNoArgConstructor || c.isInterface || (sF.requireNoArgConstructor && checkZeroArgsConstructor(c))
               && (sF.isModule || (!sF.isModule && !c.getName.endsWith(objSuffix)))) {
-              buffer += new TaskDef(c.getName.stripSuffix(objSuffix), sF, explicitelySpecified.nonEmpty, Array.empty)
+              buffer += new TaskDef(c.getName.stripSuffix(objSuffix), sF, explicitelySpecified.nonEmpty, Array(new SuiteSelector))
             }
           }
         }

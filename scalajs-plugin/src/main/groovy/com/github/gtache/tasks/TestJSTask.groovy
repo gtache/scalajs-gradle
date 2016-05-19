@@ -15,6 +15,9 @@ import scala.collection.JavaConverters
 import scala.collection.Seq
 import scala.collection.mutable.ArrayBuffer
 
+/**
+ * A task used to run tests for various frameworks
+ */
 public class TestJSTask extends DefaultTask {
     final String description = "Runs tests"
 
@@ -24,7 +27,6 @@ public class TestJSTask extends DefaultTask {
      * The action of the task : Instantiates a framework, a runner, and executes all tests found, with the fingerprints
      * given by the framework
      */
-    //TODO not functioning
     @TaskAction
     def run() {
         final Seq<ResolvedJSDependency> dependencySeq = Utils.getMinimalDependencySeq(project)
@@ -36,13 +38,12 @@ public class TestJSTask extends DefaultTask {
             allFrameworks.$plus$eq(it)
         }
         final Seq<TestFramework> defaultFrameworks = TestFrameworks.defaultFrameworks()
-        //TODO improve
         for (int i = 0; i < defaultFrameworks.length(); ++i) {
             allFrameworks.$plus$eq(defaultFrameworks.apply(i))
         }
         final List<ScalaJSFramework> frameworks = JavaConverters.asJavaIterableConverter(new FrameworkDetector(libEnv).instantiatedScalaJSFrameworks(
                 allFrameworks.toSeq(),
-                new ScalaConsoleLogger(Utils.resolveLogLevel(project, LOG_LEVEL, Level.Debug$.MODULE$)),
+                new ScalaConsoleLogger(Utils.resolveLogLevel(project, LOG_LEVEL, Level.Info$.MODULE$)),
                 ConsoleJSConsole$.MODULE$
         )).asJava().toList()
 
@@ -53,8 +54,8 @@ public class TestJSTask extends DefaultTask {
             project.logger.info("Framework found : " + framework.name())
         }
 
-        Set<String> explicitelySpecified = new HashSet<>();
-        scala.collection.immutable.Set<String> excluded = new scala.collection.immutable.HashSet<String>();
+        Set<String> explicitelySpecified = new HashSet<>()
+        scala.collection.immutable.Set<String> excluded = new scala.collection.immutable.HashSet<String>()
         if (project.hasProperty('test-only')) {
             explicitelySpecified = ((String) project.property('test-only')).split(File.pathSeparator).toList().toSet()
                     .collect { Utils.toRegex(it) }
@@ -66,33 +67,30 @@ public class TestJSTask extends DefaultTask {
             excluded = ScalaJSTestResult$.MODULE$.successfulClassnames()
         }
         scala.collection.immutable.Set<String> explicitelySpecifiedScala = JavaConverters.asScalaSetConverter(explicitelySpecified).asScala().toSet()
-        ScalaJSTestResult$.MODULE$.clear()
 
         Logger[] simpleLoggerArray = new SimpleLogger() as Logger[]
         frameworks.each { ScalaJSFramework framework ->
             final Runner runner = framework.runner(new String[0], new String[0], null)
             final Fingerprint[] fingerprints = framework.fingerprints()
             final Task[] tasks = runner.tasks(ClassScanner.scan(classL, fingerprints, explicitelySpecifiedScala, excluded))
-            final ScalaJSTestStatus testStatus = new ScalaJSTestStatus(framework)
-            ScalaJSTestResult$.MODULE$.statuses_$eq(ScalaJSTestResult$.MODULE$.statuses().$plus(testStatus) as scala.collection.immutable.Set<ScalaJSTestStatus>)
-            final EventHandler eventHandler = new ScalaJSEventHandler(testStatus)
-            testStatus.runner_$eq(runner)
             project.logger.info("Executing " + framework.name())
             if (tasks.length == 0) {
                 project.logger.info("No tasks found")
+            } else {
+                final ScalaJSTestStatus testStatus = new ScalaJSTestStatus(framework)
+                final EventHandler eventHandler = new ScalaJSEventHandler(testStatus)
+                ScalaJSTestResult$.MODULE$.statuses_$eq(ScalaJSTestResult$.MODULE$.statuses().$plus(testStatus) as scala.collection.immutable.Set<ScalaJSTestStatus>)
+                testStatus.runner_$eq(runner)
+                tasks.each { Task t ->
+                    t.execute(eventHandler, simpleLoggerArray)
+                }
+                project.logger.lifecycle('\n')
+                runner.done()
+                testStatus.finished_$eq(true)
             }
-            tasks.each { Task t ->
-                testStatus.all_$eq(testStatus.all().$colon$colon(t.taskDef()))
-            }
-            tasks.each { Task t ->
-                t.execute(eventHandler, simpleLoggerArray)
-            }
-            runner.done()
-            testStatus.finished_$eq(true)
         }
 
-        project.logger.lifecycle(ScalaJSTestResult$.MODULE$.toString() +
-                (ScalaJSTestResult$.MODULE$.isSuccess() ? "\nAll tests passed" : "\nSome tests failed")
-        )
+        project.logger.lifecycle(ScalaJSTestResult$.MODULE$.toString())
+
     }
 }

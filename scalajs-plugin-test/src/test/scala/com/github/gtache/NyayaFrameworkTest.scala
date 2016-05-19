@@ -1,8 +1,9 @@
-/*package com.github.gtache
+package com.github.gtache
 
 import nyaya.prop._
+import nyaya.test.PropTestOps
 
-object NyayaFrameworkTest {
+object NyayaFrameworkTest extends PropTestOps {
 
   val p: Prop[AllThings] = Prop.distinct("thing IDs", (_: AllThings).things.map(_.id))
 
@@ -10,4 +11,3 @@ object NyayaFrameworkTest {
 
   case class AllThings(timestamp: Long, things: List[Thing])
 }
-*/

@@ -26,35 +26,35 @@ configurations {
 
 dependencies {
     compile group: 'com.lihaoyi', name: 'scalatags_sjs0.6_2.11', version: '0.5.4'
-    //testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'org.scala-js', name: 'scalajs-junit-test-runtime_2.11', version: '0.6.9'
     testCompile group: 'org.scalactic', name: 'scalactic_sjs0.6_2.11', version: '3.0.0-M15'
     testCompile group: 'org.scalatest', name: 'scalatest_sjs0.6_2.11', version: '3.0.0-M15'
     testCompile group: 'org.scalacheck', name: 'scalacheck_sjs0.6_2.11', version: '1.13.1'
-    //testCompile group: 'com.lihaoyi', name: 'utest_sjs0.6_2.11', version: '0.4.3'
-    //testCompile group: 'io.monix', name: 'minitest_sjs0.6_2.11', version: '0.22'
-   //testCompile group: 'com.greencatsoft', name: 'greenlight_sjs0.6_2.11', version: '0.3'
-    //testCompile group: 'com.github.japgolly.nyaya', name: 'nyaya-prop_sjs0.6_2.11', version: '0.7.0'
-    //testCompile group: 'com.github.japgolly.nyaya', name: 'nyaya-gen_sjs0.6_2.11', version: '0.7.0'
-   // testCompile group: 'com.github.japgolly.nyaya', name: 'nyaya-test_sjs0.6_2.11', version: '0.7.0'
-   // testCompile group: 'com.github.scalaprops', name: 'scalaprops_sjs0.6_2.11', version: '0.3.1'
-   // testCompile group: 'com.github.scalaprops', name: 'scalaprops-scalazlaws_sjs0.6_2.11', version: '0.3.1'
-    scalaTestCompile group : 'org.scala-js', name : 'scalajs-junit-test-plugin_2.11.8', version : '0.6.9'
-    //TODO can't find it testCompile group: 'com.github.inthenow', name : 'zcheck', version : '0.6.1'
+    testCompile group: 'com.lihaoyi', name: 'utest_sjs0.6_2.11', version: '0.4.3'
+    testCompile group: 'io.monix', name: 'minitest_sjs0.6_2.11', version: '0.22'
+    //testCompile group: 'com.greencatsoft', name: 'greenlight_sjs0.6_2.11', version: '0.3'
+    testCompile group: 'com.github.japgolly.nyaya', name: 'nyaya-prop_sjs0.6_2.11', version: '0.7.0'
+    testCompile group: 'com.github.japgolly.nyaya', name: 'nyaya-gen_sjs0.6_2.11', version: '0.7.0'
+    testCompile group: 'com.github.japgolly.nyaya', name: 'nyaya-test_sjs0.6_2.11', version: '0.7.0'
+    testCompile group: 'com.github.scalaprops', name: 'scalaprops_sjs0.6_2.11', version: '0.3.1'
+    testCompile group: 'com.github.scalaprops', name: 'scalaprops-scalazlaws_sjs0.6_2.11', version: '0.3.1'
+    scalaTestCompile group: 'org.scala-js', name: 'scalajs-junit-test-plugin_2.11.8', version: '0.6.9'
+    //testCompile group: 'com.github.inthenow', name : 'zcheck', version : '0.6.1'
 }
 
 tasks.findByPath('compileTestScala').doFirst {
     scalaCompileOptions.additionalParameters = scalaCompileOptions.additionalParameters +
-            ["-Xplugin:" + project.configurations.scalaTestCompile.findAll{it.absolutePath.contains("junit-test-plugin")}.get(0).absolutePath]
-    println(scalaCompileOptions.additionalParameters)
+            ["-Xplugin:" + project.configurations.scalaTestCompile.findAll {
+                it.absolutePath.contains("junit-test-plugin")
+            }.get(0).absolutePath]
 }
 
 ext {
-    //testFrameworks = ["utest.runner.Framework"]
-    //testFrameworks = ["minitest.runner.Framework"]
-    //testFrameworks += "org.scalacheck.ScalaCheckFramework"
+    testFrameworks = ["utest.runner.Framework"]
+    testFrameworks += "minitest.runner.Framework"
+    testFrameworks += "org.scalacheck.ScalaCheckFramework"
     //testFrameworks += "com.greencatsoft.greenlight.Greenlight"
-    //testFrameworks += "scalaprops.ScalapropsFramework"
+    testFrameworks += "scalaprops.ScalapropsFramework"
 }
 
 defaultTasks += 'FastOptJS'
@@ -62,12 +62,3 @@ defaultTasks += 'FastOptJS'
 task wrapper(type: Wrapper) {
     gradleVersion = '2.13'
 }
-
-task extTest(type: TestJS.class) {
-}
-extTest.dependsOn('FastOptJS')
-
-task afterTest << {
-    println('bla')
-}
-afterTest.dependsOn('TestJS')

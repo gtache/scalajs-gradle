@@ -8,7 +8,8 @@ import sbt.testing._
   * @param testStatus The ScalaJSTestStatus used to store the results
   */
 final class ScalaJSEventHandler(testStatus: ScalaJSTestStatus) extends EventHandler {
-  private var counter = 0
+  private var counterUnknown = 0
+  private var counterKnown = 0
 
   override def handle(event: Event): Unit = {
     val fingerprint = event.fingerprint()
@@ -17,13 +18,13 @@ final class ScalaJSEventHandler(testStatus: ScalaJSTestStatus) extends EventHand
 
     var name = selector match {
       case n: NestedTestSelector =>
-        n.suiteId() + '.' + n.testName()
+        n.suiteId() + ':' + n.testName()
       case t: TestSelector =>
-        t.testName()
+        event.fullyQualifiedName() + ':' + t.testName()
       case s: SuiteSelector =>
         event.fullyQualifiedName
       case n: NestedSuiteSelector =>
-        n.suiteId()
+        event.fullyQualifiedName() + "." + n.suiteId()
       case t: TestWildcardSelector =>
         t.testWildcard()
       case _ => throw new IllegalArgumentException("Unknown Selector")
@@ -32,18 +33,23 @@ final class ScalaJSEventHandler(testStatus: ScalaJSTestStatus) extends EventHand
     name = name match {
       case "" => event.fullyQualifiedName() match {
         case "" => {
-          counter += 1
-          "Unknown test #" + counter
+          counterUnknown += 1
+          "Unknown test (probably utest) #" + counterUnknown
         }
         case _ => event.fullyQualifiedName()
       }
+      case ":" => {
+        counterUnknown += 1
+        "Unknown test (probably utest) #" + counterUnknown
+      }
       case _ => name
     }
-    println("FP : " + fingerprint)
-    println("result : " + status.name)
-    println("selector : " + selector)
-    println("name : " + name)
+    if (testStatus.all.map(t => t.fullyQualifiedName()).contains(name)) {
+      counterKnown += 1
+      name += ":" + counterKnown
+    }
     val taskDef = new TaskDef(name, fingerprint, false, Array(selector))
+    testStatus.all = testStatus.all :+ taskDef
     status.name() match {
       case "Success" =>
         testStatus.succeeded = testStatus.succeeded :+ taskDef
@@ -68,8 +74,5 @@ final class ScalaJSEventHandler(testStatus: ScalaJSTestStatus) extends EventHand
 
       case s: String => throw new IllegalStateException("Unknown task status : " + s)
     }
-
-    println("\n" + testStatus + "\n")
-
   }
 }

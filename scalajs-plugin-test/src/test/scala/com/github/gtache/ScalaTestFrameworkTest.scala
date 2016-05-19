@@ -1,10 +1,10 @@
-/*package com.github.gtache
+package com.github.gtache
 
 import org.scalatest._
 
 import scala.collection.mutable.Stack
 
-class ScalaTestFrameworkTest extends FlatSpec with Matchers {
+class ScalaTestFrameworkTestSpec extends FlatSpec with Matchers {
 
   "A Stack" should "pop values in last-in-first-out order" in {
     val stack = new Stack[Int]
@@ -23,4 +23,20 @@ class ScalaTestFrameworkTest extends FlatSpec with Matchers {
 
   assert(true)
 }
-*/
+
+class ScalaTestFrameworkTestSuite extends FunSuite {
+
+  test("An empty Set should have size 0") {
+    assert(Set.empty.isEmpty)
+  }
+
+  test("Invoking head on an empty Set should produce NoSuchElementException") {
+    intercept[NoSuchElementException] {
+      Set.empty.head
+    }
+  }
+
+  test("Fail") {
+    assert(false)
+  }
+}

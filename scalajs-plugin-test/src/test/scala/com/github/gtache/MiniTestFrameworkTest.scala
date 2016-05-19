@@ -1,4 +1,4 @@
-/*package com.github.gtache
+package com.github.gtache
 
 import minitest._
 
@@ -9,6 +9,10 @@ object MiniTestFrameworkTest extends SimpleTestSuite {
 
   test("should not be") {
     assert(1 + 1 != 3)
+  }
+
+  test("fail") {
+    assert(false)
   }
 
   test("should throw") {
@@ -25,4 +29,4 @@ object MiniTestFrameworkTest extends SimpleTestSuite {
       "hello" + " " + "world"
     }
   }
-}*/
+}

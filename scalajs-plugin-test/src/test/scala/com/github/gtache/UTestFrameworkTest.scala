@@ -1,19 +1,18 @@
-/*package com.github.gtache
+package com.github.gtache
 
 import utest._
 
 object UTestFrameworkTest extends TestSuite {
   val tests = this {
     'test1 {
-      assert(false)
+      assert(true)
     }
     'test2 {
-      throw new Exception()
+      1 == 1
     }
     'test3 {
       val a = List[Byte](1, 2)
-      a(1)==2
+      a(1) == 2
     }
   }
 }
-*/

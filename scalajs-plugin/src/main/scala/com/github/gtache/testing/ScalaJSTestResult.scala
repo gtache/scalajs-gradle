@@ -4,25 +4,10 @@ import org.scalajs.testadapter.ScalaJSFramework
 import sbt.testing.{Runner, TaskDef}
 
 /**
-  * An object containing the previous testing results.
+  * An object containing the testing results.
   */
 object ScalaJSTestResult {
   var statuses: Set[ScalaJSTestStatus] = Set.empty
-
-  /**
-    * Checks if all tests were successful
-    *
-    * @return true or false
-    */
-  def isSuccess: Boolean = {
-    if (isFinished) {
-      getFailed.isEmpty && getErrored.isEmpty
-    } else {
-      println("Testing is not finished")
-      println(statuses.filter(s => !s.isFinished).flatMap(s => s.all).map(t => t.fullyQualifiedName()).mkString)
-      false
-    }
-  }
 
   /**
     * Returns all successful classes
@@ -31,7 +16,7 @@ object ScalaJSTestResult {
     */
   def successfulClassnames: Set[String] = {
     if (isFinished) {
-      getSuccessful
+      getSuccessfulNames.map(s => s.takeWhile(c => c != ':')).filter(s => !s.contains('#')).diff(failedClassnames)
     } else {
       println("Testing is not finished")
       Set.empty
@@ -45,7 +30,7 @@ object ScalaJSTestResult {
     */
   def failedClassnames: Set[String] = {
     if (isFinished) {
-      getErrored ++ getFailed
+      (getErroredNames ++ getFailedNames).map(s => s.takeWhile(c => c != ':')).filter(s => !s.contains('#'))
     } else {
       println("Testing is not finished")
       Set.empty
@@ -59,18 +44,45 @@ object ScalaJSTestResult {
     statuses = Set.empty
   }
 
+  /**
+    * Clears the previous results for the given framework
+    *
+    * @param f The framework
+    */
+  def clearStatusFor(f: ScalaJSFramework): Unit = {
+    statuses.find(s => s.framework.name == f.name) match {
+      case Some(status) => statuses = statuses - status
+      case None =>
+    }
+  }
+
   override def toString: String = {
     "Testing result " + (if (!isFinished) {
       "(testing is not finished !)"
-    }) + " : " +
-      "\n--All : " + getAll.mkString("\n\t") +
-      "\n--Success : " + getSuccessful.mkString("\n\t") +
-      "\n--Error : " + getErrored.mkString("\n\t") +
-      "\n--Fail : " + getFailed.mkString("\n\t") +
-      "\n--Skip : " + getSkipped.mkString("\n\t") +
-      "\n--Ignored : " + getIgnored.mkString("\n\t") +
-      "\n--Canceled : " + getCanceled.mkString("\n\t") +
-      "\n--Pending : " + getPending.mkString("\n\t")
+    } else "") + " : " +
+      "\n--All : " + getAllNames.toList.sorted.mkString("\n\t") +
+      "\n--Success : " + getSuccessfulNames.toList.sorted.mkString("\n\t") +
+      "\n--Error : " + getErroredNames.toList.sorted.mkString("\n\t") +
+      "\n--Fail : " + getFailedNames.toList.sorted.mkString("\n\t") +
+      "\n--Skip : " + getSkippedNames.toList.sorted.mkString("\n\t") +
+      "\n--Ignored : " + getIgnoredNames.toList.sorted.mkString("\n\t") +
+      "\n--Canceled : " + getCanceledNames.toList.sorted.mkString("\n\t") +
+      "\n--Pending : " + getPendingNames.toList.sorted.mkString("\n\t") +
+      (if (isSuccess) "\nAll tests passed" else "\nSome tests failed")
+  }
+
+  /**
+    * Checks if all tests were successful
+    *
+    * @return true or false
+    */
+  def isSuccess: Boolean = {
+    if (isFinished) {
+      getFailedNames.isEmpty && getErroredNames.isEmpty && getCanceledNames.isEmpty
+    } else {
+      println("Testing is not finished")
+      false
+    }
   }
 
   /**
@@ -82,36 +94,46 @@ object ScalaJSTestResult {
     !statuses.exists(s => !s.isFinished)
   }
 
-  private def getAll: Set[String] = {
-    statuses.flatMap(s => s.all).map(t => t.fullyQualifiedName())
-  }
-
-  private def getSuccessful: Set[String] = {
-    statuses.flatMap(s => s.succeeded).map(t => t.fullyQualifiedName())
-  }
-
-  private def getFailed: Set[String] = {
-    statuses.flatMap(s => s.failed).map(t => t.fullyQualifiedName())
-  }
-
-  private def getErrored: Set[String] = {
+  private def getErroredNames: Set[String] = {
     statuses.flatMap(s => s.errored).map(t => t.fullyQualifiedName())
   }
 
-  private def getSkipped: Set[String] = {
-    statuses.flatMap(s => s.skipped).map(t => t.fullyQualifiedName())
-  }
-
-  private def getIgnored: Set[String] = {
-    statuses.flatMap(s => s.ignored).map(t => t.fullyQualifiedName())
-  }
-
-  private def getCanceled: Set[String] = {
+  private def getCanceledNames: Set[String] = {
     statuses.flatMap(s => s.canceled).map(t => t.fullyQualifiedName())
   }
 
-  private def getPending: Set[String] = {
+  private def getAllNames: Set[String] = {
+    statuses.flatMap(s => s.all).map(t => t.fullyQualifiedName())
+  }
+
+  private def getSuccessfulNames: Set[String] = {
+    statuses.flatMap(s => s.succeeded).map(t => t.fullyQualifiedName())
+  }
+
+  private def getFailedNames: Set[String] = {
+    statuses.flatMap(s => s.failed).map(t => t.fullyQualifiedName())
+  }
+
+  private def getSkippedNames: Set[String] = {
+    statuses.flatMap(s => s.skipped).map(t => t.fullyQualifiedName())
+  }
+
+  private def getIgnoredNames: Set[String] = {
+    statuses.flatMap(s => s.ignored).map(t => t.fullyQualifiedName())
+  }
+
+  private def getPendingNames: Set[String] = {
     statuses.flatMap(s => s.pending).map(t => t.fullyQualifiedName())
+  }
+
+  /**
+    * Returns the ScalaJSTestStatus for the given ScalaJSFramework
+    *
+    * @param f The framework
+    * @return An option containing the framework, or None
+    */
+  def getStatusFor(f: ScalaJSFramework): Option[ScalaJSFramework] = {
+    statuses.find(s => f.name == s.framework.name).map(s => s.framework)
   }
 }
 
@@ -120,7 +142,7 @@ object ScalaJSTestResult {
   *
   * @param framework The framework which corresponds to this instance
   */
-final class ScalaJSTestStatus(framework: ScalaJSFramework) {
+final class ScalaJSTestStatus(val framework: ScalaJSFramework) {
   var runner: Runner = null
   var all: List[TaskDef] = List.empty
   var errored: List[TaskDef] = List.empty
