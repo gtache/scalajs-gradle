@@ -1,4 +1,4 @@
-package com.github.gtache
+/*package com.github.gtache
 
 import org.scalatest._
 
@@ -23,3 +23,4 @@ class ScalaTestFrameworkTest extends FlatSpec with Matchers {
 
   assert(true)
 }
+*/

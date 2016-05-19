@@ -8,6 +8,7 @@ import java.nio.file.Paths
 import sbt.testing.{AnnotatedFingerprint, Fingerprint, SubclassFingerprint, TaskDef}
 
 import scala.collection.mutable.ArrayBuffer
+import scala.reflect.runtime.universe._
 
 object ClassScanner {
 
@@ -61,8 +62,12 @@ object ClassScanner {
       fingerprints.foreach {
         case aF: AnnotatedFingerprint => {
           try {
-            if (c.isAnnotationPresent(Class.forName(aF.annotationName(), false, classL).asInstanceOf[Class[_ <: Annotation]])
-             && (aF.isModule || (!aF.isModule && !c.getName.endsWith(objSuffix)))) {
+            val mirror = runtimeMirror(classL)
+            val symb = mirror.classSymbol(c)
+            val annotations = symb.annotations
+            if ((c.isAnnotationPresent(Class.forName(aF.annotationName(), false, classL).asInstanceOf[Class[_ <: Annotation]])
+              || annotations.exists(a => a.tree.tpe.toString == aF.annotationName()))
+              && (aF.isModule || (!aF.isModule && !c.getName.endsWith(objSuffix)))) {
               buffer += new TaskDef(c.getName.stripSuffix(objSuffix), aF, explicitelySpecified.nonEmpty, Array.empty)
             }
           } catch {
@@ -74,7 +79,7 @@ object ClassScanner {
         case sF: SubclassFingerprint => {
           if (checkSuperclasses(c, sF)) {
             if (!sF.requireNoArgConstructor || c.isInterface || (sF.requireNoArgConstructor && checkZeroArgsConstructor(c))
-            && (sF.isModule || (!sF.isModule && !c.getName.endsWith(objSuffix)))) {
+              && (sF.isModule || (!sF.isModule && !c.getName.endsWith(objSuffix)))) {
               buffer += new TaskDef(c.getName.stripSuffix(objSuffix), sF, explicitelySpecified.nonEmpty, Array.empty)
             }
           }

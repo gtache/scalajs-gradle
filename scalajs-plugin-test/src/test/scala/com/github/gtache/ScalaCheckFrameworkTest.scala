@@ -1,4 +1,4 @@
-package com.github.gtache
+/*package com.github.gtache
 
 import org.scalacheck.Prop.forAll
 import org.scalacheck.Properties
@@ -18,3 +18,4 @@ object ScalaCheckFrameworkTest extends Properties("String") {
   }
 
 }
+*/

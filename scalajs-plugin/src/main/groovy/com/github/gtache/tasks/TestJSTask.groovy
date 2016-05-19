@@ -50,7 +50,7 @@ public class TestJSTask extends DefaultTask {
         final URLClassLoader classL = new URLClassLoader(urls)
 
         frameworks.each { ScalaJSFramework framework ->
-            println("Framework found : " + framework.name())
+            project.logger.info("Framework found : " + framework.name())
         }
 
         Set<String> explicitelySpecified = new HashSet<>();
@@ -77,18 +77,18 @@ public class TestJSTask extends DefaultTask {
             ScalaJSTestResult$.MODULE$.statuses_$eq(ScalaJSTestResult$.MODULE$.statuses().$plus(testStatus) as scala.collection.immutable.Set<ScalaJSTestStatus>)
             final EventHandler eventHandler = new ScalaJSEventHandler(testStatus)
             testStatus.runner_$eq(runner)
-            println("Executing " + framework.name())
+            project.logger.info("Executing " + framework.name())
             if (tasks.length == 0) {
-                println("No tasks found")
-                testStatus.testingFinished()
+                project.logger.info("No tasks found")
             }
             tasks.each { Task t ->
                 testStatus.all_$eq(testStatus.all().$colon$colon(t.taskDef()))
-                println("With task : " + t.taskDef().fullyQualifiedName())
             }
             tasks.each { Task t ->
                 t.execute(eventHandler, simpleLoggerArray)
             }
+            runner.done()
+            testStatus.finished_$eq(true)
         }
 
         project.logger.lifecycle(ScalaJSTestResult$.MODULE$.toString() +

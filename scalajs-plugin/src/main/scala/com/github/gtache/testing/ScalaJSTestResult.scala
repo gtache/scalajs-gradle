@@ -16,7 +16,7 @@ object ScalaJSTestResult {
     */
   def isSuccess: Boolean = {
     if (isFinished) {
-      getAll.size == getSuccessful.size
+      getFailed.isEmpty && getErrored.isEmpty
     } else {
       println("Testing is not finished")
       println(statuses.filter(s => !s.isFinished).flatMap(s => s.all).map(t => t.fullyQualifiedName()).mkString)
@@ -130,18 +130,7 @@ final class ScalaJSTestStatus(framework: ScalaJSFramework) {
   var ignored: List[TaskDef] = List.empty
   var canceled: List[TaskDef] = List.empty
   var pending: List[TaskDef] = List.empty
-  private var finished = false
-
-  /**
-    * Tells the runner / framework that the testing is finished
-    */
-  def testingFinished(): Unit = {
-    if (runner != null && !finished) {
-      println(framework.name + " DONE")
-      runner.done()
-      finished = true
-    }
-  }
+  var finished = false
 
   /**
     * Checks if testing is finished
