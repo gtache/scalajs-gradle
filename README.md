@@ -33,8 +33,9 @@ You can run tests with `gradlew TestJS`. Be aware that this is still an early fe
 -ScalaTest    
 -JUnit ***(you have to add the junit-test-plugin to the compileTestScala task)***    
 -Minitest    
--utest    
+-utest (not fully supported, the summary will print the tests as Unknown and the retest feature will ignore them)   
 -ScalaProps    
+You can mix them (Have a JUnit suite with a utest suite and a ScalaTest suite, etc)    
 You must obviously add the dependencies and TestFrameworks for those to work.    
 
 To add the JUnit plugin or the dependencies, please refer to the *build.gradle* in *scalajs-test-plugin*
