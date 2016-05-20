@@ -8,9 +8,11 @@ before_install:
     
 script: 
     - cd ./scalajs-plugin/
+    - chmod +x gradlew
     - ./gradlew install
     - travis_wait 30 ./gradlew build
     - cd ../scalajs-plugin-test/
+    - chmod +x gradlew
 
     - ./gradlew RunJS -Pclassname="com.github.gtache.DummyObject" -Pmethname="printSomething(\"blabla\")" -Prhino
     - ./gradlew RunJS -Pclassname="com.github.gtache.DummyScalaTag" -Pphantom
