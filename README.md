@@ -21,7 +21,8 @@ Needs tests to be in src/test/scala.
 This plugin adds :   
 -`apply plugin: 'java'`   
 -`apply plugin: 'scala'`   
-as well as dependencies on **scalajs-library 2.11:0.6.9** and **scalajs-compiler 2.11.8:0.6.9**
+as well as dependencies on **scalajs-library 2.11:0.6.9** and **scalajs-compiler 2.11.8:0.6.9**    
+**org.eclipse.jetty:jetty-server:8.1.16.v20140903** and **org.eclipse.jetty:jetty-websocket:8.1.16.v20140903** for PhantomJS
 
 ## Usage
 `gradlew FastOptJS`, `gradlew FullOptJS` or `gradlew NoOptJS` to compile everything.
@@ -77,7 +78,7 @@ Examples : `gradlew RunJS -Pclassname="main.scala.DummyObject"` will compile eve
 ### Options for TestJS
 -`-PrunFull`, `-PrunNoOpt`, `-Pphantom` and `-Prhino` have the same behavior as with RunJS.    
 -`-Ptest-only=class1;class2;*l*s3` and -`-Ptest-quick=...` should have the same behavior as their sbt counterparts. **You can only select classes / suites at the moment, you can't select tests.**  
--`-Pretest` should retest all failed tests.    
+-`-Pretest` should retest all failed tests (does not work with Utest).    
 You can change the level of logging with `-PtestLogLevel=Error` for example.    
 
 ### Making options permanent
