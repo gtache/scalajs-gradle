@@ -27,7 +27,18 @@ as well as dependencies on **scalajs-library 2.11:0.6.9** and **scalajs-compiler
 `gradlew FastOptJS`, `gradlew FullOptJS` or `gradlew NoOptJS` to compile everything.
 
 You can run the generated javascript file with `gradlew RunJS`.    
-You can run tests with `gradlew TestJS`.
+You can run tests with `gradlew TestJS`. Be aware that this is still an early feature.
+
+## Test frameworks supported     
+-ScalaTest    
+-JUnit ***(you have to add the junit-test-plugin to the compileTestScala task)***    
+-Minitest    
+-utest (not fully supported, the summary will print the tests as Unknown and the retest feature will ignore them)   
+-ScalaProps    
+You can mix them (Have a JUnit suite with a utest suite and a ScalaTest suite, etc)    
+You must obviously add the dependencies and TestFrameworks for those to work.    
+
+To add the JUnit plugin or the dependencies, please refer to the *build.gradle* in *scalajs-test-plugin*
 
 ### Options for RunJS
 -`-Pclassname` is the fully qualified name of the class to run    
@@ -50,7 +61,9 @@ Examples : `gradlew RunJS -Pclassname="main.scala.DummyObject"` will compile eve
 `gradlew RunJS -PfileToExec="testjs/TestRunWithFile.js"` will run TestRunWithFile.js with the environment loaded with the compiled js file.
 
 ### Options for TestJS
--`-PrunFull`, `-PrunNoOpt`, `-Pphantom` and `-Prhino` have the same behavior as with RunJS.
+-`-PrunFull`, `-PrunNoOpt`, `-Pphantom` and `-Prhino` have the same behavior as with RunJS.    
+-`-Ptest-only=class1;class2;*l*s3` and -`-Ptest-quick=...` should have the same behavior as their sbt counterparts. **You can only select classes / suites at the moment, you can't select tests.**  
+-`-Pretest` should retest all failed tests.
 
 
 ## Changelog    
@@ -58,7 +71,7 @@ Examples : `gradlew RunJS -Pclassname="main.scala.DummyObject"` will compile eve
 -Adds support for RhinoJS and PhantomJS    
 -Adds options for the linker    
 -Removes useless tasks    
--Adds support for testing    
+-Adds support for basic testing    
 -Various improvements (cleaning, bugs, etc)    
 
 ###0.1.1    
