@@ -2,24 +2,32 @@ language: scala
 jdk:
     - oraclejdk8
 scala:
-    - 2.11.7
+    - 2.11.8
 before_install:
     - sudo apt-get -qq update
-
+    
 script: 
     - cd ./scalajs-plugin/
     - chmod +x gradlew
     - ./gradlew install
+    - travis_wait 30 ./gradlew build
     - cd ../scalajs-plugin-test/
     - chmod +x gradlew
 
-    - ./gradlew RunJS -Pclassname="main.scala.Test" -Pmethname="printSomething(\"blabla\")"
-    - ./gradlew RunJS -Pclassname="main.scala.ScalaTagTest"
-    - ./gradlew CleanAll
-    - ./gradlew RunJS -PtoExec="main.scala.ScalaTagTest().main()" -PrunFull
-    - ./gradlew CleanAll
-    - ./gradlew RunJS -PtoExec="main.scala.Test().main()" -Pclassname="main.scala.ScalaTagTest" -PrunNoOpt
-    - ./gradlew CleanAll
+    - ./gradlew RunJS -Pclassname="com.github.gtache.DummyObject" -Pmethname="printSomething(\"blabla\")" -Prhino
+    - ./gradlew RunJS -Pclassname="com.github.gtache.DummyScalaTag" -Pphantom
+    - ./gradlew clean
+    - ./gradlew RunJS -PtoExec="com.github.gtache.DummyScalaTag().main()" -PrunFull -Prhino
+    - ./gradlew clean
+    - ./gradlew RunJS -PtoExec="com.github.gtache.DummyObject().main()" -Pclassname="com.github.gtache.DummyScalaTag" -PrunNoOpt
+    - ./gradlew clean
+    - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js" -PrunFull -Pphantom
+    - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js" -PrunNoOpt -Prhino
+    - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js"
+    - ./gradlew TestJS
+    - ./gradlew TestJS -Ptest-only=*JUnit*
+    - ./gradlew TestJS -Ptest-quick=*JUnit* -Prhino
+    - ./gradlew TestJS -Pretest -Pphantom
 
 
 before_cache:
