@@ -18,12 +18,12 @@ object ClassScanner {
     *
     * @param classL               The URLClassLoader
     * @param fingerprints         The fingerprints to
-    * @param explicitelySpecified A set of String to use as regex
+    * @param explicitlySpecified A set of String to use as regex
     * @param excluded             A set of String to use as regex
     * @return The TaskDefs found by the scan
     */
-  def scan(classL: URLClassLoader, fingerprints: Array[Fingerprint], explicitelySpecified: Set[String] = Set.empty, excluded: Set[String] = Set.empty): Array[TaskDef] = {
-    
+  def scan(classL: URLClassLoader, fingerprints: Array[Fingerprint], explicitlySpecified: Set[String] = Set.empty, excluded: Set[String] = Set.empty): Array[TaskDef] = {
+
     def checkSuperclasses(c: Class[_], sF: SubclassFingerprint): Boolean = {
 
       def checkName(c: Class[_], fName: String): Boolean = {
@@ -56,7 +56,7 @@ object ClassScanner {
     }
 
     val objSuffix = "$"
-    val classes = parseClasses(classL, explicitelySpecified, excluded)
+    val classes = parseClasses(classL, explicitlySpecified, excluded)
     val buffer = ArrayBuffer[TaskDef]()
     classes.foreach(c => {
       fingerprints.foreach {
@@ -68,7 +68,7 @@ object ClassScanner {
             if ((c.isAnnotationPresent(Class.forName(aF.annotationName(), false, classL).asInstanceOf[Class[_ <: Annotation]])
               || annotations.exists(a => a.tree.tpe.toString == aF.annotationName()))
               && (aF.isModule || (!aF.isModule && !c.getName.endsWith(objSuffix)))) {
-              buffer += new TaskDef(c.getName.stripSuffix(objSuffix), aF, explicitelySpecified.nonEmpty, Array(new SuiteSelector))
+              buffer += new TaskDef(c.getName.stripSuffix(objSuffix), aF, explicitlySpecified.nonEmpty, Array(new SuiteSelector))
             }
           } catch {
             case e: ClassNotFoundException => {
@@ -80,7 +80,7 @@ object ClassScanner {
           if (checkSuperclasses(c, sF)) {
             if (!sF.requireNoArgConstructor || c.isInterface || (sF.requireNoArgConstructor && checkZeroArgsConstructor(c))
               && (sF.isModule || (!sF.isModule && !c.getName.endsWith(objSuffix)))) {
-              buffer += new TaskDef(c.getName.stripSuffix(objSuffix), sF, explicitelySpecified.nonEmpty, Array(new SuiteSelector))
+              buffer += new TaskDef(c.getName.stripSuffix(objSuffix), sF, explicitlySpecified.nonEmpty, Array(new SuiteSelector))
             }
           }
         }

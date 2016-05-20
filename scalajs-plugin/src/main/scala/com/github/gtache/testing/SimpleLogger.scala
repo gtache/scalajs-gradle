@@ -5,7 +5,7 @@ import sbt.testing.Logger
 /* https://github.com/scala-js/scala-js/blob/02be3eafcce8d2c43ae4b133969a7d5817b74bc8/tools/js/src/test/scala/org/scalajs/core/tools/test/js/TestRunner.scala */
 
 final class SimpleLogger extends Logger {
-  def ansiCodesSupported(): Boolean = false
+  def ansiCodesSupported(): Boolean = true
 
   def error(msg: String): Unit = println(msg)
 

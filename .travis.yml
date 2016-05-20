@@ -24,6 +24,10 @@ script:
     - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js" -PrunFull -Pphantom
     - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js" -PrunNoOpt -Prhino
     - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js"
+    - ./gradlew TestJS
+    - ./gradlew TestJS -Ptest-only=*JUnit*
+    - ./gradlew TestJS -Ptest-quick=*JUnit* -Prhino
+    - ./gradlew TestJS -Pretest -Pphantom
 
 
 before_cache:

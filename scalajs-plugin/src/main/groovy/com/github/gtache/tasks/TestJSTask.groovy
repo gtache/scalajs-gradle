@@ -54,25 +54,25 @@ public class TestJSTask extends DefaultTask {
             project.logger.info("Framework found : " + framework.name())
         }
 
-        Set<String> explicitelySpecified = new HashSet<>()
+        Set<String> explicitlySpecified = new HashSet<>()
         scala.collection.immutable.Set<String> excluded = new scala.collection.immutable.HashSet<String>()
         if (project.hasProperty('test-only')) {
-            explicitelySpecified = ((String) project.property('test-only')).split(File.pathSeparator).toList().toSet()
+            explicitlySpecified = ((String) project.property('test-only')).split(File.pathSeparator).toList().toSet()
                     .collect { Utils.toRegex(it) }
         } else if (project.hasProperty('test-quick')) {
-            explicitelySpecified = ((String) project.property('test-quick')).split(File.pathSeparator).toList().toSet()
+            explicitlySpecified = ((String) project.property('test-quick')).split(File.pathSeparator).toList().toSet()
                     .collect { Utils.toRegex(it) }
             excluded = ScalaJSTestResult$.MODULE$.successfulClassnames()
         } else if (project.hasProperty('retest')) {
             excluded = ScalaJSTestResult$.MODULE$.successfulClassnames()
         }
-        scala.collection.immutable.Set<String> explicitelySpecifiedScala = JavaConverters.asScalaSetConverter(explicitelySpecified).asScala().toSet()
+        scala.collection.immutable.Set<String> explicitlySpecifiedScala = JavaConverters.asScalaSetConverter(explicitlySpecified).asScala().toSet()
 
         Logger[] simpleLoggerArray = new SimpleLogger() as Logger[]
         frameworks.each { ScalaJSFramework framework ->
             final Runner runner = framework.runner(new String[0], new String[0], null)
             final Fingerprint[] fingerprints = framework.fingerprints()
-            final Task[] tasks = runner.tasks(ClassScanner.scan(classL, fingerprints, explicitelySpecifiedScala, excluded))
+            final Task[] tasks = runner.tasks(ClassScanner.scan(classL, fingerprints, explicitlySpecifiedScala, excluded))
             project.logger.info("Executing " + framework.name())
             if (tasks.length == 0) {
                 project.logger.info("No tasks found")
