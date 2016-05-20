@@ -78,9 +78,10 @@ Examples : `gradlew RunJS -Pclassname="main.scala.DummyObject"` will compile eve
 -`-PrunFull`, `-PrunNoOpt`, `-Pphantom` and `-Prhino` have the same behavior as with RunJS.    
 -`-Ptest-only=class1;class2;*l*s3` and -`-Ptest-quick=...` should have the same behavior as their sbt counterparts. **You can only select classes / suites at the moment, you can't select tests.**  
 -`-Pretest` should retest all failed tests (does not work with Utest).    
-You can change the level of logging with `-PtestLogLevel=Error` for example.    
+You can change the level of logging with `-PtestLogLevel=Error` for example.   
+*Note that retest / test-quick need a Gradle daemon to work*.
 
-### Making options permanent
+### Making options 'permanent'
 Don't forget that you can set the options directly in build.gradle. Simply put the property in the 'ext' closure.   
 Example : Instead of writing -PtestLogLevel=Debug -Po="generated.js" -Pd -PfileToExec="toExec/exec.js" everytime, write  
 
@@ -90,12 +91,19 @@ ext {
     o="generated.js"
     d=true //or false, or whatever, it just checks that the property exists
     fileToExec="toExec/exec.js"
-    testFrameworks=["utest.runner.Framework","minitest.runner.Framework"] //To add TestFramework if necessary
+    testFrameworks=["utest.runner.Framework","minitest.runner.Framework"] //If you need to add TestFrameworks
 }
 ```
 
+### Possible problems
+-*GC overhead limit exceeded* when running CompileJS    
+=> Solution : edit gradle.properties in %USER%/.gradle/ with `org.gradle.jvmargs=-Xmx4096m -XX:MaxPermSize=4096m -XX:+HeapDumpOnOutOfMemoryError` (or tweak the numbers) (source : http://stackoverflow.com/questions/27164452/how-to-solve-java-lang-outofmemoryerror-gc-overhead-limit-exceeded-error-in-and)    
+(Don't forget to delete the hprof file in the project folder)    
+-Something related to the linker state, after a failure while linking    
+=> Solution : `gradlew --stop` to stop the daemon containing the linker. Then rerun the desired command as usual.
+
 ## Changelog    
-###0.2.0 (in development)   
+###0.2.0  
 -Adds support for RhinoJS and PhantomJS    
 -Adds options for the linker    
 -Removes useless tasks    
