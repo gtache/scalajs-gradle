@@ -10,16 +10,19 @@ import sbt.testing._
 import scala.collection.mutable.ArrayBuffer
 import scala.reflect.runtime.universe._
 
+/**
+  * An object used to retrieve TaskDef for ScalaJS
+  */
 object ClassScanner {
 
   /**
     * Finds all classes contained in an URLClassLoader which match to a fingerprint, or only those specified in explicitelySpecified
     * minus the ones in excluded
     *
-    * @param classL               The URLClassLoader
-    * @param fingerprints         The fingerprints to
+    * @param classL              The URLClassLoader
+    * @param fingerprints        The fingerprints to
     * @param explicitlySpecified A set of String to use as regex
-    * @param excluded             A set of String to use as regex
+    * @param excluded            A set of String to use as regex
     * @return The TaskDefs found by the scan
     */
   def scan(classL: URLClassLoader, fingerprints: Array[Fingerprint], explicitlySpecified: Set[String] = Set.empty, excluded: Set[String] = Set.empty): Array[TaskDef] = {
@@ -136,7 +139,7 @@ object ClassScanner {
         meth()
       }
     }
-    def parseClasses(url: URL, idx: Int, explicitelySpecified: Set[String] = Set.empty, excluded: Set[String] = Set.empty): Array[Class[_]] = {
+    def parseClasses(url: URL, idx: Int, explicitlySpecified: Set[String] = Set.empty, excluded: Set[String] = Set.empty): Array[Class[_]] = {
       val f = Paths.get(url.toURI).toFile
       val packageName = {
         if (url != classL.getURLs()(idx)) {
@@ -148,7 +151,7 @@ object ClassScanner {
       if (f.isDirectory) {
         val buffer = ArrayBuffer.empty[Class[_]]
         f.listFiles().foreach(file => {
-          checkAndAddFile(file, buffer, () => parseClasses(file.toURI.toURL, idx, explicitelySpecified, excluded).foreach(c => {
+          checkAndAddFile(file, buffer, () => parseClasses(file.toURI.toURL, idx, explicitlySpecified, excluded).foreach(c => {
             buffer += c
           }), packageName)
         })

@@ -22,6 +22,9 @@ public class TestJSTask extends DefaultTask {
     final String description = "Runs tests"
 
     private static final String LOG_LEVEL = 'testLogLevel'
+    private static final String TEST_ONLY = 'test-only'
+    private static final String TEST_QUICK = 'test-quick'
+    private static final String RETEST = 'retest'
 
     /**
      * The action of the task : Instantiates a framework, a runner, and executes all tests found, with the fingerprints
@@ -54,25 +57,41 @@ public class TestJSTask extends DefaultTask {
             project.logger.info("Framework found : " + framework.name())
         }
 
+        final String objWildcard = '\\$?'
         Set<String> explicitlySpecified = new HashSet<>()
-        scala.collection.immutable.Set<String> excluded = new scala.collection.immutable.HashSet<String>()
-        if (project.hasProperty('test-only')) {
-            explicitlySpecified = ((String) project.property('test-only')).split(File.pathSeparator).toList().toSet()
+        Set<String> excluded = new HashSet<String>()
+        if (project.hasProperty(TEST_ONLY)) {
+            explicitlySpecified = ((String) project.property(TEST_ONLY)).split(File.pathSeparator).toList().toSet()
                     .collect { Utils.toRegex(it) }
-        } else if (project.hasProperty('test-quick')) {
-            explicitlySpecified = ((String) project.property('test-quick')).split(File.pathSeparator).toList().toSet()
+            if (explicitlySpecified.isEmpty()) {
+                explicitlySpecified.add("")
+            }
+        } else if (project.hasProperty(TEST_QUICK)) {
+            explicitlySpecified = ((String) project.property(TEST_QUICK)).split(File.pathSeparator).toList().toSet()
                     .collect { Utils.toRegex(it) }
-            excluded = ScalaJSTestResult$.MODULE$.successfulClassnames()
-        } else if (project.hasProperty('retest')) {
-            excluded = ScalaJSTestResult$.MODULE$.successfulClassnames()
+            if (explicitlySpecified.isEmpty()) {
+                explicitlySpecified.add("")
+            }
+            excluded = JavaConverters.asJavaCollectionConverter(ScalaJSTestResult$.MODULE$.lastSuccessfulClassnames).asJavaCollection().toSet()
+                    .collect { it + objWildcard }
+            if (excluded.isEmpty()) {
+                excluded.add("")
+            }
+        } else if (project.hasProperty(RETEST)) {
+            explicitlySpecified = JavaConverters.asJavaCollectionConverter(ScalaJSTestResult$.MODULE$.lastFailedClassnames).asJavaCollection().toSet()
+                    .collect { it + objWildcard }
+            if (explicitlySpecified.isEmpty()) {
+                explicitlySpecified.add("")
+            }
         }
         scala.collection.immutable.Set<String> explicitlySpecifiedScala = JavaConverters.asScalaSetConverter(explicitlySpecified).asScala().toSet()
+        scala.collection.immutable.Set<String> excludedScala = JavaConverters.asScalaSetConverter(excluded).asScala().toSet()
 
         Logger[] simpleLoggerArray = new SimpleLogger() as Logger[]
         frameworks.each { ScalaJSFramework framework ->
             final Runner runner = framework.runner(new String[0], new String[0], null)
             final Fingerprint[] fingerprints = framework.fingerprints()
-            final Task[] tasks = runner.tasks(ClassScanner.scan(classL, fingerprints, explicitlySpecifiedScala, excluded))
+            final Task[] tasks = runner.tasks(ClassScanner.scan(classL, fingerprints, explicitlySpecifiedScala, excludedScala))
             project.logger.info("Executing " + framework.name())
             if (tasks.length == 0) {
                 project.logger.info("No tasks found")
@@ -91,6 +110,6 @@ public class TestJSTask extends DefaultTask {
         }
 
         project.logger.lifecycle(ScalaJSTestResult$.MODULE$.toString())
-
+        ScalaJSTestResult$.MODULE$.save()
     }
 }

@@ -26,6 +26,9 @@ import java.nio.file.Files
 import static com.github.gtache.tasks.CompileJSTask.MIN_OUTPUT
 import static com.github.gtache.tasks.CompileJSTask.OUTPUT
 
+/**
+ * Helper class for the plugin
+ */
 public final class Utils {
 
     public static final String SCALA_VERSION = "2.11"
@@ -35,6 +38,7 @@ public final class Utils {
     public static final String JETTY_SERVER_VERSION = "8.1.16.v20140903"
     public static final String JETTY_WEBSOCKET_VERSION = "8.1.16.v20140903"
 
+    //All parameters for generated js file
     public static final String JS_REL_DIR = File.separator + 'js' + File.separator
     public static final String EXT = '.js'
     public static final String FULLOPT_SUFFIX = '_fullopt' + EXT
@@ -52,10 +56,10 @@ public final class Utils {
     public static final String PHANTOM = 'phantom'
 
     //LogLevel
-    public static final String ERROR_LVL = 'Error'
-    public static final String WARN_LVL = 'Warn'
-    public static final String INFO_LVL = 'Info'
-    public static final String DEBUG_LVL = 'Debug'
+    public static final String ERROR_LVL = 'error'
+    public static final String WARN_LVL = 'warn'
+    public static final String INFO_LVL = 'info'
+    public static final String DEBUG_LVL = 'debug'
 
     public static final String TEST_FRAMEWORKS = 'testFrameworks'
 
@@ -81,7 +85,7 @@ public final class Utils {
     public static Level resolveLogLevel(Project project, String property, Level base) {
         def level = base
         if (project.hasProperty(property)) {
-            switch (project.property(property)) {
+            switch ((project.property(property) as String).toLowerCase()) {
                 case ERROR_LVL:
                     level = Level.Error$.MODULE$
                     break
@@ -112,9 +116,9 @@ public final class Utils {
         if (project.hasProperty(RHINO)) {
             env = new RhinoJSEnv(Scalajsld$.MODULE$.options().semantics(), false)
         } else if (project.hasProperty(PHANTOM)) {
-            final URL[] jars = project.configurations.phantomJetty.findAll{
+            final URL[] jars = project.configurations.phantomJetty.findAll {
                 it.absolutePath.contains('jetty')
-            }.collect{ it.toURI().toURL()} as URL[]
+            }.collect { it.toURI().toURL() } as URL[]
             final PhantomJettyClassLoader loader = new PhantomJettyClassLoader(new URLClassLoader(jars), project.buildscript.classLoader)
             env = new PhantomJSEnv("phantomjs", List$.MODULE$.empty(), Map$.MODULE$.empty(), true, loader)
         } else {

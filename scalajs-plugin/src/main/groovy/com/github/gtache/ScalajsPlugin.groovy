@@ -40,8 +40,8 @@ public final class ScalajsPlugin implements Plugin<Project> {
         project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_'
                 + SCALA_VERSION + '.' + SUB_VERSION + ':' + SCALAJS_VERSION)
         project.logger.info('Adding jetty dependencies')
-        project.dependencies.add('phantomJetty', 'org.eclipse.jetty:jetty-server:'+JETTY_SERVER_VERSION)
-        project.dependencies.add('phantomJetty', 'org.eclipse.jetty:jetty-websocket:'+JETTY_WEBSOCKET_VERSION)
+        project.dependencies.add('phantomJetty', 'org.eclipse.jetty:jetty-server:' + JETTY_SERVER_VERSION)
+        project.dependencies.add('phantomJetty', 'org.eclipse.jetty:jetty-websocket:' + JETTY_WEBSOCKET_VERSION)
         project.logger.info('Dependencies added')
 
         final def jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR)
@@ -131,7 +131,7 @@ public final class ScalajsPlugin implements Plugin<Project> {
 
     /**
      * Warns the user if conflicting parameters are set for the given project
-     * @param project
+     * @param project the project
      */
     private static void warnUser(Project project) {
         Set<List<String>> linkedProperties = new HashSet<>()

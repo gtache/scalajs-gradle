@@ -8,6 +8,7 @@ import sbt.testing.{Runner, TaskDef}
   */
 object ScalaJSTestResult {
   var statuses: Set[ScalaJSTestStatus] = Set.empty
+  var lastStatuses: Set[ScalaJSTestStatus] = Set.empty
 
   /**
     * Returns all successful classes
@@ -16,11 +17,15 @@ object ScalaJSTestResult {
     */
   def successfulClassnames: Set[String] = {
     if (isFinished) {
-      getSuccessfulNames.map(s => s.takeWhile(c => c != ':')).filter(s => !s.contains('#')).diff(failedClassnames)
+      sanitizeClassnames(getSuccessfulNames).diff(failedClassnames)
     } else {
       println("Testing is not finished")
       Set.empty
     }
+  }
+
+  private def sanitizeClassnames(names: Set[String]): Set[String] = {
+    names.map(s => s.takeWhile(c => c != ':')).filter(s => !s.contains('#'))
   }
 
   /**
@@ -30,7 +35,7 @@ object ScalaJSTestResult {
     */
   def failedClassnames: Set[String] = {
     if (isFinished) {
-      (getErroredNames ++ getFailedNames).map(s => s.takeWhile(c => c != ':')).filter(s => !s.contains('#'))
+      sanitizeClassnames(getErroredNames ++ getFailedNames)
     } else {
       println("Testing is not finished")
       Set.empty
@@ -38,22 +43,38 @@ object ScalaJSTestResult {
   }
 
   /**
-    * Clears the results
+    * Returns the successful classes from the last run
+    *
+    * @return A set of classnames
     */
-  def clear(): Unit = {
-    statuses = Set.empty
+  def getLastSuccessfulClassnames: Set[String] = {
+    sanitizeClassnames(lastStatuses.flatMap(s => s.succeeded).map(t => t.fullyQualifiedName())).diff(getLastFailedClassnames)
   }
 
   /**
-    * Clears the previous results for the given framework
+    * Returns the failed classes from the last run
     *
-    * @param f The framework
+    * @return A set of classnames
     */
-  def clearStatusFor(f: ScalaJSFramework): Unit = {
-    statuses.find(s => s.framework.name == f.name) match {
-      case Some(status) => statuses = statuses - status
-      case None =>
-    }
+  def getLastFailedClassnames: Set[String] = {
+    sanitizeClassnames((lastStatuses.flatMap(s => s.failed) ++ lastStatuses.flatMap(s => s.errored)).map(t => t.fullyQualifiedName()))
+  }
+
+  /**
+    * Returns the statuses from the last run
+    *
+    * @return A set of ScalaJSTestStatus
+    */
+  def getLastStatuses: Set[ScalaJSTestStatus] = {
+    lastStatuses
+  }
+
+  /**
+    * Saves the statuses in lastStatuses and clear the current ones
+    */
+  def save(): Unit = {
+    lastStatuses = statuses
+    statuses = Set.empty
   }
 
   override def toString: String = {
@@ -98,6 +119,10 @@ object ScalaJSTestResult {
     statuses.flatMap(s => s.errored).map(t => t.fullyQualifiedName())
   }
 
+  private def getFailedNames: Set[String] = {
+    statuses.flatMap(s => s.failed).map(t => t.fullyQualifiedName())
+  }
+
   private def getCanceledNames: Set[String] = {
     statuses.flatMap(s => s.canceled).map(t => t.fullyQualifiedName())
   }
@@ -108,10 +133,6 @@ object ScalaJSTestResult {
 
   private def getSuccessfulNames: Set[String] = {
     statuses.flatMap(s => s.succeeded).map(t => t.fullyQualifiedName())
-  }
-
-  private def getFailedNames: Set[String] = {
-    statuses.flatMap(s => s.failed).map(t => t.fullyQualifiedName())
   }
 
   private def getSkippedNames: Set[String] = {

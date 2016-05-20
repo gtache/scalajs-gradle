@@ -40,6 +40,7 @@ dependencies {
     scalaTestCompile group: 'org.scala-js', name: 'scalajs-junit-test-plugin_2.11.8', version: '0.6.9'
 }
 
+//Necessary to make JUnit work
 tasks.findByPath('compileTestScala').doFirst {
     scalaCompileOptions.additionalParameters = scalaCompileOptions.additionalParameters +
             ["-Xplugin:" + project.configurations.scalaTestCompile.findAll {
@@ -52,9 +53,9 @@ ext {
     testFrameworks += "minitest.runner.Framework"
     testFrameworks += "org.scalacheck.ScalaCheckFramework"
     testFrameworks += "scalaprops.ScalapropsFramework"
-	testFrameworks += "scalaprops.ScalapropsFramework"
-	d=true
-    testLogLevel="Debug"
+    testFrameworks += "scalaprops.ScalapropsFramework"
+    d = true
+    testLogLevel = "Debug"
 }
 
 defaultTasks += 'FastOptJS'

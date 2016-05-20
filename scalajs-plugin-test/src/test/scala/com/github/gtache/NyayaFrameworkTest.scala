@@ -10,4 +10,5 @@ object NyayaFrameworkTest extends PropTestOps {
   case class Thing(id: Int, name: String)
 
   case class AllThings(timestamp: Long, things: List[Thing])
+
 }
