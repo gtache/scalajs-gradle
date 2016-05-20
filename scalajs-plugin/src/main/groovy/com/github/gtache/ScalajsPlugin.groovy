@@ -39,12 +39,9 @@ public final class ScalajsPlugin implements Plugin<Project> {
                 + SCALA_VERSION + ':' + SCALAJS_VERSION)
         project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_'
                 + SCALA_VERSION + '.' + SUB_VERSION + ':' + SCALAJS_VERSION)
-<<<<<<< HEAD
         project.logger.info('Adding jetty dependencies')
         project.dependencies.add('phantomJetty', 'org.eclipse.jetty:jetty-server:'+JETTY_SERVER_VERSION)
         project.dependencies.add('phantomJetty', 'org.eclipse.jetty:jetty-websocket:'+JETTY_WEBSOCKET_VERSION)
-=======
->>>>>>> c19e7c67b49dc0392cd9bbbe4b4de4833656dada
         project.logger.info('Dependencies added')
 
         final def jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR)
