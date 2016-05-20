@@ -38,7 +38,7 @@ You can run tests with `gradlew TestJS`. Be aware that this is still an early fe
 You can mix them (Have a JUnit suite with a utest suite and a ScalaTest suite, etc)    
 You must obviously add the dependencies and TestFrameworks for those to work.    
 
-To add the JUnit plugin or the dependencies, please refer to the *build.gradle* in *scalajs-test-plugin*
+To add the JUnit plugin or the dependencies, please refer to the *build.gradle* in *scalajs-test-plugin* or to the snippet below.
 
 ### Options for RunJS
 -`-Pclassname` is the fully qualified name of the class to run    
@@ -65,6 +65,19 @@ Examples : `gradlew RunJS -Pclassname="main.scala.DummyObject"` will compile eve
 -`-Ptest-only=class1;class2;*l*s3` and -`-Ptest-quick=...` should have the same behavior as their sbt counterparts. **You can only select classes / suites at the moment, you can't select tests.**  
 -`-Pretest` should retest all failed tests.
 
+### Making options permanent
+Don't forget that you can set the options directly in build.gradle. Simply put the property in the 'ext' closure.   
+Example : Instead of writing -PtestLogLevel=Debug -Po="generated.js" -Pd -PfileToExec="toExec/exec.js" everytime, write  
+
+```
+ext {    
+    testLogLevel="Debug" //Use a string
+    o="generated.js"
+    d=true //or false, or whatever, it just checks that the property exists
+    fileToExec="toExec/exec.js"
+    testFrameworks=["utest.runner.Framework","minitest.runner.Framework"] //To add TestFramework if necessary
+}
+```
 
 ## Changelog    
 ###0.2.0 (in development)   
