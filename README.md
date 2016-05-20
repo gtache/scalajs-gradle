@@ -96,6 +96,8 @@ ext {
 ```
 
 ### Possible problems
+-*Permission denied*    
+=> Solution : apply chmod +x to gradlew    
 -*GC overhead limit exceeded* when running CompileJS    
 => Solution : edit gradle.properties in %USER%/.gradle/ with `org.gradle.jvmargs=-Xmx4096m -XX:MaxPermSize=4096m -XX:+HeapDumpOnOutOfMemoryError` (or tweak the numbers) (source : http://stackoverflow.com/questions/27164452/how-to-solve-java-lang-outofmemoryerror-gc-overhead-limit-exceeded-error-in-and)    
 (Don't forget to delete the hprof file in the project folder)    
