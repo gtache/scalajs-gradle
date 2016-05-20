@@ -40,17 +40,31 @@ You must obviously add the dependencies and TestFrameworks for those to work.
 
 To add the JUnit plugin or the dependencies, please refer to the *build.gradle* in *scalajs-test-plugin* or to the snippet below.
 
+### Options for the linker (Fast/Full/NoOptJS)
+-`-Po="pathtofile" | -Poutput="pathtofile"` to change where the js file will be generated **There will only be one file for every different build (fast, full, test or not)**    
+-`-Pp | -Pprettyprint` for prettyPrint    
+-`-Ps | -Psourcemap` for sourceMap    
+-`-PcompliantAsInstanceOfs`    
+-`-Pm=NameOfMode | -PoutputMode=NameOfMode` to change the output mode (ECMAScript51Global, ECMAScript51Isolated, ECMAScript6)    
+-`-Pc | -PcheckIR`    
+-`-Pr="PathToSourceMap" | -PrelativizeSourceMap="PathToSourceMap"` to add a sourceMap     
+-`-PlinkLogLevel=Debug|Info (default)|Warn|Error` to change the level of logging    
+-`-Pd | -Pdebug` for Debug level    
+-`-Pq | -Pquiet` for Warn level    
+-`-Pqq | -Preally-quiet` for Error level    
+
 ### Options for RunJS
 -`-Pclassname` is the fully qualified name of the class to run    
 -`-Pmethname` is the method of classname to run.    
 -`-PtoExec` (has higher priority than `-Pclassname`) will run the given explicit command    
 -`-PfileToExec` (has highest priority) will run the given js file.    
 -Adding `-PrunNoOpt` will run the unoptimized file   
--Adding `-PrunFull` will run the fully optimized file (overrides `-PrunNoOpt` if both are used)   
+-Adding `-PrunFull` will run the fully optimized file      
 -It will run the fast optimized file by default.  
 RunJS will depend on FastOptJS (default), FullOptJS or NoOptJS accordingly.    
 -Adding `-Pphantom` will run the file in a phantomjs environment (needs phantomjs on path).    
 -Adding `-Prhino` will run the file in a rhino environment.    
+-You can change the level of logging with `-PrunLogLevel=Warn` for example.   
 
 Examples : `gradlew RunJS -Pclassname="main.scala.DummyObject"` will compile everything and run DummyObject().main()
 
@@ -63,7 +77,8 @@ Examples : `gradlew RunJS -Pclassname="main.scala.DummyObject"` will compile eve
 ### Options for TestJS
 -`-PrunFull`, `-PrunNoOpt`, `-Pphantom` and `-Prhino` have the same behavior as with RunJS.    
 -`-Ptest-only=class1;class2;*l*s3` and -`-Ptest-quick=...` should have the same behavior as their sbt counterparts. **You can only select classes / suites at the moment, you can't select tests.**  
--`-Pretest` should retest all failed tests.
+-`-Pretest` should retest all failed tests.    
+You can change the level of logging with `-PtestLogLevel=Error` for example.    
 
 ### Making options permanent
 Don't forget that you can set the options directly in build.gradle. Simply put the property in the 'ext' closure.   
