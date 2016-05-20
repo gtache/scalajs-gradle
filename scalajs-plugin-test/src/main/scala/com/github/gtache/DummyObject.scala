@@ -1,13 +1,13 @@
-package main.scala
+package com.github.gtache
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 
 @JSExport
-object Test extends js.JSApp {
+object DummyObject extends js.JSApp {
 
   @JSExport
-  def main(): Unit = {
+  override def main(): Unit = {
     val squared = square(10)
     println("Hello ! Square of 10 is " + squared)
   }

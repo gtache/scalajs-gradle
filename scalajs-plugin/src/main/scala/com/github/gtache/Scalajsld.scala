@@ -8,6 +8,7 @@ import org.scalajs.core.tools.linker.Linker
 import org.scalajs.core.tools.linker.backend.{LinkerBackend, OutputMode}
 import org.scalajs.core.tools.linker.frontend.LinkerFrontend
 import org.scalajs.core.tools.logging._
+import org.scalajs.core.tools.sem.CheckedBehavior.Compliant
 import org.scalajs.core.tools.sem._
 
 /**
@@ -34,6 +35,15 @@ object Scalajsld {
   }
 
   /**
+    * Returns the default options
+    *
+    * @return the default options
+    */
+  def defaultOptions(): Options = {
+    new Options()
+  }
+
+  /**
     * Executes the linker
     */
   def exec(): Unit = {
@@ -41,7 +51,7 @@ object Scalajsld {
     val irContainers = IRFileCache.IRContainer.fromClasspath(classpath)
     val logger = new ScalaConsoleLogger(options.logLevel)
     val outFile = WritableFileVirtualJSFile(options.output)
-    if (optionsChanged || linker == null || cache == null) {
+    if (optionsChanged || linker == null) {
       val semantics: Semantics =
         if (options.fullOpt) options.semantics.optimized
         else options.semantics
@@ -58,8 +68,9 @@ object Scalajsld {
         useClosureCompiler = options.fullOpt,
         frontendConfig, backendConfig)
 
-      cache = (new IRFileCache).newCache
-
+      if (cache == null) {
+        cache = (new IRFileCache).newCache
+      }
       optionsChanged = false
     }
     linker.link(cache.cached(irContainers), outFile, logger)
@@ -188,12 +199,19 @@ object Scalajsld {
         this.checkIR, this.stdLib, newLogLevel)
     }
 
+    def withCompliantsSemantics(): Options = {
+      new Options(this.cp, this.output, this.jsoutput, this.semantics.withAsInstanceOfs(Compliant), this.outputMode,
+        this.noOpt, this.fullOpt, this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
+        this.checkIR, this.stdLib, this.logLevel)
+    }
+
     /**
       * Returns a string representation of this object
+      *
       * @return a string
       */
-    override def toString(): String = {
-      "cp : " + cp + "\n" +
+    override def toString: String = {
+      "cp : " + cp.foldLeft("")((acc: String, c: File) => acc + "\n" + c.getAbsolutePath) + "\n" +
         "output : " + output + " jsoutput : " + jsoutput + "\n" +
         "semantics : " + semantics + "\n" +
         "outputMode : " + outputMode + "\n" +
@@ -206,30 +224,43 @@ object Scalajsld {
         "logLevel : " + logLevel
     }
 
-    /**
-      * Checks if the options given in argument are the same as this instance
-      * @param that the options to compare
-      * @return true if they are the same, false otherwise
-      */
-    def equals(that : Options): Boolean = {
-      if (!that.getClass.equals(this.getClass)){
-        false
-      } else {
-        this.cp == that.cp &&
-        this.output == that.output &&
-        this.jsoutput == that.jsoutput &&
-        this.semantics == that.semantics &&
-        this.outputMode == that.outputMode &&
-        this.noOpt == that.noOpt &&
-        this.fullOpt == that.fullOpt &&
-        this.prettyPrint == that.prettyPrint &&
-        this.sourceMap == that.sourceMap &&
-        this.relativizeSourceMap == that.relativizeSourceMap &&
-        this.bypassLinkingErrors == that.bypassLinkingErrors &&
-        this.checkIR == that.checkIR &&
-        this.stdLib == that.stdLib &&
-        this.logLevel == that.logLevel
+    override def equals(that: Any): Boolean = {
+      that match {
+        case that: Options => {
+          this.cp == that.cp &&
+            this.output == that.output &&
+            this.jsoutput == that.jsoutput &&
+            this.semantics == that.semantics &&
+            this.outputMode == that.outputMode &&
+            this.noOpt == that.noOpt &&
+            this.fullOpt == that.fullOpt &&
+            this.prettyPrint == that.prettyPrint &&
+            this.sourceMap == that.sourceMap &&
+            this.relativizeSourceMap == that.relativizeSourceMap &&
+            this.bypassLinkingErrors == that.bypassLinkingErrors &&
+            this.checkIR == that.checkIR &&
+            this.stdLib == that.stdLib &&
+            this.logLevel == that.logLevel
+        }
+        case _ => false
       }
+    }
+
+    override def hashCode: Int = {
+      cp.hashCode +
+        2 * output.hashCode +
+        3 * jsoutput.hashCode +
+        5 * semantics.hashCode +
+        7 * outputMode.hashCode +
+        11 * noOpt.hashCode +
+        13 * fullOpt.hashCode +
+        17 * prettyPrint.hashCode +
+        19 * sourceMap.hashCode +
+        23 * relativizeSourceMap.hashCode +
+        29 * bypassLinkingErrors.hashCode +
+        31 * checkIR.hashCode +
+        37 * stdLib.hashCode +
+        41 * logLevel.hashCode
     }
 
   }

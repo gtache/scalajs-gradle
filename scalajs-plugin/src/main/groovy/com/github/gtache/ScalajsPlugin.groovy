@@ -1,116 +1,185 @@
 package com.github.gtache
 
+import com.github.gtache.tasks.CompileJSTask
+import com.github.gtache.tasks.RunJSTask
+import com.github.gtache.tasks.TestJSTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.tasks.scala.ScalaCompile
+
+import static com.github.gtache.Utils.*
+import static com.github.gtache.tasks.CompileJSTask.*
 
 /**
  * The main class for the plugin
  */
-class ScalajsPlugin implements Plugin<Project> {
+public final class ScalajsPlugin implements Plugin<Project> {
 
     /**
      * Applies the plugin to the given project
+     * @param project The project it will apply the plugin to
      */
     @Override
     public void apply(Project project) {
+        prepareGraph(project)
         project.logger.info('Applying java plugin')
-        project.apply(plugin: 'java')
+        project.pluginManager.apply('java')
         project.logger.info('Applying scala plugin')
-        project.apply(plugin: 'scala')
+        project.pluginManager.apply('scala')
         project.logger.info('Plugins applied')
+
         project.configurations {
             scalaCompilePlugin
+            phantomJetty
         }
+
         project.logger.info('Adding scalajs-library and scalajs-compiler dependencies')
-        project.dependencies.add('compile', 'org.scala-js:scalajs-library_2.11:0.6.7')
-        project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_2.11.7:0.6.7')
+        project.dependencies.add('compile', 'org.scala-js:scalajs-library_'
+                + SCALA_VERSION + ':' + SCALAJS_VERSION)
+        project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_'
+                + SCALA_VERSION + '.' + SUB_VERSION + ':' + SCALAJS_VERSION)
+        project.logger.info('Adding jetty dependencies')
+        project.dependencies.add('phantomJetty', 'org.eclipse.jetty:jetty-server:' + JETTY_SERVER_VERSION)
+        project.dependencies.add('phantomJetty', 'org.eclipse.jetty:jetty-websocket:' + JETTY_WEBSOCKET_VERSION)
         project.logger.info('Dependencies added')
-        final def jsDir = project.file('js/')
-        final def jsFile = project.file(jsDir.path + '/' + project.name + '.js')
-        final def jsFastFile = project.file(jsDir.path + '/' + project.name + '_fastopt.js')
-        final def jsFullFile = project.file(jsDir.path + '/' + project.name + '_fullopt.js')
-        final def jsExecFile = project.file(jsDir.path + '/' + project.name + '_exec.js')
-        final def jsFastExecFile = project.file(jsDir.path + '/' + project.name + '_fastopt_exec.js')
-        final def jsFullExecFile = project.file(jsDir.path + '/' + project.name + '_fullopt_exec.js')
 
-        final def runNoOpt = project.hasProperty('runNoOpt')
-        final def runFull = project.hasProperty('runFull')
+        final def jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR)
+        final def jsBaseName = jsDir.absolutePath + File.separator + project.name
+        final def jsFile = project.file(jsBaseName + EXT)
+        final def jsTestFile = project.file(jsBaseName + NOOPT_TEST_SUFFIX)
+        final def jsFastFile = project.file(jsBaseName + FASTOPT_SUFFIX)
+        final def jsTestFastFile = project.file(jsBaseName + FASTOPT_TEST_SUFFIX)
+        final def jsFullFile = project.file(jsBaseName + FULLOPT_SUFFIX)
+        final def jsTestFullFile = project.file(jsBaseName + FULLOPT_TEST_SUFFIX)
 
-        if (runNoOpt && runFull) {
-            project.logger.warn('runNoOpt and runFull both declared : Assuming runFull')
-        }
+        final def runNoOpt = project.hasProperty(RUN_NOOPT)
+        final def runFull = project.hasProperty(RUN_FULL)
+
+        warnUser(project)
 
         final def tasks = project.tasks;
 
-        final def cleanAll = tasks.create('CleanAll', CleanAllTask.class)
-        cleanAll.dependsOn('clean')
-        cleanAll.toDelete = project.files(jsDir)
-        project.logger.info('CleanAll task added')
-
-        final def createDirs = tasks.create('CreateDirs', CreateDirsTask.class)
-        createDirs.toCreate = project.files(jsDir)
-        project.logger.info('CreateDirs task added')
-
         final def noOptJS = tasks.create('NoOptJS', CompileJSTask.class)
-        noOptJS.dependsOn('CreateDirs')
-        noOptJS.dependsOn('classes')
         noOptJS.destFile = jsFile
         noOptJS.noOpt()
-        project.logger.info('NoOptJS task added')
+        project.logger.info(noOptJS.name + ' task added')
 
         final def fastOptJS = tasks.create('FastOptJS', CompileJSTask.class)
-        fastOptJS.dependsOn('CreateDirs')
-        fastOptJS.dependsOn('classes')
         fastOptJS.destFile = jsFastFile
         fastOptJS.fastOpt()
-        project.logger.info('FastOptJS task added')
+        project.logger.info(fastOptJS.name + ' task added')
 
         final def fullOptJS = tasks.create('FullOptJS', CompileJSTask.class)
-        fullOptJS.dependsOn('CreateDirs')
-        fullOptJS.dependsOn('classes')
         fullOptJS.destFile = jsFullFile
         fullOptJS.fullOpt()
-        project.logger.info('FullOptJS task added')
-
-        final def copyJS = tasks.create('CopyJS', CopyJSTask.class)
-        if (runFull) {
-            copyJS.dependsOn('FullOptJS')
-            copyJS.from(jsFullFile)
-        } else if (runNoOpt) {
-            copyJS.dependsOn('NoOptJS')
-            copyJS.from(jsFile)
-        } else {
-            copyJS.dependsOn('FastOptJS')
-            copyJS.from(jsFastFile)
-        }
-        copyJS.into(jsDir)
-        project.logger.info('CopyJS task added')
-
-        final def addMethExec = tasks.create('AddMethExec', AddMethExecTask.class)
-        addMethExec.dependsOn('CopyJS')
-        addMethExec.srcFile = runFull ? jsFullExecFile : (runNoOpt ? jsExecFile : jsFastExecFile)
-        project.logger.info('AddMethExec task added')
+        project.logger.info(fullOptJS.name + ' task added')
 
         final def runJS = tasks.create('RunJS', RunJSTask.class)
-        runJS.dependsOn('AddMethExec')
-        runJS.toExec = runFull ? jsFullExecFile.absolutePath :
-                (runNoOpt ? jsExecFile.absolutePath : jsFastExecFile.absolutePath)
-        runJS.inferArgs()
-        project.logger.info('RunJS task added')
 
-        project.logger.info('ScalajsPlugin applied')
+        final def classes = 'classes'
+        final def testClasses = 'testClasses'
+
+        final def testJS = tasks.create('TestJS', TestJSTask.class)
+        testJS.dependsOn(testClasses)
+
+        if (runFull) {
+            testJS.dependsOn(fullOptJS)
+            runJS.dependsOn(fullOptJS)
+        } else if (runNoOpt) {
+            testJS.dependsOn(noOptJS)
+            runJS.dependsOn(noOptJS)
+        } else {
+            testJS.dependsOn(fastOptJS)
+            runJS.dependsOn(fastOptJS)
+        }
+        project.logger.info(testJS.name + ' task added')
 
         project.afterEvaluate {
-            project.logger.info('Configuring additional parameters related to Scalajs')
-            tasks.withType(ScalaCompile) {
-                scalaCompileOptions.additionalParameters = ["-Xplugin:" + project.configurations.scalaCompilePlugin.asPath]
-            }
             tasks.withType(CompileJSTask) {
+                it.dependsOn(classes)
+                it.mustRunAfter(testClasses, classes)
                 it.srcFiles = project.files(project.sourceSets.main.runtimeClasspath)
+                it.configure()
+            }
+            project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
+                if (graph.hasTask(testJS)) {
+                    tasks.withType(CompileJSTask) {
+                        if (it == fastOptJS) {
+                            it.destFile = jsTestFastFile
+                        } else if (it == fullOptJS) {
+                            it.destFile = jsTestFullFile
+                        } else if (it == noOptJS) {
+                            it.destFile = jsTestFile
+                        } else {
+                            throw new IllegalStateException("Unknown task : " + it.name)
+                        }
+                        it.srcFiles = project.files(project.sourceSets.test.runtimeClasspath)
+                        it.configure()
+                    }
+                }
+            }
+            tasks.withType(ScalaCompile) {
+                scalaCompileOptions.additionalParameters = ["-Xplugin:" + project.configurations.scalaCompilePlugin.findAll {
+                    it.absolutePath.contains('scalajs-compiler')
+                }.get(0).absolutePath]
             }
             project.logger.info('Xplugin for compiler added')
+            project.logger.info('ScalajsPlugin applied')
         }
     }
 
+    /**
+     * Warns the user if conflicting parameters are set for the given project
+     * @param project the project
+     */
+    private static void warnUser(Project project) {
+        Set<List<String>> linkedProperties = new HashSet<>()
+        List<String> opt = new ArrayList<>()
+        List<String> output = new ArrayList<>()
+        List<String> outputMode = new ArrayList<>()
+        List<String> relSM = new ArrayList<>()
+        List<String> logLevel = new ArrayList<>()
+
+        opt.add(RUN_FULL)
+        opt.add(RUN_NOOPT)
+        output.add(MIN_OUTPUT)
+        output.add(OUTPUT)
+        outputMode.add(MIN_OUTPUTMODE)
+        outputMode.add(OUTPUT)
+        relSM.add(MIN_RELSM)
+        relSM.add(RELSM)
+        logLevel.add(MIN_DEBUG)
+        logLevel.add(DEBUG)
+        logLevel.add(MIN_WARN)
+        logLevel.add(WARN)
+        logLevel.add(MIN_ERR)
+        logLevel.add(ERR)
+        logLevel.add(LOG_LEVEL)
+
+        linkedProperties.add(opt)
+        linkedProperties.add(output)
+        linkedProperties.add(outputMode)
+        linkedProperties.add(relSM)
+        linkedProperties.add(logLevel)
+
+        for (List<String> l : linkedProperties) {
+            Set<Integer> declared = new HashSet<>()
+            int shortestIndex = -1
+            for (int i = 0; i < l.size(); ++i) {
+                if (project.hasProperty(l.get(i))) {
+                    if (shortestIndex < 0) {
+                        shortestIndex = i
+                    }
+                    declared.add(i)
+                }
+            }
+            if (declared.size() > 1) {
+                String message = declared.collect { x -> l.get(x) }.inject({ acc, word -> acc + ', ' + word })
+                message = "Declaring " + message + " ; Assuming " + l.get(shortestIndex)
+                project.logger.warn(message)
+            }
+        }
+    }
 }
+

@@ -1,5 +1,9 @@
 group 'com.github.gtache'
-version '0.1.1'
+version '0.2.0'
+
+String scalaVersion = '2.11'
+String subVersion = '8'
+String scalaJSVersion = '0.6.9'
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
@@ -17,25 +21,28 @@ repositories {
 dependencies {
     compile gradleApi()
     compile 'org.codehaus.groovy:groovy-all:2.4.4'
-    compile 'org.scala-lang:scala-compiler:2.11.7'
-    compile 'org.scala-lang:scala-library:2.11.7'
-    compile group: 'org.scala-js', name: 'scalajs-tools_2.11', version: '0.6.7'
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile 'org.scala-lang:scala-compiler:' + scalaVersion + '.' + subVersion
+    compile 'org.scala-lang:scala-library:' + scalaVersion + '.' + subVersion
+    compile group: 'org.scala-js', name: 'scalajs-sbt-test-adapter_' + scalaVersion, version: scalaJSVersion
+    compile group: 'org.scala-js', name: 'scalajs-js-envs_' + scalaVersion, version: scalaJSVersion
+    compile group: 'org.scala-js', name: 'scalajs-tools_' + scalaVersion, version: scalaJSVersion
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'com.google.guava', name: 'guava', version: '19.0'
 }
 
 signing {
-    required { project.hasProperty('sign') && isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
+    required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
     sign configurations.archives
 }
 
-signArchives.onlyIf{project.hasProperty('sign')}
+signArchives.onlyIf { project.hasProperty('sign') }
 
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
     from javadoc
 }
 
-task groovydocJar(type: Jar){
+task groovydocJar(type: Jar) {
     classifier = 'groovydoc'
     from groovydoc
 }
@@ -54,7 +61,7 @@ artifacts {
     archives javadocJar, groovydocJar, scaladocJar, sourcesJar
 }
 
-if(project.hasProperty('upload')) {
+if (project.hasProperty('upload')) {
     uploadArchives {
         repositories {
             mavenDeployer {
@@ -101,5 +108,5 @@ if(project.hasProperty('upload')) {
 tasks.getByName('compileGroovy').dependsOn('compileScala')
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.12'
+    gradleVersion = '2.13'
 }
