@@ -22,7 +22,6 @@ buildscript {
 
 configurations {
     scalaTestCompile
-    phantomJetty
 }
 
 dependencies {
@@ -53,6 +52,7 @@ ext {
     testFrameworks += "minitest.runner.Framework"
     testFrameworks += "org.scalacheck.ScalaCheckFramework"
     testFrameworks += "scalaprops.ScalapropsFramework"
+	testFrameworks += "scalaprops.ScalapropsFramework"
 	d=true
     testLogLevel="Debug"
 }

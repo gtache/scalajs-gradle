@@ -11,7 +11,10 @@ import org.scalajs.core.tools.logging.Level
 import org.scalajs.jsenv.JSEnv
 import org.scalajs.jsenv.nodejs.NodeJSEnv
 import org.scalajs.jsenv.phantomjs.PhantomJSEnv
+<<<<<<< HEAD
 import org.scalajs.jsenv.phantomjs.PhantomJettyClassLoader
+=======
+>>>>>>> c19e7c67b49dc0392cd9bbbe4b4de4833656dada
 import org.scalajs.jsenv.rhino.RhinoJSEnv
 import scala.collection.Map$
 import scala.collection.Seq$
@@ -32,9 +35,12 @@ public final class Utils {
     public static final String SUB_VERSION = "8"
     public static final String SCALAJS_VERSION = "0.6.9"
 
+<<<<<<< HEAD
     public static final String JETTY_SERVER_VERSION = "8.1.16.v20140903"
     public static final String JETTY_WEBSOCKET_VERSION = "8.1.16.v20140903"
 
+=======
+>>>>>>> c19e7c67b49dc0392cd9bbbe4b4de4833656dada
     public static final String JS_REL_DIR = File.separator + 'js' + File.separator
     public static final String EXT = '.js'
     public static final String FULLOPT_SUFFIX = '_fullopt' + EXT
@@ -112,12 +118,16 @@ public final class Utils {
         if (project.hasProperty(RHINO)) {
             env = new RhinoJSEnv(Scalajsld$.MODULE$.options().semantics(), false)
         } else if (project.hasProperty(PHANTOM)) {
+<<<<<<< HEAD
             final URL[] jars = project.configurations.phantomJetty.findAll{
                 it.absolutePath.contains('jetty')
             }.collect{ it.toURI().toURL()} as URL[]
             final PhantomJettyClassLoader loader = new PhantomJettyClassLoader(new URLClassLoader(jars), project.buildscript.classLoader)
             env = new PhantomJSEnv("phantomjs", List$.MODULE$.empty(), Map$.MODULE$.empty(), true, loader)
 
+=======
+            env = new PhantomJSEnv("phantomjs", List$.MODULE$.empty(), Map$.MODULE$.empty(), true, null)
+>>>>>>> c19e7c67b49dc0392cd9bbbe4b4de4833656dada
         } else {
             env = new NodeJSEnv("node", Seq$.MODULE$.empty(), Map$.MODULE$.empty())
         }

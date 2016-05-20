@@ -8,46 +8,85 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.github.gtache:scalajs-plugin:0.1.1'
+        classpath 'com.github.gtache:scalajs-plugin:0.2.0'
     }
 }
 ```
 to use this plugin.    
 *Check the build.gradle of scalajs-plugin-test if needed.*    
 Needs .scala files to be in src/main/scala (or [configure your ScalaCompile](https://docs.gradle.org/current/userguide/scala_plugin.html) task accordingly)    
-(Optional) [Node.js](https://nodejs.org/) to run the generated JS file.
+Needs tests to be in src/test/scala.
 
 ## Added by the plugin
 This plugin adds :   
 -`apply plugin: 'java'`   
 -`apply plugin: 'scala'`   
-as well as dependencies on **scalajs-library 2.11:0.6.7** and **scalajs-compiler 2.11.7:0.6.7**
+as well as dependencies on **scalajs-library 2.11:0.6.9** and **scalajs-compiler 2.11.8:0.6.9**
 
 ## Usage
 `gradlew FastOptJS`, `gradlew FullOptJS` or `gradlew NoOptJS` to compile everything.
 
-There is also `gradlew CleanAll` which will delete the build and js directories.
+You can run the generated javascript file with `gradlew RunJS`.    
+You can run tests with `gradlew TestJS`. Be aware that this is still an early feature.
 
-You can run the generated javascript file with `gradlew RunJS -Pclassname='nameOfClass' -Pmethname='nameOfMeth'`, where Pclassname is the full name of the class (main.scala.*name* in the scalajs-plugin-test project) and where Pmethname is optional (default is main). It requires Node.js to be on PATH.
+## Test frameworks supported     
+-ScalaTest    
+-JUnit ***(you have to add the junit-test-plugin to the compileTestScala task)***    
+-Minitest    
+-utest (not fully supported, the summary will print the tests as Unknown and the retest feature will ignore them)   
+-ScalaProps    
+You can mix them (Have a JUnit suite with a utest suite and a ScalaTest suite, etc)    
+You must obviously add the dependencies and TestFrameworks for those to work.    
+
+To add the JUnit plugin or the dependencies, please refer to the *build.gradle* in *scalajs-test-plugin* or to the snippet below.
 
 ### Options for RunJS
--Adding `-PrunNoOpt` will copy and run the unoptimized file   
--Adding `-PrunFull` will copy and run the fully optimized file (overrides `-PrunNoOpt` if both are used)   
--It will copy and run the fast optimized file by default.  
-RunJS will depend on FastOptJS (default), FullOptJS or NoOptJS accordingly.
+-`-Pclassname` is the fully qualified name of the class to run    
+-`-Pmethname` is the method of classname to run.    
+-`-PtoExec` (has higher priority than `-Pclassname`) will run the given explicit command    
+-`-PfileToExec` (has highest priority) will run the given js file.    
+-Adding `-PrunNoOpt` will run the unoptimized file   
+-Adding `-PrunFull` will run the fully optimized file (overrides `-PrunNoOpt` if both are used)   
+-It will run the fast optimized file by default.  
+RunJS will depend on FastOptJS (default), FullOptJS or NoOptJS accordingly.    
+-Adding `-Pphantom` will run the file in a phantomjs environment (needs phantomjs on path).    
+-Adding `-Prhino` will run the file in a rhino environment.    
 
-Examples : `gradlew RunJS -Pclassname="main.scala.Test"` will compile everything and run Test().main() (With the scalajs-plugin-test, it should print the square of 10)
+Examples : `gradlew RunJS -Pclassname="main.scala.DummyObject"` will compile everything and run DummyObject().main()
 
-`gradlew RunJS -Pclassname="main.scala.Test" -Pmethname="printSomething(\"blabla\")" -PrunFull` will compile the fully optimized version of the files and will run Test().printSomething("blabla"), which should print "blabla" with the scalajs-plugin-test project.
+`gradlew RunJS -Pclassname="main.scala.DummyObject" -Pmethname="printSomething(\"blabla\")" -PrunFull` will compile the fully optimized version of the files and will run DummyObject().printSomething("blabla")
 
-`gradlew RunJS -PtoExec="main.scala.Test().main()"` will compile everything and run Test().main(). -PtoExec overrides -Pclassname.
+`gradlew RunJS -PtoExec="main.scala.DummyObject().main() -Pphantom"` will compile everything and run DummyObject().main() in a phantomjs environment.
 
+`gradlew RunJS -PfileToExec="testjs/TestRunWithFile.js"` will run TestRunWithFile.js with the environment loaded with the compiled js file.
+
+### Options for TestJS
+-`-PrunFull`, `-PrunNoOpt`, `-Pphantom` and `-Prhino` have the same behavior as with RunJS.    
+-`-Ptest-only=class1;class2;*l*s3` and -`-Ptest-quick=...` should have the same behavior as their sbt counterparts. **You can only select classes / suites at the moment, you can't select tests.**  
+-`-Pretest` should retest all failed tests.
+
+### Making options permanent
+Don't forget that you can set the options directly in build.gradle. Simply put the property in the 'ext' closure.   
+Example : Instead of writing -PtestLogLevel=Debug -Po="generated.js" -Pd -PfileToExec="toExec/exec.js" everytime, write  
+
+```
+ext {    
+    testLogLevel="Debug" //Use a string
+    o="generated.js"
+    d=true //or false, or whatever, it just checks that the property exists
+    fileToExec="toExec/exec.js"
+    testFrameworks=["utest.runner.Framework","minitest.runner.Framework"] //To add TestFramework if necessary
+}
+```
 
 ## Changelog    
-###0.1.2 (in development)   
+###0.2.0 (in development)   
 -Adds support for RhinoJS and PhantomJS    
 -Adds options for the linker    
--Removes (now) useless tasks    
+-Removes useless tasks    
+-Adds support for basic testing    
+-Various improvements (cleaning, bugs, etc)    
+
 ###0.1.1    
 -Adds -PtoExec to input directly what to execute.   
 -Linker and Cache are kept alive (should increase speed dramatically). Only works with a gradle daemon.   
