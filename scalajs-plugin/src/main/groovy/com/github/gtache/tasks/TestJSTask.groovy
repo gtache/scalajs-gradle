@@ -98,7 +98,7 @@ public class TestJSTask extends DefaultTask {
             } else {
                 final ScalaJSTestStatus testStatus = new ScalaJSTestStatus(framework)
                 final EventHandler eventHandler = new ScalaJSEventHandler(testStatus)
-                ScalaJSTestResult$.MODULE$.statuses_$eq(ScalaJSTestResult$.MODULE$.statuses().$plus(testStatus) as scala.collection.immutable.Set<ScalaJSTestStatus>)
+                ScalaJSTestResult$.MODULE$.statuses_$eq(ScalaJSTestResult.statuses().$plus(testStatus) as scala.collection.immutable.Set<ScalaJSTestStatus>)
                 testStatus.runner_$eq(runner)
                 tasks.each { Task t ->
                     t.execute(eventHandler, simpleLoggerArray)
@@ -109,7 +109,13 @@ public class TestJSTask extends DefaultTask {
             }
         }
 
-        project.logger.lifecycle(ScalaJSTestResult$.MODULE$.toString())
-        ScalaJSTestResult$.MODULE$.save()
+        project.logger.lifecycle(ScalaJSTestResult.toString())
+        boolean success = ScalaJSTestResult.isSuccess()
+        ScalaJSTestResult.save()
+
+        //Make build fail
+        if (!success){
+            throw new Exception("There were failures while testing")
+        }
     }
 }

@@ -25,8 +25,8 @@ public class CompileJSTask extends DefaultTask {
     public static final String OUTPUT = 'output'
     public static final String MIN_PRETTY = 'p'
     public static final String PRETTY = 'prettyPrint'
-    public static final String MIN_SOURCEMAP = 's'
-    public static final String SOURCEMAP = 'sourceMap'
+    public static final String MIN_SOURCEMAP = 'noS'
+    public static final String SOURCEMAP = 'noSourceMap'
     public static final String COMPLIANT = 'compliantAsInstanceOfs'
     public static final String MIN_OUTPUTMODE = 'm'
     public static final String OUTPUTMODE = 'outputMode'
@@ -41,6 +41,7 @@ public class CompileJSTask extends DefaultTask {
     public static final String WARN = 'quiet'
     public static final String MIN_ERR = 'qq'
     public static final String ERR = 'really-quiet'
+    public static final String SEMANTICS = 'semantics'
 
     private Scalajsld.Options options
     @InputFiles
@@ -135,16 +136,23 @@ public class CompileJSTask extends DefaultTask {
         }
 
         if (project.hasProperty(MIN_SOURCEMAP) || project.hasProperty(SOURCEMAP)) {
-            options = options.withSourceMap(true)
+            options = options.withSourceMap(false)
         }
 
         if (project.hasProperty(COMPLIANT)) {
             options = options.withCompliantsSemantics()
         }
 
-        if (project.hasProperty('semantics')){
-            Semantics semantics = project.property('semantics') as Semantics
-            options = options.withSemantics(semantics)
+        if (project.hasProperty(SEMANTICS)){
+            def semanticsObj = project.property(SEMANTICS)
+            if (semanticsObj instanceof Semantics){
+                options = options.withSemantics(semanticsObj as Semantics)
+            } else {
+                project.logger.error("The object given as \"semantics\" is not of type Semantics")
+            }
+
+        } else if (fullOpt){
+            options = options.withSemantics(options.semantics().withProductionMode(true))
         }
 
 

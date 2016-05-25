@@ -8,7 +8,6 @@ import org.scalajs.core.tools.linker.Linker
 import org.scalajs.core.tools.linker.backend.{LinkerBackend, OutputMode}
 import org.scalajs.core.tools.linker.frontend.LinkerFrontend
 import org.scalajs.core.tools.logging._
-import org.scalajs.core.tools.sem.CheckedBehavior.Compliant
 import org.scalajs.core.tools.sem._
 
 /**
@@ -40,7 +39,7 @@ object Scalajsld {
     * @return the default options
     */
   def defaultOptions(): Options = {
-    new Options()
+    Options()
   }
 
   /**
@@ -88,127 +87,95 @@ object Scalajsld {
     * @param cp                  the classpath
     * @param output              the output file
     * @param jsoutput            Deprecated
-    * @param semantics
+    * @param semantics           the semantics to be used
     * @param outputMode          the output mode
     * @param noOpt               with no optimization
     * @param fullOpt             with full optimization
     * @param prettyPrint         with pretty print
-    * @param sourceMap
-    * @param relativizeSourceMap
-    * @param bypassLinkingErrors bypass errors or not
-    * @param checkIR
+    * @param sourceMap           if the sourcemap has to be emitted
+    * @param relativizeSourceMap a sourcemap to use for linking
+    * @param bypassLinkingErrors bypass errors or not (deprecated)
+    * @param checkIR             checks the sjsir (expensive)
     * @param stdLib              a library to be used for the linking
     * @param logLevel            the level of the logging to be displayed
     */
-  case class Options(val cp: Seq[File] = Seq.empty,
-                val output: File = null,
-                val jsoutput: Boolean = false,
-                val semantics: Semantics = Semantics.Defaults,
-                val outputMode: OutputMode = OutputMode.ECMAScript51Isolated,
-                val noOpt: Boolean = false,
-                val fullOpt: Boolean = false,
-                val prettyPrint: Boolean = false,
-                val sourceMap: Boolean = false,
-                val relativizeSourceMap: Option[URI] = None,
-                val bypassLinkingErrors: Boolean = false,
-                val checkIR: Boolean = false,
-                val stdLib: Option[File] = None,
-                val logLevel: Level = Level.Info) {
+  case class Options(cp: Seq[File] = Seq.empty,
+                output: File = null,
+                jsoutput: Boolean = false,
+                semantics: Semantics = Semantics.Defaults,
+                outputMode: OutputMode = OutputMode.ECMAScript51Isolated,
+                noOpt: Boolean = false,
+                fullOpt: Boolean = false,
+                prettyPrint: Boolean = false,
+                sourceMap: Boolean = true,
+                relativizeSourceMap: Option[URI] = None,
+                bypassLinkingErrors: Boolean = false,
+                checkIR: Boolean = false,
+                stdLib: Option[File] = None,
+                logLevel: Level = Level.Info) {
 
     def withClasspath(newCp: Seq[File]): Options = {
-      new Options(newCp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
-        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
-        this.checkIR, this.stdLib, this.logLevel)
+      this.copy(cp=newCp)
     }
 
     def withOutput(newOutput: File): Options = {
-      new Options(this.cp, newOutput, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
-        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
-        this.checkIR, this.stdLib, this.logLevel)
+      this.copy(output=newOutput)
     }
 
     def withJsOutput(newJsOutput: Boolean): Options = {
-      new Options(this.cp, this.output, newJsOutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
-        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
-        this.checkIR, this.stdLib, this.logLevel)
+      this.copy(jsoutput=newJsOutput)
     }
 
     def withSemantics(newSemantics: Semantics): Options = {
-      new Options(this.cp, this.output, this.jsoutput, newSemantics, this.outputMode, this.noOpt, this.fullOpt,
-        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
-        this.checkIR, this.stdLib, this.logLevel)
+      this.copy(semantics=newSemantics)
     }
 
     def withOutputMode(newOutputMode: OutputMode): Options = {
-      new Options(this.cp, this.output, this.jsoutput, this.semantics, newOutputMode, this.noOpt, this.fullOpt,
-        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
-        this.checkIR, this.stdLib, this.logLevel)
+      this.copy(outputMode=newOutputMode)
     }
 
     def withNoOpt(): Options = {
-      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, true, false,
-        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
-        this.checkIR, this.stdLib, this.logLevel)
+      this.copy(fullOpt=false, noOpt=true)
     }
 
     def withFastOpt(): Options = {
-      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, false, false,
-        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
-        this.checkIR, this.stdLib, this.logLevel)
+      this.copy(fullOpt=false,noOpt=false)
     }
 
     def withFullOpt(): Options = {
-      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, false, true,
-        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
-        this.checkIR, this.stdLib, this.logLevel)
+      this.copy(fullOpt=true,noOpt=false)
     }
 
     def withPrettyPrint(newPrettyPrint: Boolean): Options = {
-      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
-        newPrettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
-        this.checkIR, this.stdLib, this.logLevel)
+      this.copy(prettyPrint=newPrettyPrint)
     }
 
     def withSourceMap(newSourceMap: Boolean): Options = {
-      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
-        this.prettyPrint, newSourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
-        this.checkIR, this.stdLib, this.logLevel)
+      this.copy(sourceMap=newSourceMap)
     }
 
     def withRelativizeSourceMap(newRelativizeSourceMap: Option[URI]): Options = {
-      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
-        this.prettyPrint, this.sourceMap, newRelativizeSourceMap, this.bypassLinkingErrors,
-        this.checkIR, this.stdLib, this.logLevel)
+      this.copy(relativizeSourceMap=newRelativizeSourceMap)
     }
 
     def withBypassLinkingErrors(newBypass: Boolean): Options = {
-      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
-        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, newBypass,
-        this.checkIR, this.stdLib, this.logLevel)
+      this.copy(bypassLinkingErrors=newBypass)
     }
 
     def withCheckIR(newCheckIR: Boolean): Options = {
-      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
-        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
-        newCheckIR, this.stdLib, this.logLevel)
+      this.copy(checkIR=newCheckIR)
     }
 
     def withStdLib(newStdLib: Option[File]): Options = {
-      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
-        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
-        this.checkIR, newStdLib, this.logLevel)
+      this.copy(stdLib=newStdLib)
     }
 
     def withLogLevel(newLogLevel: Level): Options = {
-      new Options(this.cp, this.output, this.jsoutput, this.semantics, this.outputMode, this.noOpt, this.fullOpt,
-        this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
-        this.checkIR, this.stdLib, newLogLevel)
+      this.copy(logLevel=newLogLevel)
     }
 
     def withCompliantsSemantics(): Options = {
-      new Options(this.cp, this.output, this.jsoutput, this.semantics.withAsInstanceOfs(Compliant), this.outputMode,
-        this.noOpt, this.fullOpt, this.prettyPrint, this.sourceMap, this.relativizeSourceMap, this.bypassLinkingErrors,
-        this.checkIR, this.stdLib, this.logLevel)
+      this.copy(semantics = semantics.withAsInstanceOfs(CheckedBehavior.Compliant))
     }
 
     /**
@@ -223,7 +190,8 @@ object Scalajsld {
         "outputMode : " + outputMode + "\n" +
         "NoOpt : " + noOpt + " ; fullOpt : " + fullOpt + "\n" +
         "prettyPrint : " + prettyPrint + "\n" +
-        "sourcemap : " + sourceMap + " ; " + relativizeSourceMap + "\n" +
+        "sourcemap : " + sourceMap + "\n"+
+        "relativizeSourceMap + " + relativizeSourceMap.getOrElse("No sourcemap") +"\n"+
         "bypass : " + bypassLinkingErrors + "\n" +
         "checkIR : " + checkIR + "\n" +
         "stdLib : " + stdLib + "\n" +

@@ -46,15 +46,9 @@ object ClassScanner {
               sC = sC.getSuperclass
             }
           }
-          c.getInterfaces.foreach(interf => {
-            if (checkRec(interf, fName)) {
-              return true
-            }
-          })
-          false
+          c.getInterfaces.exists(interf => checkRec(interf, fName))
         }
       }
-
       checkRec(c, sF.superclassName())
     }
 
@@ -100,12 +94,7 @@ object ClassScanner {
     * @return true or false
     */
   def checkZeroArgsConstructor(c: Class[_]): Boolean = {
-    c.getDeclaredConstructors.foreach(cons => {
-      if (cons.getParameterCount == 0) {
-        return true
-      }
-    })
-    false
+    c.getDeclaredConstructors.exists(cons => cons.getParameterCount == 0)
   }
 
   /**

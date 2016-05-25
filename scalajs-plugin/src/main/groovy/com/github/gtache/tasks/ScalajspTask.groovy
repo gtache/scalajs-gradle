@@ -6,30 +6,46 @@ import org.gradle.api.tasks.TaskAction
 import scala.Option
 import scala.collection.JavaConverters
 
+/**
+ * Task used to call scalajsp
+ */
 class ScalajspTask extends DefaultTask {
+    final String description = "Translates and prints sjsir file to a more readable format"
 
+    public static final String MIN_SUPPORTED = 's'
+    public static final String SUPPORTED = 'supported'
+    public static final String MIN_INFOS = 'i'
+    public static final String INFOS = 'infos'
+    public static final String MIN_FILENAME = 'f'
+    public static final String FILENAME = 'filename'
+    public static final String MIN_JAR = 'j'
+    public static final String JAR = 'jar'
+
+    /**
+     * Parametrize the options and calls scalajsp
+     */
     @TaskAction
     def run() {
-        if (project.hasProperty('s') || project.hasProperty('supported')){
+        if (project.hasProperty(MIN_SUPPORTED) || project.hasProperty(SUPPORTED)){
             Scalajsp.printSupported()
         } else {
-            Scalajsp.Options options = Scalajsp.getDefaultOptions()
-            if (project.hasProperty('i') || project.hasProperty('infos')){
+            Scalajsp.Options options = Scalajsp.defaultOptions()
+            if (project.hasProperty(MIN_INFOS) || project.hasProperty(INFOS)){
                 options = options.withInfos(true)
             }
-            if (project.hasProperty('filename')){
-                String[] filenames = (project.property('filename') as String).split(';')
+            if (project.hasProperty(MIN_FILENAME)){
+                String[] filenames = (project.property(MIN_FILENAME) as String).split(';')
                 options = options.withFileNames(JavaConverters.asScalaSetConverter(filenames.toList().toSet()).asScala()
                         .toSet().toSeq().toIndexedSeq())
-            } else if (project.hasProperty('f')){
-                String[] filenames = (project.property('f') as String).split(';')
+            } else if (project.hasProperty(FILENAME)){
+                String[] filenames = (project.property(FILENAME) as String).split(';')
                 options = options.withFileNames(JavaConverters.asScalaSetConverter(filenames.toList().toSet()).asScala()
                         .toSet().toSeq().toIndexedSeq())
             }
-            if (project.hasProperty('jar')){
-                options = options.withJar(Option.apply(project.file(project.property('jar'))))
-            } else if (project.hasProperty('j')){
-                options = optoins.withJar(Option.apply(project.file(project.property('j'))))
+            if (project.hasProperty(MIN_JAR)){
+                options = options.withJar(Option.apply(project.file(project.property(MIN_JAR))))
+            } else if (project.hasProperty(JAR)){
+                options = options.withJar(Option.apply(project.file(project.property(JAR))))
             }
             Scalajsp.execute(options)
         }

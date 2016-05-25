@@ -11,6 +11,7 @@ import org.gradle.api.tasks.scala.ScalaCompile
 
 import static com.github.gtache.Utils.*
 import static com.github.gtache.tasks.CompileJSTask.*
+import static com.github.gtache.tasks.ScalajspTask.*
 
 /**
  * The main class for the plugin
@@ -144,6 +145,9 @@ public final class ScalajsPlugin implements Plugin<Project> {
         List<String> outputMode = new ArrayList<>()
         List<String> relSM = new ArrayList<>()
         List<String> logLevel = new ArrayList<>()
+        List<String> filenames = new ArrayList<>()
+        List<String> jar = new ArrayList<>()
+
 
         opt.add(RUN_FULL)
         opt.add(RUN_NOOPT)
@@ -160,12 +164,18 @@ public final class ScalajsPlugin implements Plugin<Project> {
         logLevel.add(MIN_ERR)
         logLevel.add(ERR)
         logLevel.add(LOG_LEVEL)
+        filenames.add(MIN_FILENAME)
+        filenames.add(FILENAME)
+        jar.add(MIN_JAR)
+        jar.add(JAR)
 
         linkedProperties.add(opt)
         linkedProperties.add(output)
         linkedProperties.add(outputMode)
         linkedProperties.add(relSM)
         linkedProperties.add(logLevel)
+        linkedProperties.add(filenames)
+        linkedProperties.add(jar)
 
         for (List<String> l : linkedProperties) {
             Set<Integer> declared = new HashSet<>()

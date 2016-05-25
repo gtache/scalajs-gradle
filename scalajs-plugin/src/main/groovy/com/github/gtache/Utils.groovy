@@ -1,7 +1,6 @@
 package com.github.gtache
 
 import com.github.gtache.testing.TestFramework
-import jdk.nashorn.internal.runtime.JSErrorType
 import org.gradle.api.Project
 import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.file.FileCollection
@@ -55,12 +54,14 @@ public final class Utils {
     //Envs
     public static final String RHINO = 'rhino'
     public static final String PHANTOM = 'phantom'
+    public static final String JSENV = 'jsEnv'
 
     //LogLevel
     public static final String ERROR_LVL = 'error'
     public static final String WARN_LVL = 'warn'
     public static final String INFO_LVL = 'info'
     public static final String DEBUG_LVL = 'debug'
+
 
     public static final String TEST_FRAMEWORKS = 'testFrameworks'
 
@@ -114,8 +115,14 @@ public final class Utils {
      */
     public static JSEnv resolveEnv(Project project) {
         def env
-        if (project.hasProperty('jsEnv')){
-            env = project.property('jsEnv') as JSEnv
+        if (project.hasProperty(JSENV)){
+            def envObj = project.property(JSENV)
+            if (envObj instanceof JSEnv){
+                env=envObj as JSEnv
+            } else {
+                project.logger.error("The object given as \"jsEnv\" is not of type JSEnv")
+                env = null
+            }
         }
         else if (project.hasProperty(RHINO)) {
             env = new RhinoJSEnv(Scalajsld$.MODULE$.options().semantics(), false)

@@ -9,87 +9,79 @@ import scala.collection.immutable.Seq
 import java.io.{Console => _, _}
 import java.util.zip.ZipFile
 
+/**
+  * Object used to translate sjsir files to something readable
+  */
 object Scalajsp {
 
+  /**
+    * Options used to run Scalajsp
+    * @param infos If we only want the infos about the file and not its content
+    * @param jar If the file to be read is in a jar
+    * @param fileNames The files to read
+    */
   case class Options( infos: Boolean = false,
-                              jar: Option[File] = None,
-                              fileNames: Seq[String] = Seq.empty){
+                      jar: Option[File] = None,
+                      fileNames: Seq[String] = Seq.empty){
 
-    def withInfos(infos : Boolean) : Options = {
-      this.copy(infos,this.jar,this.fileNames)
+    /**
+      * Returns a new Options instance with the given infos value
+      * @param newInfos The new infos value
+      * @return A new Options
+      */
+    def withInfos(newInfos : Boolean) : Options = {
+      this.copy(infos=newInfos)
     }
 
-    def withJar(jar : Option[File]) : Options = {
-      this.copy(this.infos,jar,this.fileNames)
+    /**
+      * Returns a new Options instance with the given jar value
+      * @param newJar The new jar value
+      * @return A new Options
+      */
+    def withJar(newJar : Option[File]) : Options = {
+      this.copy(jar=newJar)
     }
 
-    def withFileNames(fileNames : Seq[String]): Options ={
-      this.copy(this.infos,this.jar,fileNames)
+    /**
+      * Returns a new Options instance with the given fileNames value
+      * @param newFilenames The new Filenames value
+      * @return A new Options
+      */
+    def withFileNames(newFilenames : Seq[String]): Options ={
+      this.copy(fileNames=newFilenames)
     }
 
   }
 
-  def getDefaultOptions : Options =  {
+  /**
+    * Returns the default options
+    * @return the default options
+    */
+  def defaultOptions : Options =  {
     Options()
   }
+
+  /**
+    * Executes scalajsp with the given Options
+    * @param givenOptions The options to use
+    */
   def execute(givenOptions : Options) : Unit = {
     for {
-      options : Options  <- givenOptions
-      fileName <- options.fileNames
+      fileName <- givenOptions.fileNames
     } {
-      val vfile = options.jar map { jar =>
+      val vfile = givenOptions.jar map { jar =>
         readFromJar(jar, fileName)
       } getOrElse {
         readFromFile(fileName)
       }
 
-      displayFileContent(vfile, options)
+      displayFileContent(vfile, givenOptions)
     }
   }
 
-
-
-  def main(args: Array[String]): Unit = {
-    val parser = new scopt.OptionParser[Options]("scalajsp") {
-      head("scalajsp", ScalaJSVersions.current)
-      arg[String]("<file> ...")
-        .unbounded()
-        .action { (x, c) => c.copy(fileNames = c.fileNames :+ x) }
-        .text("*.sjsir file to display content of")
-      opt[File]('j', "jar")
-        .valueName("<jar>")
-        .action { (x, c) => c.copy(jar = Some(x)) }
-        .text("Read *.sjsir file(s) from the given JAR.")
-      opt[Unit]('i', "infos")
-        .action { (_, c) => c.copy(infos = true) }
-        .text("Show DCE infos instead of trees")
-      opt[Unit]('s', "supported")
-        .action { (_,_) => printSupported(); sys.exit() }
-        .text("Show supported Scala.js IR versions")
-      version("version")
-        .abbr("v")
-        .text("Show scalajsp version")
-      help("help")
-        .abbr("h")
-        .text("prints this usage text")
-
-      override def showUsageOnError = true
-    }
-
-    for {
-      options  <- parser.parse(args, Options())
-      fileName <- options.fileNames
-    } {
-      val vfile = options.jar map { jar =>
-        readFromJar(jar, fileName)
-      } getOrElse {
-        readFromFile(fileName)
-      }
-
-      displayFileContent(vfile, options)
-    }
-  }
-
+  /**
+    * Prints the supported Scala.js IR versions
+    */
   def printSupported(): Unit = {
     import ScalaJSVersions._
     println(s"Emitted Scala.js IR version is: $binaryEmitted")
