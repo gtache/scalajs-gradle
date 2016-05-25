@@ -19,7 +19,7 @@ class ScalajspTask extends DefaultTask {
     public static final String MIN_FILENAME = 'f'
     public static final String FILENAME = 'filename'
     public static final String MIN_JAR = 'j'
-    public static final String JAR = 'jar'
+    public static final String JAR = 'jarfile' //can't use jar as it is the name of a task apparently...
 
     /**
      * Parametrize the options and calls scalajsp
