@@ -115,16 +115,15 @@ public final class Utils {
      */
     public static JSEnv resolveEnv(Project project) {
         def env
-        if (project.hasProperty(JSENV)){
+        if (project.hasProperty(JSENV)) {
             def envObj = project.property(JSENV)
-            if (envObj instanceof JSEnv){
-                env=envObj as JSEnv
+            if (envObj instanceof JSEnv) {
+                env = envObj as JSEnv
             } else {
                 project.logger.error("The object given as \"jsEnv\" is not of type JSEnv")
                 env = null
             }
-        }
-        else if (project.hasProperty(RHINO)) {
+        } else if (project.hasProperty(RHINO)) {
             env = new RhinoJSEnv(Scalajsld$.MODULE$.options().semantics(), false)
         } else if (project.hasProperty(PHANTOM)) {
             final URL[] jars = project.configurations.phantomJetty.findAll {

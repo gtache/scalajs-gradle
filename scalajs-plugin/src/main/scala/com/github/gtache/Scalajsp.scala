@@ -1,71 +1,38 @@
 package com.github.gtache
 
+import java.io.{Console => _, _}
+import java.util.zip.ZipFile
+
 import org.scalajs.core.ir
-import ir.ScalaJSVersions
-import ir.Printers.{IRTreePrinter, InfoPrinter}
+import org.scalajs.core.ir.Printers.{IRTreePrinter, InfoPrinter}
+import org.scalajs.core.ir.ScalaJSVersions
 import org.scalajs.core.tools.io._
 
 import scala.collection.immutable.Seq
-import java.io.{Console => _, _}
-import java.util.zip.ZipFile
 
 /**
   * Object used to translate sjsir files to something readable
   */
 object Scalajsp {
 
-  /**
-    * Options used to run Scalajsp
-    * @param infos If we only want the infos about the file and not its content
-    * @param jar If the file to be read is in a jar
-    * @param fileNames The files to read
-    */
-  case class Options( infos: Boolean = false,
-                      jar: Option[File] = None,
-                      fileNames: Seq[String] = Seq.empty){
-
-    /**
-      * Returns a new Options instance with the given infos value
-      * @param newInfos The new infos value
-      * @return A new Options
-      */
-    def withInfos(newInfos : Boolean) : Options = {
-      this.copy(infos=newInfos)
-    }
-
-    /**
-      * Returns a new Options instance with the given jar value
-      * @param newJar The new jar value
-      * @return A new Options
-      */
-    def withJar(newJar : Option[File]) : Options = {
-      this.copy(jar=newJar)
-    }
-
-    /**
-      * Returns a new Options instance with the given fileNames value
-      * @param newFilenames The new Filenames value
-      * @return A new Options
-      */
-    def withFileNames(newFilenames : Seq[String]): Options ={
-      this.copy(fileNames=newFilenames)
-    }
-
-  }
+  private val stdout =
+    new BufferedWriter(new OutputStreamWriter(Console.out, "UTF-8"))
 
   /**
     * Returns the default options
+    *
     * @return the default options
     */
-  def defaultOptions : Options =  {
+  def defaultOptions: Options = {
     Options()
   }
 
   /**
     * Executes scalajsp with the given Options
+    *
     * @param givenOptions The options to use
     */
-  def execute(givenOptions : Options) : Unit = {
+  def execute(givenOptions: Options): Unit = {
     for {
       fileName <- givenOptions.fileNames
     } {
@@ -79,16 +46,6 @@ object Scalajsp {
     }
   }
 
-  /**
-    * Prints the supported Scala.js IR versions
-    */
-  def printSupported(): Unit = {
-    import ScalaJSVersions._
-    println(s"Emitted Scala.js IR version is: $binaryEmitted")
-    println("Supported Scala.js IR versions are")
-    binarySupported.foreach(v => println(s"* $v"))
-  }
-
   private def displayFileContent(vfile: VirtualScalaJSIRFile,
                                  opts: Options): Unit = {
     if (opts.infos)
@@ -97,11 +54,6 @@ object Scalajsp {
       new IRTreePrinter(stdout).printTopLevelTree(vfile.tree)
 
     stdout.flush()
-  }
-
-  private def fail(msg: String) = {
-    Console.err.println(msg)
-    sys.exit(1)
   }
 
   private def readFromFile(fileName: String) = {
@@ -115,10 +67,19 @@ object Scalajsp {
       FileVirtualScalaJSIRFile(file)
   }
 
+  private def fail(msg: String) = {
+    Console.err.println(msg)
+    sys.exit(1)
+  }
+
   private def readFromJar(jar: File, name: String) = {
     val jarFile =
-      try { new ZipFile(jar) }
-      catch { case _: FileNotFoundException => fail(s"No such JAR: $jar") }
+      try {
+        new ZipFile(jar)
+      }
+      catch {
+        case _: FileNotFoundException => fail(s"No such JAR: $jar")
+      }
     try {
       val entry = jarFile.getEntry(name)
       if (entry == null)
@@ -134,7 +95,57 @@ object Scalajsp {
     }
   }
 
-  private val stdout =
-    new BufferedWriter(new OutputStreamWriter(Console.out, "UTF-8"))
+  /**
+    * Prints the supported Scala.js IR versions
+    */
+  def printSupported(): Unit = {
+    import ScalaJSVersions._
+    println(s"Emitted Scala.js IR version is: $binaryEmitted")
+    println("Supported Scala.js IR versions are")
+    binarySupported.foreach(v => println(s"* $v"))
+  }
+
+  /**
+    * Options used to run Scalajsp
+    *
+    * @param infos     If we only want the infos about the file and not its content
+    * @param jar       If the file to be read is in a jar
+    * @param fileNames The files to read
+    */
+  case class Options(infos: Boolean = false,
+                     jar: Option[File] = None,
+                     fileNames: Seq[String] = Seq.empty) {
+
+    /**
+      * Returns a new Options instance with the given infos value
+      *
+      * @param newInfos The new infos value
+      * @return A new Options
+      */
+    def withInfos(newInfos: Boolean): Options = {
+      this.copy(infos = newInfos)
+    }
+
+    /**
+      * Returns a new Options instance with the given jar value
+      *
+      * @param newJar The new jar value
+      * @return A new Options
+      */
+    def withJar(newJar: Option[File]): Options = {
+      this.copy(jar = newJar)
+    }
+
+    /**
+      * Returns a new Options instance with the given fileNames value
+      *
+      * @param newFilenames The new Filenames value
+      * @return A new Options
+      */
+    def withFileNames(newFilenames: Seq[String]): Options = {
+      this.copy(fileNames = newFilenames)
+    }
+
+  }
 
 }

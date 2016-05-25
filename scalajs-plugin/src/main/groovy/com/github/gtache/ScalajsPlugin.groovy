@@ -98,7 +98,7 @@ public final class ScalajsPlugin implements Plugin<Project> {
         project.logger.info(testJS.name + ' task added')
 
         final def scalajsp = tasks.create('Scalajsp', ScalajspTask.class)
-        project.logger.info(scalajsp.name+ ' task added')
+        project.logger.info(scalajsp.name + ' task added')
 
         project.afterEvaluate {
             tasks.withType(CompileJSTask) {

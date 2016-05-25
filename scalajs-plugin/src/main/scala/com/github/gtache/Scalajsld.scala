@@ -76,7 +76,7 @@ object Scalajsld {
     try {
       linker.link(cache.cached(irContainers), outFile, logger)
     } catch {
-      case e : Exception => linker=null
+      case e: Exception => linker = null
         throw e
     }
   }
@@ -100,78 +100,78 @@ object Scalajsld {
     * @param logLevel            the level of the logging to be displayed
     */
   case class Options(cp: Seq[File] = Seq.empty,
-                output: File = null,
-                jsoutput: Boolean = false,
-                semantics: Semantics = Semantics.Defaults,
-                outputMode: OutputMode = OutputMode.ECMAScript51Isolated,
-                noOpt: Boolean = false,
-                fullOpt: Boolean = false,
-                prettyPrint: Boolean = false,
-                sourceMap: Boolean = true,
-                relativizeSourceMap: Option[URI] = None,
-                bypassLinkingErrors: Boolean = false,
-                checkIR: Boolean = false,
-                stdLib: Option[File] = None,
-                logLevel: Level = Level.Info) {
+                     output: File = null,
+                     jsoutput: Boolean = false,
+                     semantics: Semantics = Semantics.Defaults,
+                     outputMode: OutputMode = OutputMode.ECMAScript51Isolated,
+                     noOpt: Boolean = false,
+                     fullOpt: Boolean = false,
+                     prettyPrint: Boolean = false,
+                     sourceMap: Boolean = true,
+                     relativizeSourceMap: Option[URI] = None,
+                     bypassLinkingErrors: Boolean = false,
+                     checkIR: Boolean = false,
+                     stdLib: Option[File] = None,
+                     logLevel: Level = Level.Info) {
 
     def withClasspath(newCp: Seq[File]): Options = {
-      this.copy(cp=newCp)
+      this.copy(cp = newCp)
     }
 
     def withOutput(newOutput: File): Options = {
-      this.copy(output=newOutput)
+      this.copy(output = newOutput)
     }
 
     def withJsOutput(newJsOutput: Boolean): Options = {
-      this.copy(jsoutput=newJsOutput)
+      this.copy(jsoutput = newJsOutput)
     }
 
     def withSemantics(newSemantics: Semantics): Options = {
-      this.copy(semantics=newSemantics)
+      this.copy(semantics = newSemantics)
     }
 
     def withOutputMode(newOutputMode: OutputMode): Options = {
-      this.copy(outputMode=newOutputMode)
+      this.copy(outputMode = newOutputMode)
     }
 
     def withNoOpt(): Options = {
-      this.copy(fullOpt=false, noOpt=true)
+      this.copy(fullOpt = false, noOpt = true)
     }
 
     def withFastOpt(): Options = {
-      this.copy(fullOpt=false,noOpt=false)
+      this.copy(fullOpt = false, noOpt = false)
     }
 
     def withFullOpt(): Options = {
-      this.copy(fullOpt=true,noOpt=false)
+      this.copy(fullOpt = true, noOpt = false)
     }
 
     def withPrettyPrint(newPrettyPrint: Boolean): Options = {
-      this.copy(prettyPrint=newPrettyPrint)
+      this.copy(prettyPrint = newPrettyPrint)
     }
 
     def withSourceMap(newSourceMap: Boolean): Options = {
-      this.copy(sourceMap=newSourceMap)
+      this.copy(sourceMap = newSourceMap)
     }
 
     def withRelativizeSourceMap(newRelativizeSourceMap: Option[URI]): Options = {
-      this.copy(relativizeSourceMap=newRelativizeSourceMap)
+      this.copy(relativizeSourceMap = newRelativizeSourceMap)
     }
 
     def withBypassLinkingErrors(newBypass: Boolean): Options = {
-      this.copy(bypassLinkingErrors=newBypass)
+      this.copy(bypassLinkingErrors = newBypass)
     }
 
     def withCheckIR(newCheckIR: Boolean): Options = {
-      this.copy(checkIR=newCheckIR)
+      this.copy(checkIR = newCheckIR)
     }
 
     def withStdLib(newStdLib: Option[File]): Options = {
-      this.copy(stdLib=newStdLib)
+      this.copy(stdLib = newStdLib)
     }
 
     def withLogLevel(newLogLevel: Level): Options = {
-      this.copy(logLevel=newLogLevel)
+      this.copy(logLevel = newLogLevel)
     }
 
     def withCompliantsSemantics(): Options = {
@@ -190,8 +190,8 @@ object Scalajsld {
         "outputMode : " + outputMode + "\n" +
         "NoOpt : " + noOpt + " ; fullOpt : " + fullOpt + "\n" +
         "prettyPrint : " + prettyPrint + "\n" +
-        "sourcemap : " + sourceMap + "\n"+
-        "relativizeSourceMap + " + relativizeSourceMap.getOrElse("No sourcemap") +"\n"+
+        "sourcemap : " + sourceMap + "\n" +
+        "relativizeSourceMap + " + relativizeSourceMap.getOrElse("No sourcemap") + "\n" +
         "bypass : " + bypassLinkingErrors + "\n" +
         "checkIR : " + checkIR + "\n" +
         "stdLib : " + stdLib + "\n" +

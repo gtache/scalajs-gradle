@@ -24,10 +24,6 @@ object ScalaJSTestResult {
     }
   }
 
-  private def sanitizeClassnames(names: Set[String]): Set[String] = {
-    names.map(s => s.takeWhile(c => c != ':')).filter(s => !s.contains('#'))
-  }
-
   /**
     * Returns all failed classes
     *
@@ -58,6 +54,10 @@ object ScalaJSTestResult {
     */
   def getLastFailedClassnames: Set[String] = {
     sanitizeClassnames((lastStatuses.flatMap(s => s.failed) ++ lastStatuses.flatMap(s => s.errored)).map(t => t.fullyQualifiedName()))
+  }
+
+  private def sanitizeClassnames(names: Set[String]): Set[String] = {
+    names.map(s => s.takeWhile(c => c != ':')).filter(s => !s.contains('#'))
   }
 
   /**

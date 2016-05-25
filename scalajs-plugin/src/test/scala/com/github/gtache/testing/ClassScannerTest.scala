@@ -85,15 +85,6 @@ class ClassScannerTest {
     assertTrue(map.get(packageName + "M").get.fingerprint.isInstanceOf[AnnotatedFingerprint])
   }
 
-  def checkContains(nameTasks: Set[String], contained: Set[String], all: Set[String]): Unit = {
-    contained.foreach { s =>
-      assertTrue(s + " in " + contained.mkString(" ; "), nameTasks.contains(s))
-    }
-    all.filterNot(contained).foreach { s =>
-      assertFalse(s + " not in " + contained.mkString(" ; "), nameTasks.contains(s))
-    }
-  }
-
   @Test
   def testScannerExplicitely(): Unit = {
     val taskDefs = ClassScanner.scan(loader, fingerprints, explicitlySpecified)
@@ -106,6 +97,15 @@ class ClassScannerTest {
     assertTrue(map.get(packageName + "AB").get.fingerprint.isInstanceOf[SubclassFingerprint])
     assertTrue(map.get(packageName + "B").get.fingerprint.isInstanceOf[SubclassFingerprint])
     assertTrue(map.get(packageName + "C").get.fingerprint.isInstanceOf[SubclassFingerprint])
+  }
+
+  def checkContains(nameTasks: Set[String], contained: Set[String], all: Set[String]): Unit = {
+    contained.foreach { s =>
+      assertTrue(s + " in " + contained.mkString(" ; "), nameTasks.contains(s))
+    }
+    all.filterNot(contained).foreach { s =>
+      assertFalse(s + " not in " + contained.mkString(" ; "), nameTasks.contains(s))
+    }
   }
 
   @Test

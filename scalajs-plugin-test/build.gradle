@@ -1,3 +1,7 @@
+import org.scalajs.jsenv.nodejs.*
+import scala.collection.immutable.Seq$
+import scala.collection.immutable.Map$
+
 group 'com.github.gtache'
 version '1.0-SNAPSHOT'
 
@@ -48,6 +52,7 @@ tasks.findByPath('compileTestScala').doFirst {
             }.get(0).absolutePath]
 }
 
+
 ext {
     testFrameworks = ["utest.runner.Framework"]
     testFrameworks += "minitest.runner.Framework"
@@ -56,6 +61,14 @@ ext {
     testFrameworks += "scalaprops.ScalapropsFramework"
     d = true
     testLogLevel = "Debug"
+
+    //You can configure a custom JSEnv
+    //jsEnv = new NodeJSEnv("node", Seq$.MODULE$.empty(), Map$.MODULE$.empty())
+    //jsEnv.loadLibs(...)
+    //jsEnv.withSourceMap(...)
+
+    //You can configure custom Semantics
+    //semantics = Semantics.Defaults().withProductionMode(true).with...
 }
 
 defaultTasks += 'FastOptJS'

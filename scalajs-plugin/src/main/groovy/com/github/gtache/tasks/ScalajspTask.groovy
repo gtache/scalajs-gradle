@@ -26,25 +26,25 @@ class ScalajspTask extends DefaultTask {
      */
     @TaskAction
     def run() {
-        if (project.hasProperty(MIN_SUPPORTED) || project.hasProperty(SUPPORTED)){
+        if (project.hasProperty(MIN_SUPPORTED) || project.hasProperty(SUPPORTED)) {
             Scalajsp.printSupported()
         } else {
             Scalajsp.Options options = Scalajsp.defaultOptions()
-            if (project.hasProperty(MIN_INFOS) || project.hasProperty(INFOS)){
+            if (project.hasProperty(MIN_INFOS) || project.hasProperty(INFOS)) {
                 options = options.withInfos(true)
             }
-            if (project.hasProperty(MIN_FILENAME)){
+            if (project.hasProperty(MIN_FILENAME)) {
                 String[] filenames = (project.property(MIN_FILENAME) as String).split(';')
                 options = options.withFileNames(JavaConverters.asScalaSetConverter(filenames.toList().toSet()).asScala()
                         .toSet().toSeq().toIndexedSeq())
-            } else if (project.hasProperty(FILENAME)){
+            } else if (project.hasProperty(FILENAME)) {
                 String[] filenames = (project.property(FILENAME) as String).split(';')
                 options = options.withFileNames(JavaConverters.asScalaSetConverter(filenames.toList().toSet()).asScala()
                         .toSet().toSeq().toIndexedSeq())
             }
-            if (project.hasProperty(MIN_JAR)){
+            if (project.hasProperty(MIN_JAR)) {
                 options = options.withJar(Option.apply(project.file(project.property(MIN_JAR))))
-            } else if (project.hasProperty(JAR)){
+            } else if (project.hasProperty(JAR)) {
                 options = options.withJar(Option.apply(project.file(project.property(JAR))))
             }
             Scalajsp.execute(options)

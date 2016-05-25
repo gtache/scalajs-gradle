@@ -10,7 +10,6 @@ import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.linker.backend.OutputMode
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.sem.Semantics
-import org.scalajs.jsenv.JSEnv
 import scala.Option
 import scala.collection.JavaConverters
 
@@ -143,15 +142,15 @@ public class CompileJSTask extends DefaultTask {
             options = options.withCompliantsSemantics()
         }
 
-        if (project.hasProperty(SEMANTICS)){
+        if (project.hasProperty(SEMANTICS)) {
             def semanticsObj = project.property(SEMANTICS)
-            if (semanticsObj instanceof Semantics){
+            if (semanticsObj instanceof Semantics) {
                 options = options.withSemantics(semanticsObj as Semantics)
             } else {
                 project.logger.error("The object given as \"semantics\" is not of type Semantics")
             }
 
-        } else if (fullOpt){
+        } else if (fullOpt) {
             options = options.withSemantics(options.semantics().withProductionMode(true))
         }
 

@@ -114,7 +114,7 @@ public class TestJSTask extends DefaultTask {
         ScalaJSTestResult.save()
 
         //Make build fail
-        if (!success){
+        if (!success) {
             throw new Exception("There were failures while testing")
         }
     }
