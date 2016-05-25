@@ -26,6 +26,7 @@ dependencies {
     compile group: 'org.scala-js', name: 'scalajs-sbt-test-adapter_' + scalaVersion, version: scalaJSVersion
     compile group: 'org.scala-js', name: 'scalajs-js-envs_' + scalaVersion, version: scalaJSVersion
     compile group: 'org.scala-js', name: 'scalajs-tools_' + scalaVersion, version: scalaJSVersion
+    compile group: 'org.scala-js', name: 'scalajs-cli_' + scalaVersion, version : scalaJSVersion
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'com.google.guava', name: 'guava', version: '19.0'
 }
@@ -35,7 +36,7 @@ signing {
     sign configurations.archives
 }
 
-signArchives.onlyIf { project.hasProperty('sign') }
+signArchives.onlyIf { project.hasProperty('uploadArchives') }
 
 task javadocJar(type: Jar) {
     classifier = 'javadoc'

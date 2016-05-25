@@ -9,6 +9,8 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.linker.backend.OutputMode
 import org.scalajs.core.tools.logging.Level
+import org.scalajs.core.tools.sem.Semantics
+import org.scalajs.jsenv.JSEnv
 import scala.Option
 import scala.collection.JavaConverters
 
@@ -91,6 +93,7 @@ public class CompileJSTask extends DefaultTask {
             logger.info('Options changed, linker recreated')
         }
         logger.info('Running linker with ' + options.toString())
+
         Scalajsld.exec()
     }
 
@@ -137,6 +140,11 @@ public class CompileJSTask extends DefaultTask {
 
         if (project.hasProperty(COMPLIANT)) {
             options = options.withCompliantsSemantics()
+        }
+
+        if (project.hasProperty('semantics')){
+            Semantics semantics = project.property('semantics') as Semantics
+            options = options.withSemantics(semantics)
         }
 
 

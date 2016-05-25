@@ -2,6 +2,7 @@ package com.github.gtache
 
 import com.github.gtache.tasks.CompileJSTask
 import com.github.gtache.tasks.RunJSTask
+import com.github.gtache.tasks.ScalajspTask
 import com.github.gtache.tasks.TestJSTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -94,6 +95,9 @@ public final class ScalajsPlugin implements Plugin<Project> {
             runJS.dependsOn(fastOptJS)
         }
         project.logger.info(testJS.name + ' task added')
+
+        final def scalajsp = tasks.create('Scalajsp', ScalajspTask.class)
+        project.logger.info(scalajsp.name+ ' task added')
 
         project.afterEvaluate {
             tasks.withType(CompileJSTask) {

@@ -73,7 +73,13 @@ object Scalajsld {
       }
       optionsChanged = false
     }
-    linker.link(cache.cached(irContainers), outFile, logger)
+    //Reset linker if there is an error
+    try {
+      linker.link(cache.cached(irContainers), outFile, logger)
+    } catch {
+      case e : Exception => linker=null
+        throw e
+    }
   }
 
   /**
@@ -94,7 +100,7 @@ object Scalajsld {
     * @param stdLib              a library to be used for the linking
     * @param logLevel            the level of the logging to be displayed
     */
-  class Options(val cp: Seq[File] = Seq.empty,
+  case class Options(val cp: Seq[File] = Seq.empty,
                 val output: File = null,
                 val jsoutput: Boolean = false,
                 val semantics: Semantics = Semantics.Defaults,

@@ -1,6 +1,7 @@
 package com.github.gtache
 
 import com.github.gtache.testing.TestFramework
+import jdk.nashorn.internal.runtime.JSErrorType
 import org.gradle.api.Project
 import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.file.FileCollection
@@ -113,7 +114,10 @@ public final class Utils {
      */
     public static JSEnv resolveEnv(Project project) {
         def env
-        if (project.hasProperty(RHINO)) {
+        if (project.hasProperty('jsEnv')){
+            env = project.property('jsEnv') as JSEnv
+        }
+        else if (project.hasProperty(RHINO)) {
             env = new RhinoJSEnv(Scalajsld$.MODULE$.options().semantics(), false)
         } else if (project.hasProperty(PHANTOM)) {
             final URL[] jars = project.configurations.phantomJetty.findAll {
