@@ -164,7 +164,6 @@ object ScalaJSTestResult {
   * @param framework The framework which corresponds to this instance
   */
 final class ScalaJSTestStatus(val framework: ScalaJSFramework) {
-  var runner: Runner = null
   var all: List[TaskDef] = List.empty
   var errored: List[TaskDef] = List.empty
   var failed: List[TaskDef] = List.empty
@@ -186,7 +185,6 @@ final class ScalaJSTestStatus(val framework: ScalaJSFramework) {
 
   override def toString: String = {
     "ScalaJSTestStatus for " + framework.name + " : " +
-      "\n--Runner : " + runner +
       "\n--All : " + all.map(t => t.fullyQualifiedName()).mkString("\n\t") +
       "\n--Success : " + succeeded.map(t => t.fullyQualifiedName()).mkString("\n\t") +
       "\n--Error : " + errored.map(t => t.fullyQualifiedName()).mkString("\n\t") +
