@@ -21,7 +21,11 @@ import static Utils.CPSeparator
  * A task used to run tests for various frameworks
  */
 public class TestJSTask extends DefaultTask {
-    final String description = "Runs tests"
+    final String description = "Runs tests. Depends on a CompileJS task.\n" +
+            "Can use -PtestLogLevel to change the level of logging, \n" +
+            "-Ptest-only='...' to test only the given files, \n" +
+            "-Ptest-quick='...' to test only the given files which have failed during the last testing, \n" +
+            "-Pretest to run only tests which have failed during the last testing."
 
     private static final String LOG_LEVEL = 'testLogLevel'
     private static final String TEST_ONLY = 'test-only'

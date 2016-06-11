@@ -29,9 +29,6 @@ final class ScalaJSEventHandler(testStatus: ScalaJSTestStatus) extends EventHand
         t.testWildcard()
       case _ => throw new IllegalArgumentException("Unknown Selector")
     }
-    println(testStatus.framework.name)
-    println(event.fullyQualifiedName())
-    println(selector)
 
     name = name match {
       case "" => event.fullyQualifiedName() match {

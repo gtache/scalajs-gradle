@@ -59,8 +59,8 @@ object Scalajsld {
     val outFile = WritableFileVirtualJSFile(options.output)
     if (optionsChanged || linker == null) {
       val semantics: Semantics =
-        if (options.fullOpt) options.semantics.optimized
-        else options.semantics
+        if (options.fullOpt) {options.semantics.optimized}
+        else {options.semantics}
 
       val frontendConfig = LinkerFrontend.Config()
         .withCheckIR(options.checkIR)
@@ -79,7 +79,7 @@ object Scalajsld {
       }
       optionsChanged = false
     }
-    //Reset linker if there is an error
+    //Reset linker if there is an error (else trying to link with the same one will throw an exception)
     try {
       linker.link(cache.cached(irContainers), outFile, logger)
     } catch {

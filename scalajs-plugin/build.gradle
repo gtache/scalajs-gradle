@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     compile gradleApi()
-    compile 'org.codehaus.groovy:groovy-all:2.4.4'
+    compile localGroovy() //Use same version as the one used by Gradle
     compile 'org.scala-lang:scala-compiler:' + scalaVersion + '.' + subVersion
     compile 'org.scala-lang:scala-library:' + scalaVersion + '.' + subVersion
     compile group: 'org.scala-js', name: 'scalajs-sbt-test-adapter_' + scalaVersion, version: scalaJSVersion

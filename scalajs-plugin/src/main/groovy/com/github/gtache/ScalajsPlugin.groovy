@@ -25,6 +25,7 @@ public final class ScalajsPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         prepareGraph(project)
+        warnConflictingProperties(project)
         project.logger.info('Applying java plugin')
         project.pluginManager.apply('java')
         project.logger.info('Applying scala plugin')
@@ -58,7 +59,6 @@ public final class ScalajsPlugin implements Plugin<Project> {
         final def runNoOpt = project.hasProperty(RUN_NOOPT)
         final def runFull = project.hasProperty(RUN_FULL)
 
-        warnUser(project)
 
         final def tasks = project.tasks;
 
@@ -138,7 +138,7 @@ public final class ScalajsPlugin implements Plugin<Project> {
      * Warns the user if conflicting parameters are set for the given project
      * @param project the project
      */
-    private static void warnUser(Project project) {
+    private static void warnConflictingProperties(Project project) {
         Set<List<String>> linkedProperties = new HashSet<>()
         List<String> opt = new ArrayList<>()
         List<String> envs = new ArrayList<>()
