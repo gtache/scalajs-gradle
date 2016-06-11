@@ -24,11 +24,14 @@ final class ScalaJSEventHandler(testStatus: ScalaJSTestStatus) extends EventHand
       case s: SuiteSelector =>
         event.fullyQualifiedName
       case n: NestedSuiteSelector =>
-        event.fullyQualifiedName() + "." + n.suiteId()
+        event.fullyQualifiedName() + '.' + n.suiteId()
       case t: TestWildcardSelector =>
         t.testWildcard()
       case _ => throw new IllegalArgumentException("Unknown Selector")
     }
+    println(testStatus.framework.name)
+    println(event.fullyQualifiedName())
+    println(selector)
 
     name = name match {
       case "" => event.fullyQualifiedName() match {

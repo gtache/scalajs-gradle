@@ -38,6 +38,7 @@ public final class Utils {
     public static final String JETTY_SERVER_VERSION = "8.1.16.v20140903"
     public static final String JETTY_WEBSOCKET_VERSION = "8.1.16.v20140903"
 
+    public static final String CPSeparator = File.pathSeparator
     //All parameters for generated js file
     public static final String JS_REL_DIR = File.separator + 'js' + File.separator
     public static final String EXT = '.js'
@@ -62,6 +63,11 @@ public final class Utils {
     public static final String INFO_LVL = 'info'
     public static final String DEBUG_LVL = 'debug'
 
+    //OutputMode
+    public static final String ECMA_51_GLOBAL = "ecmascript51global"
+    public static final String ECMA_51_ISOLATED = "ecmascript51isolated"
+    public static final String ECMA_6 = "ecmascript6"
+
 
     public static final String TEST_FRAMEWORKS = 'testFrameworks'
 
@@ -74,7 +80,7 @@ public final class Utils {
      * @param project
      */
     public static void prepareGraph(Project project) {
-        graph = null
+        graph = null //Need to reset, if we are using a daemon it will be saved
         project.gradle.taskGraph.whenReady { graph = it }
     }
 
@@ -144,11 +150,11 @@ public final class Utils {
      */
     public static OutputMode getOutputMode(String s) {
         String toCompare = s.toLowerCase()
-        if (toCompare == "ecmascript51global") {
+        if (toCompare == ECMA_51_GLOBAL) {
             return OutputMode.ECMAScript51Global$.MODULE$
-        } else if (toCompare == "ecmascript51isolated") {
+        } else if (toCompare == ECMA_51_ISOLATED) {
             return OutputMode.ECMAScript51Isolated$.MODULE$
-        } else if (toCompare == "ecmascript6") {
+        } else if (toCompare == ECMA_6) {
             return OutputMode.ECMAScript6$.MODULE$
         } else {
             return null

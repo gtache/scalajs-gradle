@@ -16,12 +16,19 @@ import org.scalajs.core.tools.sem._
   */
 object Scalajsld {
 
-  var options: Options = new Options()
+  private var options: Options = new Options()
   private var optionsChanged: Boolean = false
 
   //Store linker and cache to gain time
   private var linker: Linker = null
   private var cache: IRFileCache#Cache = null
+
+  /**
+    * Returns the current options for the linker
+    *
+    * @return the options
+    */
+  def getOptions: Options = options
 
   /**
     * Changes the option of the linker
@@ -178,11 +185,7 @@ object Scalajsld {
       this.copy(semantics = semantics.withAsInstanceOfs(CheckedBehavior.Compliant))
     }
 
-    /**
-      * Returns a string representation of this object
-      *
-      * @return a string
-      */
+
     override def toString: String = {
       "cp : " + cp.foldLeft("")((acc: String, c: File) => acc + "\n" + c.getAbsolutePath) + "\n" +
         "output : " + output + " jsoutput : " + jsoutput + "\n" +

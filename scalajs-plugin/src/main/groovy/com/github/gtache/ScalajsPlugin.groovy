@@ -141,6 +141,7 @@ public final class ScalajsPlugin implements Plugin<Project> {
     private static void warnUser(Project project) {
         Set<List<String>> linkedProperties = new HashSet<>()
         List<String> opt = new ArrayList<>()
+        List<String> envs = new ArrayList<>()
         List<String> output = new ArrayList<>()
         List<String> outputMode = new ArrayList<>()
         List<String> relSM = new ArrayList<>()
@@ -151,6 +152,9 @@ public final class ScalajsPlugin implements Plugin<Project> {
 
         opt.add(RUN_FULL)
         opt.add(RUN_NOOPT)
+        envs.add(JSENV)
+        envs.add(RHINO)
+        envs.add(PHANTOM)
         output.add(MIN_OUTPUT)
         output.add(OUTPUT)
         outputMode.add(MIN_OUTPUTMODE)
@@ -170,6 +174,7 @@ public final class ScalajsPlugin implements Plugin<Project> {
         jar.add(JAR)
 
         linkedProperties.add(opt)
+        linkedProperties.add(envs)
         linkedProperties.add(output)
         linkedProperties.add(outputMode)
         linkedProperties.add(relSM)

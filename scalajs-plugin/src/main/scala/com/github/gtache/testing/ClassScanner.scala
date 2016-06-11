@@ -128,6 +128,7 @@ object ClassScanner {
         meth()
       }
     }
+
     def parseClasses(url: URL, idx: Int, explicitlySpecified: Set[String] = Set.empty, excluded: Set[String] = Set.empty): Array[Class[_]] = {
       val f = Paths.get(url.toURI).toFile
       val packageName = {

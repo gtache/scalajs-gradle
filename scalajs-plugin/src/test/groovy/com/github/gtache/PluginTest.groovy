@@ -30,8 +30,8 @@ class PluginTest extends GroovyTestCase {
                 OUTPUT + "=" + OUTPUT_FILE,
                 MIN_PRETTY,
                 PRETTY,
-                MIN_SOURCEMAP,
-                SOURCEMAP,
+                MIN_N_SOURCEMAP,
+                N_SOURCEMAP,
                 //"compliantAsInstanceOfs",
                 MIN_OUTPUTMODE + "=" + M_MODE,
                 OUTPUTMODE + "=" + OUTPUT_MODE,
@@ -220,8 +220,8 @@ class PluginTest extends GroovyTestCase {
                 case PRETTY:
                     assertTrue(options.prettyPrint())
                     break
-                case MIN_SOURCEMAP:
-                case SOURCEMAP:
+                case MIN_N_SOURCEMAP:
+                case N_SOURCEMAP:
                     assertTrue(options.sourceMap())
                     break
                 case COMPLIANT:

@@ -6,6 +6,8 @@ import org.gradle.api.tasks.TaskAction
 import scala.Option
 import scala.collection.JavaConverters
 
+import static com.github.gtache.Utils.CPSeparator
+
 /**
  * Task used to call scalajsp
  */
@@ -34,11 +36,11 @@ class ScalajspTask extends DefaultTask {
                 options = options.withInfos(true)
             }
             if (project.hasProperty(MIN_FILENAME)) {
-                String[] filenames = (project.property(MIN_FILENAME) as String).split(';')
+                String[] filenames = (project.property(MIN_FILENAME) as String).split(CPSeparator)
                 options = options.withFileNames(JavaConverters.asScalaSetConverter(filenames.toList().toSet()).asScala()
                         .toSet().toSeq().toIndexedSeq())
             } else if (project.hasProperty(FILENAME)) {
-                String[] filenames = (project.property(FILENAME) as String).split(';')
+                String[] filenames = (project.property(FILENAME) as String).split(CPSeparator)
                 options = options.withFileNames(JavaConverters.asScalaSetConverter(filenames.toList().toSet()).asScala()
                         .toSet().toSeq().toIndexedSeq())
             }

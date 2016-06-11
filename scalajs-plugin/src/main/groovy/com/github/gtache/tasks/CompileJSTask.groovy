@@ -24,8 +24,8 @@ public class CompileJSTask extends DefaultTask {
     public static final String OUTPUT = 'output'
     public static final String MIN_PRETTY = 'p'
     public static final String PRETTY = 'prettyPrint'
-    public static final String MIN_SOURCEMAP = 'noS'
-    public static final String SOURCEMAP = 'noSourceMap'
+    public static final String MIN_N_SOURCEMAP = 'noS'
+    public static final String N_SOURCEMAP = 'noSourceMap'
     public static final String COMPLIANT = 'compliantAsInstanceOfs'
     public static final String MIN_OUTPUTMODE = 'm'
     public static final String OUTPUTMODE = 'outputMode'
@@ -75,8 +75,7 @@ public class CompileJSTask extends DefaultTask {
     }
 
     /**
-     * Parse the options
-     * @return
+     * Configure the options given the project properties (given by user)
      */
     def configure() {
         options = parseOptions()
@@ -87,7 +86,7 @@ public class CompileJSTask extends DefaultTask {
      */
     @TaskAction
     def run() {
-        final def curOptions = Scalajsld.options()
+        final def curOptions = Scalajsld.getOptions()
         if (!options.equals(curOptions)) {
             Scalajsld.setOptions(options)
             logger.info('Options changed, linker recreated')
@@ -106,7 +105,7 @@ public class CompileJSTask extends DefaultTask {
     }
 
     /**
-     * Configure the options given the project properties (given by user)
+     * Parse the options given the project properties
      * @return The configured options
      */
     private def Scalajsld.Options parseOptions() {
@@ -134,7 +133,7 @@ public class CompileJSTask extends DefaultTask {
             options = options.withPrettyPrint(true)
         }
 
-        if (project.hasProperty(MIN_SOURCEMAP) || project.hasProperty(SOURCEMAP)) {
+        if (project.hasProperty(MIN_N_SOURCEMAP) || project.hasProperty(N_SOURCEMAP)) {
             options = options.withSourceMap(false)
         }
 

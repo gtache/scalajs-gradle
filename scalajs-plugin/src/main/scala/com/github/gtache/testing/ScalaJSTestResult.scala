@@ -106,15 +106,6 @@ object ScalaJSTestResult {
     }
   }
 
-  /**
-    * Checks if testing is finished
-    *
-    * @return true or false
-    */
-  def isFinished: Boolean = {
-    !statuses.exists(s => !s.isFinished)
-  }
-
   private def getErroredNames: Set[String] = {
     statuses.flatMap(s => s.errored).map(t => t.fullyQualifiedName())
   }
@@ -125,6 +116,15 @@ object ScalaJSTestResult {
 
   private def getCanceledNames: Set[String] = {
     statuses.flatMap(s => s.canceled).map(t => t.fullyQualifiedName())
+  }
+
+  /**
+    * Checks if testing is finished
+    *
+    * @return true or false
+    */
+  def isFinished: Boolean = {
+    !statuses.exists(s => !s.isFinished)
   }
 
   private def getAllNames: Set[String] = {

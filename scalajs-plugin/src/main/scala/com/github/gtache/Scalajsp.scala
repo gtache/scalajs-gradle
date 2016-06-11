@@ -3,7 +3,6 @@ package com.github.gtache
 import java.io.{Console => _, _}
 import java.util.zip.ZipFile
 
-import org.scalajs.core.ir
 import org.scalajs.core.ir.Printers.{IRTreePrinter, InfoPrinter}
 import org.scalajs.core.ir.ScalaJSVersions
 import org.scalajs.core.tools.io._
