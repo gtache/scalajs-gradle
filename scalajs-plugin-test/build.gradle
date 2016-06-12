@@ -59,7 +59,7 @@ ext {
     testFrameworks += "org.scalacheck.ScalaCheckFramework"
     testFrameworks += "scalaprops.ScalapropsFramework"
     testFrameworks += "scalaprops.ScalapropsFramework"
-    d = true
+    linkLogLevel = "Debug"
     testLogLevel = "Debug"
 
     //You can configure a custom JSEnv, don't forget to import the classes
