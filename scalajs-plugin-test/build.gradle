@@ -20,7 +20,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.github.gtache:scalajs-plugin:0.2.0'
+        classpath 'com.github.gtache:scalajs-plugin:0.2.1'
     }
 }
 
@@ -62,7 +62,7 @@ ext {
     d = true
     testLogLevel = "Debug"
 
-    //You can configure a custom JSEnv
+    //You can configure a custom JSEnv, don't forget to import the classes
     //jsEnv = new NodeJSEnv("node", Seq$.MODULE$.empty(), Map$.MODULE$.empty())
     //jsEnv.loadLibs(...)
     //jsEnv.withSourceMap(...)

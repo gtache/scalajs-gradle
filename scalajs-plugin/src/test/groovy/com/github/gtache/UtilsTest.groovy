@@ -101,21 +101,19 @@ class UtilsTest extends GroovyTestCase {
 
     @Test
     public void testResolveEnv() {
-        final String rhino = "rhino"
-        final String phantom = "phantom"
         Project project = getFreshProject()
         applyPlugin(project)
         assertEquals(NodeJSEnv.class, resolveEnv(project).getClass())
         deleteRecursive(project.projectDir)
 
         project = getFreshProject()
-        setProperty(project, rhino)
+        setProperty(project, RHINO)
         applyPlugin(project)
         assertEquals(RhinoJSEnv.class, resolveEnv(project).getClass())
         deleteRecursive(project.projectDir)
 
         project = getFreshProject()
-        setProperty(project, phantom)
+        setProperty(project, PHANTOM)
         applyPlugin(project)
         assertEquals(PhantomJSEnv.class, resolveEnv(project).getClass())
         deleteRecursive(project.projectDir)
@@ -157,12 +155,9 @@ class UtilsTest extends GroovyTestCase {
 
     @Test
     public void testGetOutputMode() {
-        final String one = "ECMAScript51Global"
-        final String two = "ECMAScript51Isolated"
-        final String three = "ECMAScript6"
-        assertEquals(OutputMode.ECMAScript51Global$.MODULE$, getOutputMode(one))
-        assertEquals(OutputMode.ECMAScript51Isolated$.MODULE$, getOutputMode(two))
-        assertEquals(OutputMode.ECMAScript6$.MODULE$, getOutputMode(three))
+        assertEquals(OutputMode.ECMAScript51Global$.MODULE$, getOutputMode(ECMA_51_GLOBAL))
+        assertEquals(OutputMode.ECMAScript51Isolated$.MODULE$, getOutputMode(ECMA_51_ISOLATED))
+        assertEquals(OutputMode.ECMAScript6$.MODULE$, getOutputMode(ECMA_6))
     }
 
     @Test

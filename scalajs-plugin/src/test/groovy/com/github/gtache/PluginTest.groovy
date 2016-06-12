@@ -17,11 +17,11 @@ class PluginTest extends GroovyTestCase {
 
     static final def O_FILE = 'js2/js.js'
     static final def OUTPUT_FILE = 'js2/js2.js'
-    static final def M_MODE = 'ECMAScript6'
-    static final def OUTPUT_MODE = 'ECMAScript51Global'
+    static final def M_MODE = Utils.ECMA_6
+    static final def OUTPUT_MODE = Utils.ECMA_51_GLOBAL
     static final def R_FILE = 'bla.js'
     static final def REL_FILE = 'blabla.js'
-    static final def LOG_LEVEL = 'Debug'
+    static final def LOG_LEVEL = DEBUG
 
     @Test
     public void testAllConfigurations() {

@@ -80,7 +80,7 @@ public final class Utils {
      * @param project
      */
     public static void prepareGraph(Project project) {
-        graph = null //Need to reset, if we are using a daemon it will be saved
+        graph = null //Need to reset, as if we are using a daemon it will be saved
         project.gradle.taskGraph.whenReady { graph = it }
     }
 

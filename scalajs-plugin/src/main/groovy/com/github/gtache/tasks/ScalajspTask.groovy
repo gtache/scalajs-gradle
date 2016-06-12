@@ -17,7 +17,7 @@ class ScalajspTask extends DefaultTask {
     public static final String MIN_SUPPORTED = 's'
     public static final String SUPPORTED = 'supported'
     public static final String MIN_INFOS = 'i'
-    public static final String INFOS = 'infos'
+    public static final String INFOS = 'info'
     public static final String MIN_FILENAME = 'f'
     public static final String FILENAME = 'filename'
     public static final String MIN_JAR = 'j'
