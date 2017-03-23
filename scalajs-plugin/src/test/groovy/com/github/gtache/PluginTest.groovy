@@ -189,7 +189,7 @@ class PluginTest extends GroovyTestCase {
             assertEquals(Level.Info$.MODULE$, options.logLevel())
             assertFalse(options.cp().isEmpty())
             assertFalse(options.jsoutput())
-            assertFalse(options.sourceMap())
+            assertTrue(options.sourceMap())
             assertFalse(options.checkIR())
             assertFalse(options.fullOpt())
             assertFalse(options.noOpt())
