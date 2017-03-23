@@ -2,7 +2,6 @@ plugins {
     id 'de.fuerstenau.buildconfig' version '1.1.8'
 }
 group 'com.github.gtache'
-version '0.3.0-SNAPSHOT'
 
 
 String scalaVersion = project.hasProperty('scalaVersion') ? project.property('scalaVersion') : '2.12'
@@ -13,6 +12,7 @@ String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 
+version 'sjs'+scalaJSVersion+'_'+scalaVersion+'_0.3.0-SNAPSHOT'
 
 apply plugin: 'idea'
 apply plugin: 'scala'

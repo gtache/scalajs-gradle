@@ -8,7 +8,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.github.gtache:scalajs-plugin:0.3.0'
+        classpath 'com.github.gtache:scalajs-plugin:sjs[scalaJSVersion]_[scalaVersion]_0.3.0'
     }
 }
 ```
