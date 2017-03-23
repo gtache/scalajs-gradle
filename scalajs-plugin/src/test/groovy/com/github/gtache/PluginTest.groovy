@@ -110,7 +110,7 @@ class PluginTest extends GroovyTestCase {
         def compileIt = project.configurations.getByName('compile').dependencies.iterator()
         def libDepFound = false
         while (compileIt.hasNext() && !libDepFound) {
-            def dep = ++compileIt
+            def dep = compileIt.next()
             if (libDep.group == dep.group && libDep.name == dep.name && libDep.version == dep.version) {
                 libDepFound = true
             }
@@ -118,7 +118,7 @@ class PluginTest extends GroovyTestCase {
         def scalaCompileIt = project.configurations.getByName('scalaCompilePlugin').dependencies.iterator()
         def compileDepFound = false
         while (scalaCompileIt.hasNext() && !compileDepFound) {
-            def dep = ++scalaCompileIt
+            def dep = scalaCompileIt.next()
             if (compDep.group == dep.group && compDep.name == dep.name && compDep.version == dep.version) {
                 compileDepFound = true
             }
