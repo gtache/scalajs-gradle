@@ -3,6 +3,8 @@ package com.github.gtache
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 
+import static com.github.gtache.BuildConfig.*
+
 class TestUtils {
 
     public static Project getFreshProject() {
@@ -15,7 +17,7 @@ class TestUtils {
                 mavenCentral()
             }
             dependencies {
-                classpath 'com.github.gtache:scalajs-plugin:0.2.0'
+                classpath 'com.github.gtache:scalajs-plugin:' + PLUGIN_VERSION
             }
         }
         proj.repositories {
@@ -27,14 +29,9 @@ class TestUtils {
         proj.pluginManager.apply('scala')
 
         proj.dependencies {
-            compile 'org.scala-lang:scala-compiler:2.11.8'
-            compile 'org.scala-lang:scala-library:2.11.8'
+            compile 'org.scala-lang:scala-compiler:' + SCALA_FULL_VERSION
+            compile 'org.scala-lang:scala-library:' + SCALA_FULL_VERSION
         }
-        /*
-        Copy libCopy = proj.tasks.create("copyToLib", Copy.class)
-        libCopy.from(proj.configurations.compile.files)
-        libCopy.into(offlineLib)
-        */
         return proj
     }
 

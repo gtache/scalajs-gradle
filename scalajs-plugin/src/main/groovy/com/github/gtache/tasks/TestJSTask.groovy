@@ -15,8 +15,6 @@ import scala.collection.JavaConverters
 import scala.collection.Seq
 import scala.collection.mutable.ArrayBuffer
 
-import static Utils.CPSeparator
-
 /**
  * A task used to run tests for various frameworks
  */
@@ -39,7 +37,7 @@ public class TestJSTask extends DefaultTask {
     @TaskAction
     def run() {
         final Seq<ResolvedJSDependency> dependencySeq = Utils.getMinimalDependencySeq(project)
-        final def libEnv = (ComJSEnv) Utils.resolveEnv(project).loadLibs(dependencySeq)
+        final libEnv = (ComJSEnv) Utils.resolveEnv(project).loadLibs(dependencySeq)
 
         final List<TestFramework> customTestFrameworks = Utils.resolveTestFrameworks(project)
         final ArrayBuffer<TestFramework> allFrameworks = new ArrayBuffer<>()
@@ -67,13 +65,13 @@ public class TestJSTask extends DefaultTask {
         Set<String> explicitlySpecified = new HashSet<>()
         Set<String> excluded = new HashSet<String>()
         if (project.hasProperty(TEST_ONLY)) {
-            explicitlySpecified = ((String) project.property(TEST_ONLY)).split(CPSeparator).toList().toSet()
+            explicitlySpecified = ((String) project.property(TEST_ONLY)).split(File.separator).toList().toSet()
                     .collect { Utils.toRegex(it) }
             if (explicitlySpecified.isEmpty()) {
                 explicitlySpecified.add("")
             }
         } else if (project.hasProperty(TEST_QUICK)) {
-            explicitlySpecified = ((String) project.property(TEST_QUICK)).split(CPSeparator).toList().toSet()
+            explicitlySpecified = ((String) project.property(TEST_QUICK)).split(File.separator).toList().toSet()
                     .collect { Utils.toRegex(it) }
             if (explicitlySpecified.isEmpty()) {
                 explicitlySpecified.add("")

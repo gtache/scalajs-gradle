@@ -9,6 +9,7 @@ import org.gradle.api.Project
 import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.tasks.scala.ScalaCompile
 
+import static com.github.gtache.BuildConfig.*
 import static com.github.gtache.Utils.*
 import static com.github.gtache.tasks.CompileJSTask.*
 import static com.github.gtache.tasks.ScalajspTask.*
@@ -16,14 +17,14 @@ import static com.github.gtache.tasks.ScalajspTask.*
 /**
  * The main class for the plugin
  */
-public final class ScalajsPlugin implements Plugin<Project> {
+final class ScalajsPlugin implements Plugin<Project> {
 
     /**
      * Applies the plugin to the given project
      * @param project The project it will apply the plugin to
      */
     @Override
-    public void apply(Project project) {
+    void apply(Project project) {
         prepareGraph(project)
         warnConflictingProperties(project)
         project.logger.info('Applying java plugin')
@@ -41,48 +42,48 @@ public final class ScalajsPlugin implements Plugin<Project> {
         project.dependencies.add('compile', 'org.scala-js:scalajs-library_'
                 + SCALA_VERSION + ':' + SCALAJS_VERSION)
         project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_'
-                + SCALA_VERSION + '.' + SUB_VERSION + ':' + SCALAJS_VERSION)
+                + SCALA_FULL_VERSION + ':' + SCALAJS_VERSION)
         project.logger.info('Adding jetty dependencies')
         project.dependencies.add('phantomJetty', 'org.eclipse.jetty:jetty-server:' + JETTY_SERVER_VERSION)
         project.dependencies.add('phantomJetty', 'org.eclipse.jetty:jetty-websocket:' + JETTY_WEBSOCKET_VERSION)
         project.logger.info('Dependencies added')
 
-        final def jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR)
-        final def jsBaseName = jsDir.absolutePath + File.separator + project.name
-        final def jsFile = project.file(jsBaseName + EXT)
-        final def jsTestFile = project.file(jsBaseName + NOOPT_TEST_SUFFIX)
-        final def jsFastFile = project.file(jsBaseName + FASTOPT_SUFFIX)
-        final def jsTestFastFile = project.file(jsBaseName + FASTOPT_TEST_SUFFIX)
-        final def jsFullFile = project.file(jsBaseName + FULLOPT_SUFFIX)
-        final def jsTestFullFile = project.file(jsBaseName + FULLOPT_TEST_SUFFIX)
+        final jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR)
+        final jsBaseName = jsDir.absolutePath + File.separator + project.name
+        final jsFile = project.file(jsBaseName + EXT)
+        final jsTestFile = project.file(jsBaseName + NOOPT_TEST_SUFFIX)
+        final jsFastFile = project.file(jsBaseName + FASTOPT_SUFFIX)
+        final jsTestFastFile = project.file(jsBaseName + FASTOPT_TEST_SUFFIX)
+        final jsFullFile = project.file(jsBaseName + FULLOPT_SUFFIX)
+        final jsTestFullFile = project.file(jsBaseName + FULLOPT_TEST_SUFFIX)
 
-        final def runNoOpt = project.hasProperty(RUN_NOOPT)
-        final def runFull = project.hasProperty(RUN_FULL)
+        final runNoOpt = project.hasProperty(RUN_NOOPT)
+        final runFull = project.hasProperty(RUN_FULL)
 
 
-        final def tasks = project.tasks;
+        final tasks = project.tasks
 
-        final def noOptJS = tasks.create('NoOptJS', CompileJSTask.class)
+        final noOptJS = tasks.create('NoOptJS', CompileJSTask.class)
         noOptJS.destFile = jsFile
         noOptJS.noOpt()
         project.logger.info(noOptJS.name + ' task added')
 
-        final def fastOptJS = tasks.create('FastOptJS', CompileJSTask.class)
+        final fastOptJS = tasks.create('FastOptJS', CompileJSTask.class)
         fastOptJS.destFile = jsFastFile
         fastOptJS.fastOpt()
         project.logger.info(fastOptJS.name + ' task added')
 
-        final def fullOptJS = tasks.create('FullOptJS', CompileJSTask.class)
+        final fullOptJS = tasks.create('FullOptJS', CompileJSTask.class)
         fullOptJS.destFile = jsFullFile
         fullOptJS.fullOpt()
         project.logger.info(fullOptJS.name + ' task added')
 
-        final def runJS = tasks.create('RunJS', RunJSTask.class)
+        final runJS = tasks.create('RunJS', RunJSTask.class)
 
-        final def classes = 'classes'
-        final def testClasses = 'testClasses'
+        final classes = 'classes'
+        final testClasses = 'testClasses'
 
-        final def testJS = tasks.create('TestJS', TestJSTask.class)
+        final testJS = tasks.create('TestJS', TestJSTask.class)
         testJS.dependsOn(testClasses)
 
         if (runFull) {
@@ -97,7 +98,7 @@ public final class ScalajsPlugin implements Plugin<Project> {
         }
         project.logger.info(testJS.name + ' task added')
 
-        final def scalajsp = tasks.create('Scalajsp', ScalajspTask.class)
+        final scalajsp = tasks.create('Scalajsp', ScalajspTask.class)
         project.logger.info(scalajsp.name + ' task added')
 
         project.afterEvaluate {

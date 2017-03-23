@@ -86,8 +86,8 @@ public class CompileJSTask extends DefaultTask {
      */
     @TaskAction
     def run() {
-        final def curOptions = Scalajsld.getOptions()
-        if (!options.equals(curOptions)) {
+        final curOptions = Scalajsld.getOptions()
+        if (options != curOptions) {
             Scalajsld.setOptions(options)
             logger.info('Options changed, linker recreated')
         }
@@ -108,8 +108,8 @@ public class CompileJSTask extends DefaultTask {
      * Parse the options given the project properties
      * @return The configured options
      */
-    private def Scalajsld.Options parseOptions() {
-        final def cp = project.configurations.runtime + srcFiles
+    private Scalajsld.Options parseOptions() {
+        final cp = project.configurations.runtime + srcFiles
         def options = Scalajsld.defaultOptions().withClasspath(
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
 

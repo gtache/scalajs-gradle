@@ -32,16 +32,14 @@ final class ScalaJSEventHandler(testStatus: ScalaJSTestStatus) extends EventHand
 
     name = name match {
       case "" => event.fullyQualifiedName() match {
-        case "" => {
+        case "" =>
           counterUnknown += 1
           "Unknown test (probably utest) #" + counterUnknown
-        }
         case _ => event.fullyQualifiedName()
       }
-      case ":" => {
+      case ":" =>
         counterUnknown += 1
         "Unknown test (probably utest) #" + counterUnknown
-      }
       case _ => name
     }
     if (testStatus.all.map(t => t.fullyQualifiedName()).contains(name)) {

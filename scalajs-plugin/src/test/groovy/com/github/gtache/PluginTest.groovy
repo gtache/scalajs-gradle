@@ -11,17 +11,19 @@ import scala.Option
 
 import java.util.concurrent.locks.ReentrantLock
 
+import static com.github.gtache.Utils.*
+import static com.github.gtache.BuildConfig.*
 import static com.github.gtache.tasks.CompileJSTask.*
 
 class PluginTest extends GroovyTestCase {
 
-    static final def O_FILE = 'js2/js.js'
-    static final def OUTPUT_FILE = 'js2/js2.js'
-    static final def M_MODE = Utils.ECMA_6
-    static final def OUTPUT_MODE = Utils.ECMA_51_GLOBAL
-    static final def R_FILE = 'bla.js'
-    static final def REL_FILE = 'blabla.js'
-    static final def LOG_LEVEL = DEBUG
+    static final O_FILE = 'js2/js.js'
+    static final OUTPUT_FILE = 'js2/js2.js'
+    static final M_MODE = ECMA_6
+    static final OUTPUT_MODE = ECMA_51_GLOBAL
+    static final R_FILE = 'bla.js'
+    static final REL_FILE = 'blabla.js'
+    static final LOG_LEVEL = DEBUG
 
     @Test
     public void testAllConfigurations() {
@@ -103,12 +105,12 @@ class PluginTest extends GroovyTestCase {
             assertTrue(project.plugins.findPlugin(it) != null)
         }
 
-        def libDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-library_' + Utils.SCALA_VERSION, Utils.SCALAJS_VERSION)
-        def compDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-compiler_' + Utils.SCALA_VERSION + '.' + Utils.SUB_VERSION, Utils.SCALAJS_VERSION)
+        def libDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-library_' + SCALA_VERSION, SCALAJS_VERSION)
+        def compDep = new DefaultExternalModuleDependency('org.scala-js', 'scalajs-compiler_' + SCALA_FULL_VERSION, SCALAJS_VERSION)
         def compileIt = project.configurations.getByName('compile').dependencies.iterator()
         def libDepFound = false
         while (compileIt.hasNext() && !libDepFound) {
-            def dep = compileIt.next()
+            def dep = ++compileIt
             if (libDep.group == dep.group && libDep.name == dep.name && libDep.version == dep.version) {
                 libDepFound = true
             }
@@ -116,14 +118,13 @@ class PluginTest extends GroovyTestCase {
         def scalaCompileIt = project.configurations.getByName('scalaCompilePlugin').dependencies.iterator()
         def compileDepFound = false
         while (scalaCompileIt.hasNext() && !compileDepFound) {
-            def dep = scalaCompileIt.next()
+            def dep = ++scalaCompileIt
             if (compDep.group == dep.group && compDep.name == dep.name && compDep.version == dep.version) {
                 compileDepFound = true
             }
         }
-        assertTrue(libDepFound)
-        assertTrue(compileDepFound)
-        Utils.deleteRecursive(project.projectDir)
+        assertTrue(libDepFound && compileDepFound)
+        deleteRecursive(project.projectDir)
     }
 
     private final class CheckRunnable implements Runnable {
@@ -155,7 +156,7 @@ class PluginTest extends GroovyTestCase {
 
         private void checkProperties(Set<String> p) {
             lock.lock()
-            final def project = TestUtils.getFreshProject()
+            final project = TestUtils.getFreshProject()
             lock.unlock()
             p.each {
                 if (it.contains('=')) {
@@ -173,15 +174,15 @@ class PluginTest extends GroovyTestCase {
             p.each {
                 checkProperty(it, p, project)
             }
-            Utils.deleteRecursive(project.projectDir)
+            deleteRecursive(project.projectDir)
         }
 
         private void checkDefault(Project project) {
-            final def jsDir = project.file(Utils.JS_REL_DIR)
-            final def jsBase = jsDir.absolutePath + File.separator + project.name
-            final def jsFile = project.file(jsBase + Utils.EXT)
-            final def jsFastFile = project.file(jsBase + Utils.FASTOPT_SUFFIX)
-            final def jsFullFile = project.file(jsBase + Utils.FULLOPT_SUFFIX)
+            final jsDir = project.file(JS_REL_DIR)
+            final jsBase = jsDir.absolutePath + File.separator + project.name
+            final jsFile = project.file(jsBase + EXT)
+            final jsFastFile = project.file(jsBase + FASTOPT_SUFFIX)
+            final jsFullFile = project.file(jsBase + FULLOPT_SUFFIX)
             def options = ((CompileJSTask) project.tasks.findByName('FastOptJS')).options
             assertEquals(jsFastFile.path, options.output().path)
             assertEquals(Semantics.Defaults(), options.semantics())
@@ -202,7 +203,7 @@ class PluginTest extends GroovyTestCase {
         }
 
         private void checkProperty(String s, Set<String> p, Project project) {
-            final def options = ((CompileJSTask) project.tasks.findByName('FastOptJS')).options
+            final options = ((CompileJSTask) project.tasks.findByName('FastOptJS')).options
             switch (s) {
                 case MIN_OUTPUT:
                     def projectP = project.file(project.property(s)).path
@@ -222,18 +223,18 @@ class PluginTest extends GroovyTestCase {
                     break
                 case MIN_N_SOURCEMAP:
                 case N_SOURCEMAP:
-                    assertTrue(options.sourceMap())
+                    assertFalse(options.sourceMap())
                     break
                 case COMPLIANT:
                     //TODO
                     break
                 case MIN_OUTPUTMODE:
-                    assertEquals(options.outputMode(), Utils.getOutputMode((String) project.property(s)))
+                    assertEquals(options.outputMode(), getOutputMode((String) project.property(s)))
                     assertEquals(M_MODE, (String) project.property(s))
                     break
                 case OUTPUTMODE:
                     if (!p.contains(MIN_OUTPUTMODE)) {
-                        assertEquals(options.outputMode(), Utils.getOutputMode((String) project.property(s)))
+                        assertEquals(options.outputMode(), getOutputMode((String) project.property(s)))
                         assertEquals(OUTPUT_MODE, (String) project.property(s))
                     }
                     break
@@ -257,7 +258,7 @@ class PluginTest extends GroovyTestCase {
                     if (!(p.contains(MIN_WARN) || p.contains(MIN_ERR) || p.contains(MIN_DEBUG) ||
                             p.contains(WARN) || p.contains(ERR) || p.contains(DEBUG))) {
                         assertEquals(
-                                Utils.resolveLogLevel(project, (String) project.property(CompileJSTask.LOG_LEVEL), Level.Info$.MODULE$),
+                                resolveLogLevel(project, (String) project.property(CompileJSTask.LOG_LEVEL), Level.Info$.MODULE$),
                                 options.logLevel())
                         assertEquals(LOG_LEVEL, (String) project.property(s))
                     }

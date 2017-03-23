@@ -4,7 +4,6 @@ import java.io.{Console => _, _}
 import java.util.zip.ZipFile
 
 import org.scalajs.core.ir.Printers.{IRTreePrinter, InfoPrinter}
-import org.scalajs.core.ir.ScalaJSVersions
 import org.scalajs.core.tools.io._
 
 import scala.collection.immutable.Seq
@@ -66,11 +65,6 @@ object Scalajsp {
       FileVirtualScalaJSIRFile(file)
   }
 
-  private def fail(msg: String) = {
-    Console.err.println(msg)
-    sys.exit(1)
-  }
-
   private def readFromJar(jar: File, name: String) = {
     val jarFile =
       try {
@@ -94,11 +88,16 @@ object Scalajsp {
     }
   }
 
+  private def fail(msg: String) = {
+    Console.err.println(msg)
+    sys.exit(1)
+  }
+
   /**
     * Prints the supported Scala.js IR versions
     */
   def printSupported(): Unit = {
-    import ScalaJSVersions._
+    import org.scalajs.core.ir.ScalaJSVersions._
     println(s"Emitted Scala.js IR version is: $binaryEmitted")
     println("Supported Scala.js IR versions are")
     binarySupported.foreach(v => println(s"* $v"))

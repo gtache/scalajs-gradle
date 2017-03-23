@@ -1,18 +1,43 @@
+plugins {
+    id 'de.fuerstenau.buildconfig' version '1.1.8'
+}
 group 'com.github.gtache'
-version '0.2.1'
+version '0.2.1-SNAPSHOT'
 
-String scalaVersion = '2.11'
-String subVersion = '8'
-String scalaJSVersion = '0.6.9'
+
+String scalaVersion = project.hasProperty('scalaVersion') ? project.property('scalaVersion') : '2.12'
+String subVersion = project.hasProperty('subVersion') ? project.property('subVersion') : '1'
+String scalaFullVersion = scalaVersion + '.' + subVersion
+String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.15'
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
+
+
+apply plugin: 'idea'
 apply plugin: 'scala'
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
 sourceCompatibility = 1.8
+
+buildConfig {
+    appName = project.name       // sets value of NAME field
+    version = project.version // sets value of VERSION field,
+    // 'unspecified' if project.version is not set
+
+    clsName = 'BuildConfig'      // sets the name of the BuildConfig class
+    packageName = project.group  // sets the package of the BuildConfig class,
+    // 'de.fuerstenau.buildconfig' if project.group is not set
+    charset = 'UTF-8'            // sets charset of the generated class,
+    // 'UTF-8' if not set otherwise
+    buildConfigField 'String', 'SCALA_VERSION', scalaVersion
+    buildConfigField 'String', 'SUB_VERSION', subVersion
+    buildConfigField 'String', 'SCALA_FULL_VERSION', scalaFullVersion
+    buildConfigField 'String', 'SCALAJS_VERSION', scalaJSVersion
+    buildConfigField 'String', 'PLUGIN_VERSION', project.version
+}
 
 repositories {
     mavenCentral()
@@ -21,13 +46,13 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy() //Use same version as the one used by Gradle
-    compile 'org.scala-lang:scala-compiler:' + scalaVersion + '.' + subVersion
-    compile 'org.scala-lang:scala-library:' + scalaVersion + '.' + subVersion
+    compile 'org.scala-lang:scala-compiler:' + scalaFullVersion
+    compile 'org.scala-lang:scala-library:' + scalaFullVersion
     compile group: 'org.scala-js', name: 'scalajs-sbt-test-adapter_' + scalaVersion, version: scalaJSVersion
     compile group: 'org.scala-js', name: 'scalajs-js-envs_' + scalaVersion, version: scalaJSVersion
     compile group: 'org.scala-js', name: 'scalajs-tools_' + scalaVersion, version: scalaJSVersion
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'com.google.guava', name: 'guava', version: '19.0'
+    testCompile group: 'com.google.guava', name: 'guava', version: '21.0'
 }
 
 signing {
@@ -57,6 +82,16 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
+task copyLd(type: Copy) {
+    duplicatesStrategy=DuplicatesStrategy.INCLUDE
+    if (scalaJSVersion.split("\\.")[2].toInteger()>14){
+        from 'diff/0.6.15+/'
+    } else {
+        from 'diff/0.6.14-/'
+    }
+    into 'src/main/scala/com/github/gtache/'
+
+}
 artifacts {
     archives javadocJar, groovydocJar, scaladocJar, sourcesJar
 }
@@ -106,7 +141,8 @@ if (project.hasProperty('upload')) {
 }
 
 tasks.getByName('compileGroovy').dependsOn('compileScala')
+tasks.getByName('compileScala').dependsOn('copyLd')
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.13'
+    gradleVersion = '3.4.1'
 }

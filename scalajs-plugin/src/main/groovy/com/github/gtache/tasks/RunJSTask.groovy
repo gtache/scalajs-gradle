@@ -70,7 +70,7 @@ public class RunJSTask extends DefaultTask {
         } else if (project.hasProperty(EXEC_CODE)) {
             toExec = project.property(EXEC_CODE)
         } else if (project.hasProperty(CLASSNAME)) {
-            final def classname = project.property(CLASSNAME);
+            final classname = project.property(CLASSNAME)
             if (!project.hasProperty(METHNAME)) {
                 toExec = classname + '().main()'
             } else {

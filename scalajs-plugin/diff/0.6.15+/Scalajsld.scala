@@ -4,9 +4,9 @@ import java.io.File
 import java.net.URI
 
 import org.scalajs.core.tools.io._
-import org.scalajs.core.tools.linker.Linker
-import org.scalajs.core.tools.linker.backend.{LinkerBackend, OutputMode}
+import org.scalajs.core.tools.linker.backend.{LinkerBackend, ModuleKind, OutputMode}
 import org.scalajs.core.tools.linker.frontend.LinkerFrontend
+import org.scalajs.core.tools.linker.{Linker, ModuleInitializer}
 import org.scalajs.core.tools.logging._
 import org.scalajs.core.tools.sem._
 
@@ -59,8 +59,12 @@ object Scalajsld {
     val outFile = WritableFileVirtualJSFile(options.output)
     if (optionsChanged || linker == null) {
       val semantics: Semantics =
-        if (options.fullOpt) {options.semantics.optimized}
-        else {options.semantics}
+        if (options.fullOpt) {
+          options.semantics.optimized
+        }
+        else {
+          options.semantics
+        }
 
       val frontendConfig = LinkerFrontend.Config()
         .withCheckIR(options.checkIR)
@@ -69,33 +73,42 @@ object Scalajsld {
         .withRelativizeSourceMapBase(options.relativizeSourceMap)
         .withPrettyPrint(options.prettyPrint)
 
-      linker = Linker(semantics, options.outputMode, options.sourceMap,
-        disableOptimizer = options.noOpt, parallel = true,
-        useClosureCompiler = options.fullOpt,
-        frontendConfig, backendConfig)
 
-      if (cache == null) {
+      val config = Linker.Config()
+        .withBackendConfig(backendConfig)
+        .withFrontendConfig(frontendConfig)
+        .withClosureCompilerIfAvailable(options.fullOpt)
+        .withOptimizer(!options.noOpt)
+        .withParallel(true)
+        .withSourceMap(options.sourceMap)
+      linker = Linker(semantics, options.outputMode, options.moduleKind,
+        config)
+	  if (cache == null) {
         cache = (new IRFileCache).newCache
       }
-      optionsChanged = false
+      try {
+        linker.link(cache.cached(irContainers), options.moduleInitializers, outFile, logger)
+      } catch {
+        case e: Exception => linker = null
+          throw e
+      }
     }
-    //Reset linker if there is an error (else trying to link with the same one will throw an exception)
-    try {
-      linker.link(cache.cached(irContainers), outFile, logger)
-    } catch {
-      case e: Exception => linker = null
-        throw e
-    }
+
+    optionsChanged = false
+
+
   }
 
   /**
     * A subclass containing the options for the linker
     *
     * @param cp                  the classpath
+    * @param moduleInitializers  the initializers
     * @param output              the output file
     * @param jsoutput            Deprecated
     * @param semantics           the semantics to be used
     * @param outputMode          the output mode
+    * @param moduleKind          the type of the modules
     * @param noOpt               with no optimization
     * @param fullOpt             with full optimization
     * @param prettyPrint         with pretty print
@@ -106,15 +119,18 @@ object Scalajsld {
     * @param stdLib              a library to be used for the linking
     * @param logLevel            the level of the logging to be displayed
     */
+
   case class Options(cp: Seq[File] = Seq.empty,
+                     moduleInitializers: Seq[ModuleInitializer] = Seq.empty,
                      output: File = null,
                      jsoutput: Boolean = false,
                      semantics: Semantics = Semantics.Defaults,
                      outputMode: OutputMode = OutputMode.ECMAScript51Isolated,
+                     moduleKind: ModuleKind = ModuleKind.NoModule,
                      noOpt: Boolean = false,
                      fullOpt: Boolean = false,
                      prettyPrint: Boolean = false,
-                     sourceMap: Boolean = true,
+                     sourceMap: Boolean = false,
                      relativizeSourceMap: Option[URI] = None,
                      bypassLinkingErrors: Boolean = false,
                      checkIR: Boolean = false,
@@ -123,6 +139,10 @@ object Scalajsld {
 
     def withClasspath(newCp: Seq[File]): Options = {
       this.copy(cp = newCp)
+    }
+
+    def withModuleInitializers(newModuleIntializers: Seq[ModuleInitializer]): Options = {
+      this.copy(moduleInitializers = newModuleIntializers)
     }
 
     def withOutput(newOutput: File): Options = {
@@ -139,6 +159,10 @@ object Scalajsld {
 
     def withOutputMode(newOutputMode: OutputMode): Options = {
       this.copy(outputMode = newOutputMode)
+    }
+
+    def withModuleKind(newModuleKind: ModuleKind): Options = {
+      this.copy(moduleKind = newModuleKind)
     }
 
     def withNoOpt(): Options = {
@@ -188,9 +212,11 @@ object Scalajsld {
 
     override def toString: String = {
       "cp : " + cp.foldLeft("")((acc: String, c: File) => acc + "\n" + c.getAbsolutePath) + "\n" +
+        "moduleInitializers : " + moduleInitializers.mkString(", ") + "\n" +
         "output : " + output + " jsoutput : " + jsoutput + "\n" +
         "semantics : " + semantics + "\n" +
         "outputMode : " + outputMode + "\n" +
+        "moduleKind : " + moduleKind + "\n" +
         "NoOpt : " + noOpt + " ; fullOpt : " + fullOpt + "\n" +
         "prettyPrint : " + prettyPrint + "\n" +
         "sourcemap : " + sourceMap + "\n" +
@@ -203,12 +229,14 @@ object Scalajsld {
 
     override def equals(that: Any): Boolean = {
       that match {
-        case that: Options => {
+        case that: Options =>
           this.cp == that.cp &&
+            this.moduleInitializers == that.moduleInitializers &&
             this.output == that.output &&
             this.jsoutput == that.jsoutput &&
             this.semantics == that.semantics &&
             this.outputMode == that.outputMode &&
+            this.moduleKind == that.moduleKind &&
             this.noOpt == that.noOpt &&
             this.fullOpt == that.fullOpt &&
             this.prettyPrint == that.prettyPrint &&
@@ -218,17 +246,18 @@ object Scalajsld {
             this.checkIR == that.checkIR &&
             this.stdLib == that.stdLib &&
             this.logLevel == that.logLevel
-        }
         case _ => false
       }
     }
 
     override def hashCode: Int = {
       cp.hashCode +
+        47 * moduleInitializers.hashCode +
         2 * output.hashCode +
         3 * jsoutput.hashCode +
         5 * semantics.hashCode +
         7 * outputMode.hashCode +
+        71 * moduleKind.hashCode +
         11 * noOpt.hashCode +
         13 * fullOpt.hashCode +
         17 * prettyPrint.hashCode +

@@ -31,14 +31,9 @@ import static com.github.gtache.tasks.CompileJSTask.OUTPUT
  */
 public final class Utils {
 
-    public static final String SCALA_VERSION = "2.11"
-    public static final String SUB_VERSION = "8"
-    public static final String SCALAJS_VERSION = "0.6.9"
-
     public static final String JETTY_SERVER_VERSION = "8.1.16.v20140903"
     public static final String JETTY_WEBSOCKET_VERSION = "8.1.16.v20140903"
 
-    public static final String CPSeparator = File.pathSeparator
     //All parameters for generated js file
     public static final String JS_REL_DIR = File.separator + 'js' + File.separator
     public static final String EXT = '.js'
@@ -71,7 +66,7 @@ public final class Utils {
 
     public static final String TEST_FRAMEWORKS = 'testFrameworks'
 
-    private static TaskExecutionGraph graph;
+    private static TaskExecutionGraph graph
 
     private Utils() {}
 
@@ -166,7 +161,6 @@ public final class Utils {
      * @return The path of the file
      */
     public static String resolvePath(Project project) {
-        def path
         final def buildPath = project.buildDir.absolutePath
         final def jsPath = buildPath + JS_REL_DIR
         final def baseFilename = jsPath + project.name
@@ -176,7 +170,7 @@ public final class Utils {
         }
         //Performs suboptimal check if TaskExecutionGraph not ready
         final def hasTest = graph != null ? graph.hasTask(':TestJS') : isTaskInStartParameter(project, 'testjs')
-
+        def path
         if (project.hasProperty(MIN_OUTPUT)) {
             path = project.file(project.property(MIN_OUTPUT))
         } else if (project.hasProperty(OUTPUT)) {
@@ -265,7 +259,7 @@ public final class Utils {
     }
 
     /**
-     * Checks if there is a task is to be executed (explicitely specified)
+     * Checks if there is a task to be executed (explicitely specified)
      * @param project The project whose startparameters we want to use
      * @param task The name task to be checked
      */

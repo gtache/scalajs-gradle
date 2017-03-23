@@ -48,7 +48,7 @@ final class FrameworkDetector(jsEnv: JSEnv) {
     * @return A map linking a framework to it's common name
     */
   def detect(frameworks: Seq[TestFramework]): Map[TestFramework, String] = {
-    import FrameworkDetector.ConsoleFrameworkPrefix
+    import com.github.gtache.testing.FrameworkDetector.ConsoleFrameworkPrefix
     val data = frameworks.map(_.classNames.toList).toList.toJSON
 
     val code =
@@ -105,7 +105,7 @@ object FrameworkDetector {
   private val ConsoleFrameworkPrefix = "@scalajs-test-framework-detector:"
 
   private class StoreConsole extends JSConsole {
-    val buf = mutable.Buffer.empty[String]
+    val buf: mutable.Buffer[String] = mutable.Buffer.empty[String]
 
     def log(msg: Any): Unit = buf += msg.toString
   }

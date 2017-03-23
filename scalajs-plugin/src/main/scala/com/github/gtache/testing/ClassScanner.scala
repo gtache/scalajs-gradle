@@ -49,6 +49,7 @@ object ClassScanner {
           c.getInterfaces.exists(interf => checkRec(interf, fName))
         }
       }
+
       checkRec(c, sF.superclassName())
     }
 
@@ -57,7 +58,7 @@ object ClassScanner {
     val buffer = ArrayBuffer[TaskDef]()
     classes.foreach(c => {
       fingerprints.foreach {
-        case aF: AnnotatedFingerprint => {
+        case aF: AnnotatedFingerprint =>
           try {
             val mirror = runtimeMirror(classL)
             val symb = mirror.classSymbol(c)
@@ -68,19 +69,16 @@ object ClassScanner {
               buffer += new TaskDef(c.getName.stripSuffix(objSuffix), aF, explicitlySpecified.nonEmpty, Array(new SuiteSelector))
             }
           } catch {
-            case e: ClassNotFoundException => {
+            case e: ClassNotFoundException =>
               Console.err.println("Class not found for annotation : " + aF.annotationName())
-            }
           }
-        }
-        case sF: SubclassFingerprint => {
+        case sF: SubclassFingerprint =>
           if (checkSuperclasses(c, sF)) {
             if (!sF.requireNoArgConstructor || c.isInterface || (sF.requireNoArgConstructor && checkZeroArgsConstructor(c))
               && (sF.isModule || (!sF.isModule && !c.getName.endsWith(objSuffix)))) {
               buffer += new TaskDef(c.getName.stripSuffix(objSuffix), sF, explicitlySpecified.nonEmpty, Array(new SuiteSelector))
             }
           }
-        }
         case _ => throw new IllegalArgumentException("Unsupported Fingerprint type")
       }
     })
