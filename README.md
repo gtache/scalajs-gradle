@@ -8,7 +8,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.github.gtache:scalajs-plugin:0.2.0'
+        classpath 'com.github.gtache:scalajs-plugin:0.3.0'
     }
 }
 ```
@@ -21,7 +21,7 @@ Needs tests to be in src/test/scala.
 This plugin adds :   
 -`apply plugin: 'java'`   
 -`apply plugin: 'scala'`   
-and dependencies on **scalajs-library 2.11:0.6.9**, **scalajs-compiler 2.11.8:0.6.9**, as well as **org.eclipse.jetty:jetty-server:8.1.16.v20140903** and **org.eclipse.jetty:jetty-websocket:8.1.16.v20140903** for PhantomJS
+and dependencies on **scalajs-library (version depending on plugin version)**, **scalajs-compiler (version depending on plugin version)**, as well as **org.eclipse.jetty:jetty-server:8.1.16.v20140903** and **org.eclipse.jetty:jetty-websocket:8.1.16.v20140903** for PhantomJS
 
 ## Usage
 `gradlew FastOptJS`, `gradlew FullOptJS` or `gradlew NoOptJS` to compile everything.
