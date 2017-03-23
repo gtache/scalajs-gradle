@@ -178,7 +178,7 @@ class PluginTest extends GroovyTestCase {
         }
 
         private void checkDefault(Project project) {
-            final jsDir = project.file(JS_REL_DIR)
+            final jsDir = project.file(project.buildDir.absolutePath+JS_REL_DIR)
             final jsBase = jsDir.absolutePath + File.separator + project.name
             final jsFile = project.file(jsBase + EXT)
             final jsFastFile = project.file(jsBase + FASTOPT_SUFFIX)
