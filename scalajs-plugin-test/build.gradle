@@ -9,6 +9,15 @@ apply plugin: 'scalajs-plugin'
 
 sourceCompatibility = 1.8
 
+String scalaVersion = project.hasProperty('scalaVersion') ? project.property('scalaVersion') : '2.12'
+String subVersion = project.hasProperty('subVersion') ? project.property('subVersion') : '1'
+String scalaFullVersion = scalaVersion + '.' + subVersion
+String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.15'
+String scalaJSM = scalaJSVersion.substring(0,3)
+String scalaJSV = scalaJSM+'_'+scalaVersion
+
+String pluginVersion = '0.3.0'
+String pluginFullVersion = 'sjs'+scalaJSVersion+'_'+scalaVersion+'_'+pluginVersion
 
 repositories {
     mavenCentral()
@@ -21,7 +30,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.github.gtache:scalajs-plugin:0.2.1-SNAPSHOT'
+        classpath 'com.github.gtache:scalajs-plugin:'+pluginVersion
     }
 }
 
@@ -29,12 +38,7 @@ configurations {
     scalaTestCompile
 }
 
-String scalaVersion = project.hasProperty('scalaVersion') ? project.property('scalaVersion') : '2.12'
-String subVersion = project.hasProperty('subVersion') ? project.property('subVersion') : '1'
-String scalaFullVersion = scalaVersion + '.' + subVersion
-String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.15'
-String scalaJSM = scalaJSVersion.substring(0,3)
-String scalaJSV = scalaJSM+'_'+scalaVersion
+
 
 dependencies {
     compile group: 'com.lihaoyi', name: 'scalatags_sjs'+scalaJSV, version: '0.6.3'

@@ -12,7 +12,7 @@ String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 
-version 'sjs'+scalaJSVersion+'_'+scalaVersion+'_0.3.0-SNAPSHOT'
+version 'sjs'+scalaJSVersion+'_'+scalaVersion+'_0.3.0'
 
 apply plugin: 'idea'
 apply plugin: 'scala'
@@ -36,7 +36,7 @@ buildConfig {
     buildConfigField 'String', 'SUB_VERSION', subVersion
     buildConfigField 'String', 'SCALA_FULL_VERSION', scalaFullVersion
     buildConfigField 'String', 'SCALAJS_VERSION', scalaJSVersion
-    buildConfigField 'String', 'PLUGIN_VERSION', project.version
+    buildConfigField 'String', 'PLUGIN_VERSION', project.version.toString()
 }
 
 repositories {
