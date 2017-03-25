@@ -1,23 +1,14 @@
 import org.scalajs.jsenv.nodejs.*
-import scala.collection.immutable.Seq$
-import scala.collection.immutable.Map$
 
 group 'com.github.gtache'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'scalajs-plugin'
+appy plugin: 'idea'
 
 sourceCompatibility = 1.8
 
-String scalaVersion = project.hasProperty('scalaVersion') ? project.property('scalaVersion') : '2.12'
-String subVersion = project.hasProperty('subVersion') ? project.property('subVersion') : '1'
-String scalaFullVersion = scalaVersion + '.' + subVersion
-String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.15'
-String scalaJSM = scalaJSVersion.substring(0,3)
-String scalaJSV = scalaJSM+'_'+scalaVersion
 
-String pluginVersion = '0.3.0'
-String pluginFullVersion = 'sjs'+scalaJSVersion+'_'+scalaVersion+'_'+pluginVersion
 
 repositories {
     mavenCentral()
@@ -25,12 +16,21 @@ repositories {
 }
 
 buildscript {
+    String scalaVersion = project.hasProperty('scalaVersion') ? project.property('scalaVersion') : '2.12'
+    String subVersion = project.hasProperty('subVersion') ? project.property('subVersion') : '1'
+    String scalaFullVersion = scalaVersion + '.' + subVersion
+    String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.15'
+    String scalaJSM = scalaJSVersion.substring(0,3)
+    String scalaJSV = scalaJSM+'_'+scalaVersion
+
+    String pluginVersion = '0.3.0'
+    String pluginFullVersion = 'sjs'+scalaJSVersion+'_'+scalaVersion+'_'+pluginVersion
     repositories {
         mavenLocal()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.github.gtache:scalajs-plugin:'+pluginVersion
+        classpath 'com.github.gtache:scalajs-plugin:'+pluginFullVersion
     }
 }
 
@@ -38,7 +38,13 @@ configurations {
     scalaTestCompile
 }
 
-
+//Duplication because buildscript{} and the rest of the build file don't share variables
+String scalaVersion = project.hasProperty('scalaVersion') ? project.property('scalaVersion') : '2.12'
+String subVersion = project.hasProperty('subVersion') ? project.property('subVersion') : '1'
+String scalaFullVersion = scalaVersion + '.' + subVersion
+String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.15'
+String scalaJSM = scalaJSVersion.substring(0,3)
+String scalaJSV = scalaJSM+'_'+scalaVersion
 
 dependencies {
     compile group: 'com.lihaoyi', name: 'scalatags_sjs'+scalaJSV, version: '0.6.3'
