@@ -8,11 +8,12 @@ String scalaVersion = project.hasProperty('scalaVersion') ? project.property('sc
 String subVersion = project.hasProperty('subVersion') ? project.property('subVersion') : '1'
 String scalaFullVersion = scalaVersion + '.' + subVersion
 String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.15'
+String scalaJSM = scalaJSVersion.substring(0,3)
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 
-version 'sjs'+scalaJSVersion+'_'+scalaVersion+'_0.3.0'
+version 'sjs'+scalaJSM+'_'+scalaVersion+'_0.3.0'
 
 apply plugin: 'idea'
 apply plugin: 'scala'
