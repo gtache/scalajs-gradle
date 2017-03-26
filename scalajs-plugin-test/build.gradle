@@ -1,4 +1,5 @@
 import org.scalajs.jsenv.nodejs.*
+import com.github.gtache.Scalajsld$
 
 group 'com.github.gtache'
 version '1.0-SNAPSHOT'
@@ -75,13 +76,16 @@ ext {
     linkLogLevel = "Debug"
     testLogLevel = "Debug"
 
-    //You can configure a custom JSEnv, don't forget to import the classes
+    //You can configure a custom JSEnv (selenium,...), don't forget to import the classes
     //jsEnv = new NodeJSEnv("node", Seq$.MODULE$.empty(), Map$.MODULE$.empty())
     //jsEnv.loadLibs(...)
     //jsEnv.withSourceMap(...)
 
     //You can configure custom Semantics
     //semantics = Semantics.Defaults().withProductionMode(true).with...
+
+    //You can configure optimizer options
+    //oOptions = Scalajsld$.MODULE$.defaultOptions().withParallel(false)...
 }
 
 defaultTasks += 'FastOptJS'

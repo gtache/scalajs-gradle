@@ -260,6 +260,6 @@ class UtilsTest extends GroovyTestCase {
         assertEquals("com\\..*", toRegex("com.*"))
         assertEquals("com\\.github\\.gtache", toRegex("com.github.gtache"))
         assertEquals(".*", toRegex("*"))
-        assertEquals("com\\\\gtache",toRegex("com\\gtache"))
+        assertEquals("com\\\\gtache", toRegex("com\\gtache"))
     }
 }

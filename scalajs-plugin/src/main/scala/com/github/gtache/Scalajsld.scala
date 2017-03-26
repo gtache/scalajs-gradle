@@ -6,7 +6,7 @@ import java.net.URI
 import org.scalajs.core.tools.io._
 import org.scalajs.core.tools.linker.backend.{LinkerBackend, ModuleKind, OutputMode}
 import org.scalajs.core.tools.linker.frontend.LinkerFrontend
-import org.scalajs.core.tools.linker.{Linker, ModuleInitializer}
+import org.scalajs.core.tools.linker.{ClearableLinker, Linker, ModuleInitializer}
 import org.scalajs.core.tools.logging._
 import org.scalajs.core.tools.sem._
 
@@ -20,7 +20,7 @@ object Scalajsld {
   private var optionsChanged: Boolean = false
 
   //Store linker and cache to gain time
-  private var linker: Linker = _
+  private var linker: ClearableLinker = _
   private var cache: IRFileCache#Cache = _
 
   /**
@@ -79,11 +79,11 @@ object Scalajsld {
         .withFrontendConfig(frontendConfig)
         .withClosureCompilerIfAvailable(options.fullOpt)
         .withOptimizer(!options.noOpt)
-        .withParallel(true)
+        .withParallel(options.parallel)
         .withSourceMap(options.sourceMap)
-      linker = Linker(semantics, options.outputMode, options.moduleKind,
-        config)
-	  if (cache == null) {
+      linker = new ClearableLinker(() => Linker(semantics, options.outputMode, options.moduleKind,
+        config), options.batchMode)
+      if (cache == null) {
         cache = (new IRFileCache).newCache
       }
       try {
@@ -133,6 +133,8 @@ object Scalajsld {
                      sourceMap: Boolean = false,
                      relativizeSourceMap: Option[URI] = None,
                      bypassLinkingErrors: Boolean = false,
+                     batchMode: Boolean = false,
+                     parallel: Boolean = true,
                      checkIR: Boolean = false,
                      stdLib: Option[File] = None,
                      logLevel: Level = Level.Info) {
@@ -165,36 +167,12 @@ object Scalajsld {
       this.copy(moduleKind = newModuleKind)
     }
 
-    def withNoOpt(): Options = {
-      this.copy(fullOpt = false, noOpt = true)
-    }
-
-    def withFastOpt(): Options = {
-      this.copy(fullOpt = false, noOpt = false)
-    }
-
-    def withFullOpt(): Options = {
-      this.copy(fullOpt = true, noOpt = false)
-    }
-
-    def withPrettyPrint(newPrettyPrint: Boolean): Options = {
-      this.copy(prettyPrint = newPrettyPrint)
-    }
-
     def withSourceMap(newSourceMap: Boolean): Options = {
       this.copy(sourceMap = newSourceMap)
     }
 
     def withRelativizeSourceMap(newRelativizeSourceMap: Option[URI]): Options = {
       this.copy(relativizeSourceMap = newRelativizeSourceMap)
-    }
-
-    def withBypassLinkingErrors(newBypass: Boolean): Options = {
-      this.copy(bypassLinkingErrors = newBypass)
-    }
-
-    def withCheckIR(newCheckIR: Boolean): Options = {
-      this.copy(checkIR = newCheckIR)
     }
 
     def withStdLib(newStdLib: Option[File]): Options = {
@@ -209,6 +187,43 @@ object Scalajsld {
       this.copy(semantics = semantics.withAsInstanceOfs(CheckedBehavior.Compliant))
     }
 
+    def withOptimizerOptions(newOptions: Options): Options = {
+      this.withBypassLinkingErrors(newOptions.bypassLinkingErrors)
+        .withParallel(newOptions.parallel)
+        .withBatchMode(newOptions.batchMode)
+        .withDisableOptimizer(!newOptions.noOpt)
+        .withPrettyPrint(newOptions.prettyPrint)
+        .withCheckIR(newOptions.checkIR)
+        .withUseClosureCompiler(newOptions.fullOpt)
+    }
+
+    def withDisableOptimizer(newFastOpt: Boolean): Options = {
+      this.copy(noOpt = !newFastOpt)
+    }
+
+    def withUseClosureCompiler(newFullOpt: Boolean): Options = {
+      this.copy(fullOpt = newFullOpt)
+    }
+
+    def withPrettyPrint(newPrettyPrint: Boolean): Options = {
+      this.copy(prettyPrint = newPrettyPrint)
+    }
+
+    def withBypassLinkingErrors(newBypass: Boolean): Options = {
+      this.copy(bypassLinkingErrors = newBypass)
+    }
+
+    def withCheckIR(newCheckIR: Boolean): Options = {
+      this.copy(checkIR = newCheckIR)
+    }
+
+    def withBatchMode(newBatchMode: Boolean): Options = {
+      this.copy(batchMode = newBatchMode)
+    }
+
+    def withParallel(newParallel: Boolean): Options = {
+      this.copy(parallel = newParallel)
+    }
 
     override def toString: String = {
       "cp : " + cp.foldLeft("")((acc: String, c: File) => acc + "\n" + c.getAbsolutePath) + "\n" +
@@ -222,6 +237,8 @@ object Scalajsld {
         "sourcemap : " + sourceMap + "\n" +
         "relativizeSourceMap + " + relativizeSourceMap.getOrElse("No sourcemap") + "\n" +
         "bypass : " + bypassLinkingErrors + "\n" +
+        "parallel : " + parallel + "\n" +
+        "batch mode : " + batchMode + "\n" +
         "checkIR : " + checkIR + "\n" +
         "stdLib : " + stdLib + "\n" +
         "logLevel : " + logLevel
@@ -243,6 +260,8 @@ object Scalajsld {
             this.sourceMap == that.sourceMap &&
             this.relativizeSourceMap == that.relativizeSourceMap &&
             this.bypassLinkingErrors == that.bypassLinkingErrors &&
+            this.parallel == that.parallel &&
+            this.batchMode == that.batchMode &&
             this.checkIR == that.checkIR &&
             this.stdLib == that.stdLib &&
             this.logLevel == that.logLevel
@@ -264,9 +283,12 @@ object Scalajsld {
         19 * sourceMap.hashCode +
         23 * relativizeSourceMap.hashCode +
         29 * bypassLinkingErrors.hashCode +
+        97 * parallel.hashCode() +
+        101 * batchMode.hashCode() +
         31 * checkIR.hashCode +
         37 * stdLib.hashCode +
         41 * logLevel.hashCode
+
     }
 
   }

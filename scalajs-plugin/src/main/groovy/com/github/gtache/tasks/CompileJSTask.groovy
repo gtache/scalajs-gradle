@@ -41,6 +41,9 @@ public class CompileJSTask extends DefaultTask {
     public static final String MIN_ERR = 'qq'
     public static final String ERR = 'really-quiet'
     public static final String SEMANTICS = 'semantics'
+    public static final String NO_PARALLEL = 'noParallel'
+    public static final String BATCH = 'batch'
+    public static final String OPTIONS = 'oOptions'
 
     private Scalajsld.Options options
     @InputFiles
@@ -114,6 +117,14 @@ public class CompileJSTask extends DefaultTask {
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
 
 
+        if (project.hasProperty(OPTIONS)) {
+            def optimizerOptions = project.property(OPTIONS)
+            if (optimizerOptions instanceof Scalajsld.Options) {
+                options = options.withOptimizerOptions(optimizerOptions as Scalajsld.Options)
+            } else {
+                project.error("OptimizerOptions are not of the class Scalajsld.Options : was " + project.property(OPTIONS).getClass())
+            }
+        }
         if (project.hasProperty(MIN_OUTPUT)) {
             destFile = project.file(project.property(MIN_OUTPUT))
         } else if (project.hasProperty(OUTPUT)) {
@@ -122,11 +133,11 @@ public class CompileJSTask extends DefaultTask {
         options = options.withOutput(destFile)
 
         if (fullOpt) {
-            options = options.withFullOpt()
+            options = options.withUseClosureCompiler(true)
         } else if (noOpt) {
-            options = options.withNoOpt()
+            options = options.withDisableOptimizer(true)
         } else {
-            options = options.withFastOpt()
+            options = options.withDisableOptimizer(false)
         }
 
         if (project.hasProperty(MIN_PRETTY) || project.hasProperty(PRETTY)) {
@@ -146,7 +157,7 @@ public class CompileJSTask extends DefaultTask {
             if (semanticsObj instanceof Semantics) {
                 options = options.withSemantics(semanticsObj as Semantics)
             } else {
-                project.logger.error("The object given as \"semantics\" is not of type Semantics")
+                project.logger.error("The object given as \"semantics\" is not of type Semantics : was " + semanticsObj.getClass())
             }
 
         } else if (fullOpt) {
@@ -193,6 +204,13 @@ public class CompileJSTask extends DefaultTask {
         }
         if (level != Level.Info$.MODULE$) {
             options = options.withLogLevel(level)
+        }
+
+        if (project.hasProperty(BATCH)) {
+            options = options.withBatchMode(true)
+        }
+        if (project.hasProperty(NO_PARALLEL)) {
+            options = options.withParallel(false)
         }
 
 

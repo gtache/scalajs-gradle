@@ -3,7 +3,8 @@ package com.github.gtache
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 
-import static com.github.gtache.BuildConfig.*
+import static com.github.gtache.BuildConfig.PLUGIN_VERSION
+import static com.github.gtache.BuildConfig.SCALA_FULL_VERSION
 
 class TestUtils {
 

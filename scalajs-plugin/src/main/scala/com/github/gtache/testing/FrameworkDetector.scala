@@ -56,7 +56,8 @@ final class FrameworkDetector(jsEnv: JSEnv,
     val exportsNamespaceExpr =
       makeExportsNamespaceExpr(moduleKind, moduleIdentifier)
 
-    val code = s"""
+    val code =
+      s"""
       (function(exportsNamespace) {
         "use strict";
         /* #2752: if there is no testing framework at all on the classpath,

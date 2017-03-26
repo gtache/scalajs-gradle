@@ -53,7 +53,9 @@ To add the JUnit plugin or the dependencies, please refer to the *build.gradle* 
 -`-PlinkLogLevel=Debug|Info (default)|Warn|Error` to change the level of logging    
 -`-Pd | -Pdebug` for Debug level    
 -`-Pq | -Pquiet` for Warn level    
--`-Pqq | -Preally-quiet` for Error level    
+-`-Pqq | -Preally-quiet` for Error level   
+-`-Pbatch` to turn on batch mode
+-`-PnoParallel` to set parallel to false   
 
 ### Options for RunJS
 -`-Pclassname` is the fully qualified name of the class to run    
@@ -65,8 +67,10 @@ To add the JUnit plugin or the dependencies, please refer to the *build.gradle* 
 -It will run the fast optimized file by default.  
 RunJS will depend on FastOptJS (default), FullOptJS or NoOptJS accordingly.    
 -Adding `-Pphantom` will run the file in a phantomjs environment (needs phantomjs on path).    
--Adding `-Prhino` will run the file in a rhino environment.    
+-Adding `-Prhino` will run the file in a rhino environment.
+-Adding `-PjsDom` will run the file with Node.js on a JSDOM window.    
 -You can change the level of logging with `-PrunLogLevel=Warn` for example.   
+-You can add java system properties with '-PjavaOpt="-D<key1>=<val1>;<key2>=<val2>;..." (replace semicolon with colon if you are on an Unix system)
 
 Examples : `gradlew RunJS -Pclassname="main.scala.DummyObject"` will compile everything and run DummyObject().main()
 
@@ -77,7 +81,7 @@ Examples : `gradlew RunJS -Pclassname="main.scala.DummyObject"` will compile eve
 `gradlew RunJS -PfileToExec="testjs/TestRunWithFile.js"` will run TestRunWithFile.js with the environment loaded with the compiled js file.
 
 ### Options for TestJS
--`-PrunFull`, `-PrunNoOpt`, `-Pphantom` and `-Prhino` have the same behavior as with RunJS.    
+-`-PrunFull`, `-PrunNoOpt`, `-Pphantom`, `-PjsDom` and `-Prhino` have the same behavior as with RunJS.    
 -`-Ptest-only=class1;class2;*l*s3` and -`-Ptest-quick=...` should have the same behavior as their sbt counterparts. **You can only select classes / suites at the moment, you can't select tests.**  
 -`-Pretest` should retest all failed tests (does not work with Utest).    
 You can change the level of logging with `-PtestLogLevel=Error` for example.   
@@ -114,9 +118,15 @@ ext {
 
 ## Changelog    
 ###0.3.0 (uses Scala 2.12.1 or Scala 2.11.8 with scalajs 0.6.15)  
--Uses Scala 2.12 and Scalajs 0.6.15
+-Updates to Scala 2.12 and Scalajs 0.6.15
 -Adds Scalajsp
--Various improvements
+-Adds JSDOMNode environment
+-Adds custom environment option
+-Adds custom semantics option
+-Adds custom OptimizerOptions option
+-Adds batchMode, parallel
+-Adds Java system properties
+-Various improvements / bugfixes
 
 ###0.2.0 (uses Scala 2.11.8 with scalajs 0.6.9)  
 -Adds support for RhinoJS and PhantomJS    
