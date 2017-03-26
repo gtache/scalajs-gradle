@@ -6,19 +6,18 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.linker.backend.ModuleKind
-import org.scalajs.core.tools.linker.backend.ModuleKind$
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.logging.ScalaConsoleLogger
 import org.scalajs.jsenv.ComJSEnv
 import org.scalajs.jsenv.ConsoleJSConsole$
 import org.scalajs.testadapter.ScalaJSFramework
 import sbt.testing.*
-import scala.None
-import scala.None$
 import scala.Option
 import scala.collection.JavaConverters
 import scala.collection.Seq
 import scala.collection.mutable.ArrayBuffer
+
+import static com.github.gtache.Utils.CPSeparator
 
 /**
  * A task used to run tests for various frameworks
@@ -34,7 +33,6 @@ class TestJSTask extends DefaultTask {
     private static final String TEST_ONLY = 'test-only'
     private static final String TEST_QUICK = 'test-quick'
     private static final String RETEST = 'retest'
-    private static final String parametersSeparator = ';'
 
     /**
      * The action of the task : Instantiates a framework, a runner, and executes all tests found, with the fingerprints
@@ -71,13 +69,13 @@ class TestJSTask extends DefaultTask {
         Set<String> explicitlySpecified = new HashSet<>()
         Set<String> excluded = new HashSet<String>()
         if (project.hasProperty(TEST_ONLY)) {
-            explicitlySpecified = ((String) project.property(TEST_ONLY)).split(parametersSeparator).toList().toSet()
+            explicitlySpecified = ((String) project.property(TEST_ONLY)).split(CPSeparator).toList().toSet()
                     .collect { Utils.toRegex(it) }
             if (explicitlySpecified.isEmpty()) {
                 explicitlySpecified.add("")
             }
         } else if (project.hasProperty(TEST_QUICK)) {
-            explicitlySpecified = ((String) project.property(TEST_QUICK)).split(parametersSeparator).toList().toSet()
+            explicitlySpecified = ((String) project.property(TEST_QUICK)).split(CPSeparator).toList().toSet()
                     .collect { Utils.toRegex(it) }
             if (explicitlySpecified.isEmpty()) {
                 explicitlySpecified.add("")

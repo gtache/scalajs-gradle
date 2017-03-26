@@ -34,6 +34,7 @@ public final class Utils {
     public static final String JETTY_SERVER_VERSION = "8.1.16.v20140903"
     public static final String JETTY_WEBSOCKET_VERSION = "8.1.16.v20140903"
 
+    public static final String CPSeparator = ';'
     //All parameters for generated js file
     public static final String JS_REL_DIR = File.separator + 'js' + File.separator
     public static final String EXT = '.js'
