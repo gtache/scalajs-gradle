@@ -4,16 +4,9 @@ group 'com.github.gtache'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'scalajs-plugin'
-appy plugin: 'idea'
+apply plugin: 'idea'
 
 sourceCompatibility = 1.8
-
-
-
-repositories {
-    mavenCentral()
-    jcenter()
-}
 
 buildscript {
     String scalaVersion = project.hasProperty('scalaVersion') ? project.property('scalaVersion') : '2.12'
@@ -45,6 +38,11 @@ String scalaFullVersion = scalaVersion + '.' + subVersion
 String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.15'
 String scalaJSM = scalaJSVersion.substring(0,3)
 String scalaJSV = scalaJSM+'_'+scalaVersion
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
 
 dependencies {
     compile group: 'com.lihaoyi', name: 'scalatags_sjs'+scalaJSV, version: '0.6.3'

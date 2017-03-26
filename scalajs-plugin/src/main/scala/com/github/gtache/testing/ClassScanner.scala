@@ -30,7 +30,7 @@ object ClassScanner {
     def checkSuperclasses(c: Class[_], sF: SubclassFingerprint): Boolean = {
 
       def checkName(c: Class[_], fName: String): Boolean = {
-        c.getName == fName || c.getSimpleName == fName || c.getCanonicalName == fName
+        c.getName == fName || (c.getCanonicalName!=null && c.getSimpleName == fName) || c.getCanonicalName == fName
       }
 
 

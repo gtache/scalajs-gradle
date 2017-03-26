@@ -95,6 +95,7 @@ public class TestJSTask extends DefaultTask {
         frameworks.each { ScalaJSFramework framework ->
             final Runner runner = framework.runner(new String[0], new String[0], null)
             final Fingerprint[] fingerprints = framework.fingerprints()
+            project.logger.info("Scanning "+framework.name())
             final Task[] tasks = runner.tasks(ClassScanner.scan(classL, fingerprints, explicitlySpecifiedScala, excludedScala))
             project.logger.info("Executing " + framework.name())
             if (tasks.length == 0) {
