@@ -82,16 +82,6 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
-task copyLd(type: Copy) {
-    duplicatesStrategy=DuplicatesStrategy.INCLUDE
-    if (scalaJSVersion.split("\\.")[2].toInteger()>14){
-        from 'diff/0.6.15+/'
-    } else {
-        from 'diff/0.6.14-/'
-    }
-    into 'src/main/scala/com/github/gtache/'
-
-}
 artifacts {
     archives javadocJar, groovydocJar, scaladocJar, sourcesJar
 }
@@ -141,7 +131,6 @@ if (project.hasProperty('upload')) {
 }
 
 tasks.getByName('compileGroovy').dependsOn('compileScala')
-tasks.getByName('compileScala').dependsOn('copyLd')
 
 task wrapper(type: Wrapper) {
     gradleVersion = '3.4.1'

@@ -5,12 +5,17 @@ import com.github.gtache.testing.*
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency
+import org.scalajs.core.tools.linker.backend.ModuleKind
+import org.scalajs.core.tools.linker.backend.ModuleKind$
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.logging.ScalaConsoleLogger
 import org.scalajs.jsenv.ComJSEnv
 import org.scalajs.jsenv.ConsoleJSConsole$
 import org.scalajs.testadapter.ScalaJSFramework
 import sbt.testing.*
+import scala.None
+import scala.None$
+import scala.Option
 import scala.collection.JavaConverters
 import scala.collection.Seq
 import scala.collection.mutable.ArrayBuffer
@@ -18,7 +23,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * A task used to run tests for various frameworks
  */
-public class TestJSTask extends DefaultTask {
+class TestJSTask extends DefaultTask {
     final String description = "Runs tests. Depends on a CompileJS task.\n" +
             "Can use -PtestLogLevel to change the level of logging, \n" +
             "-Ptest-only='...' to test only the given files, \n" +
@@ -29,6 +34,7 @@ public class TestJSTask extends DefaultTask {
     private static final String TEST_ONLY = 'test-only'
     private static final String TEST_QUICK = 'test-quick'
     private static final String RETEST = 'retest'
+    private static final String parametersSeparator = ';'
 
     /**
      * The action of the task : Instantiates a framework, a runner, and executes all tests found, with the fingerprints
@@ -48,7 +54,7 @@ public class TestJSTask extends DefaultTask {
         for (int i = 0; i < defaultFrameworks.length(); ++i) {
             allFrameworks.$plus$eq(defaultFrameworks.apply(i))
         }
-        final List<ScalaJSFramework> frameworks = JavaConverters.asJavaIterableConverter(new FrameworkDetector(libEnv).instantiatedScalaJSFrameworks(
+        final List<ScalaJSFramework> frameworks = JavaConverters.asJavaIterableConverter(new FrameworkDetector(libEnv, ModuleKind.NoModule$.MODULE$, Option.apply(null)).instantiatedScalaJSFrameworks(
                 allFrameworks.toSeq(),
                 new ScalaConsoleLogger(Utils.resolveLogLevel(project, LOG_LEVEL, Level.Info$.MODULE$)),
                 ConsoleJSConsole$.MODULE$
@@ -65,13 +71,13 @@ public class TestJSTask extends DefaultTask {
         Set<String> explicitlySpecified = new HashSet<>()
         Set<String> excluded = new HashSet<String>()
         if (project.hasProperty(TEST_ONLY)) {
-            explicitlySpecified = ((String) project.property(TEST_ONLY)).split(File.separator).toList().toSet()
+            explicitlySpecified = ((String) project.property(TEST_ONLY)).split(parametersSeparator).toList().toSet()
                     .collect { Utils.toRegex(it) }
             if (explicitlySpecified.isEmpty()) {
                 explicitlySpecified.add("")
             }
         } else if (project.hasProperty(TEST_QUICK)) {
-            explicitlySpecified = ((String) project.property(TEST_QUICK)).split(File.separator).toList().toSet()
+            explicitlySpecified = ((String) project.property(TEST_QUICK)).split(parametersSeparator).toList().toSet()
                     .collect { Utils.toRegex(it) }
             if (explicitlySpecified.isEmpty()) {
                 explicitlySpecified.add("")
@@ -95,7 +101,6 @@ public class TestJSTask extends DefaultTask {
         frameworks.each { ScalaJSFramework framework ->
             final Runner runner = framework.runner(new String[0], new String[0], null)
             final Fingerprint[] fingerprints = framework.fingerprints()
-            project.logger.info("Scanning "+framework.name())
             final Task[] tasks = runner.tasks(ClassScanner.scan(classL, fingerprints, explicitlySpecifiedScala, excludedScala))
             project.logger.info("Executing " + framework.name())
             if (tasks.length == 0) {

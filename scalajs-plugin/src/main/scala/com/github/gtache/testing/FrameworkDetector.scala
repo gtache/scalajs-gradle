@@ -3,6 +3,7 @@ package com.github.gtache.testing
 import com.github.gtache.testing.FrameworkDetector.StoreConsole
 import org.scalajs.core.tools.io._
 import org.scalajs.core.tools.json._
+import org.scalajs.core.tools.linker.backend.ModuleKind
 import org.scalajs.core.tools.logging._
 import org.scalajs.jsenv._
 import org.scalajs.testadapter.ScalaJSFramework
@@ -15,7 +16,8 @@ import scala.collection.mutable
   *
   * @param jsEnv The environment to use
   */
-final class FrameworkDetector(jsEnv: JSEnv) {
+final class FrameworkDetector(jsEnv: JSEnv,
+                              moduleKind: ModuleKind = ModuleKind.NoModule, moduleIdentifier: Option[String] = None) {
 
 
   val jsGlobalExpr: String = {
@@ -51,33 +53,34 @@ final class FrameworkDetector(jsEnv: JSEnv) {
     import com.github.gtache.testing.FrameworkDetector.ConsoleFrameworkPrefix
     val data = frameworks.map(_.classNames.toList).toList.toJSON
 
-    val code =
-      s"""
-      var data = ${jsonToString(data)};
-      function frameworkExists(name) {
-        var parts = name.split(".");
-        var obj = $jsGlobalExpr;
-        for (var i = 0; i < parts.length; ++i) {
-          obj = obj[parts[i]];
-          if (obj === void 0)
-            return false;
+    val exportsNamespaceExpr =
+      makeExportsNamespaceExpr(moduleKind, moduleIdentifier)
+
+    val code = s"""
+      (function(exportsNamespace) {
+        "use strict";
+        /* #2752: if there is no testing framework at all on the classpath,
+         * the testing interface will not be there, and therefore the
+         * `detectFrameworks` function will not exist. We must therefore be
+         * careful when selecting it.
+         */
+        var namespace = exportsNamespace;
+        namespace = namespace.org || {};
+        namespace = namespace.scalajs || {};
+        namespace = namespace.testinterface || {};
+        namespace = namespace.internal || {};
+        var detectFrameworksFun = namespace.detectFrameworks || (function(data) {
+          var results = [];
+          for (var i = 0; i < data.length; ++i)
+            results.push(void 0);
+          return results;
+        });
+        var data = ${jsonToString(data)};
+        var results = detectFrameworksFun(data);
+        for (var i = 0; i < results.length; ++i) {
+          console.log("$ConsoleFrameworkPrefix" + (results[i] || ""));
         }
-        return true;
-      }
-      for (var i = 0; i < data.length; ++i) {
-        var gotOne = false;
-        for (var j = 0; j < data[i].length; ++j) {
-          if (frameworkExists(data[i][j])) {
-            console.log("$ConsoleFrameworkPrefix" + data[i][j]);
-            gotOne = true;
-            break;
-          }
-        }
-        if (!gotOne) {
-          // print an empty line with prefix to zip afterwards
-          console.log("$ConsoleFrameworkPrefix");
-        }
-      }
+      })($exportsNamespaceExpr);
     """
 
     val vf = new MemVirtualJSFile("frameworkDetector.js").withContent(code)
@@ -95,6 +98,22 @@ final class FrameworkDetector(jsEnv: JSEnv) {
     assert(results.size == frameworks.size)
 
     (frameworks zip results).filter(_._2.nonEmpty).toMap
+  }
+
+  def makeExportsNamespaceExpr(moduleKind: ModuleKind,
+                               moduleIdentifier: Option[String]): String = {
+    moduleKind match {
+      case ModuleKind.NoModule =>
+        jsGlobalExpr
+
+      case ModuleKind.CommonJSModule =>
+        import org.scalajs.core.ir.Utils.escapeJS
+        val moduleIdent = moduleIdentifier.getOrElse {
+          throw new IllegalArgumentException(
+            "The module identifier must be specified for CommonJS modules")
+        }
+        s"""require("${escapeJS(moduleIdent)}")"""
+    }
   }
 
 
