@@ -9,6 +9,8 @@ cd scalajs-plugin
 echo subVersion=!subVersion!
 echo scalaJSVersion=!scalaJSVersion!)>%file%
 call gradlew.bat uploadArchives -Pupload
+set "scalaVersion=2.12"
+set "subVersion=1"
 (echo scalaVersion=!scalaVersion!
 echo subVersion=!subVersion!
 echo scalaJSVersion=!scalaJSVersion!)>%file%
