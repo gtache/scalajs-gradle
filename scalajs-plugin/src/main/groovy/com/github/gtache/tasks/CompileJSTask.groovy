@@ -9,6 +9,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.linker.backend.OutputMode
 import org.scalajs.core.tools.logging.Level
+import org.scalajs.core.tools.sem.Semantics
 import scala.Option
 import scala.collection.JavaConverters
 
@@ -23,8 +24,8 @@ public class CompileJSTask extends DefaultTask {
     public static final String OUTPUT = 'output'
     public static final String MIN_PRETTY = 'p'
     public static final String PRETTY = 'prettyPrint'
-    public static final String MIN_SOURCEMAP = 's'
-    public static final String SOURCEMAP = 'sourceMap'
+    public static final String MIN_N_SOURCEMAP = 'noS'
+    public static final String N_SOURCEMAP = 'noSourceMap'
     public static final String COMPLIANT = 'compliantAsInstanceOfs'
     public static final String MIN_OUTPUTMODE = 'm'
     public static final String OUTPUTMODE = 'outputMode'
@@ -39,6 +40,10 @@ public class CompileJSTask extends DefaultTask {
     public static final String WARN = 'quiet'
     public static final String MIN_ERR = 'qq'
     public static final String ERR = 'really-quiet'
+    public static final String SEMANTICS = 'semantics'
+    public static final String NO_PARALLEL = 'noParallel'
+    public static final String BATCH = 'batch'
+    public static final String OPTIONS = 'oOptions'
 
     private Scalajsld.Options options
     @InputFiles
@@ -73,8 +78,7 @@ public class CompileJSTask extends DefaultTask {
     }
 
     /**
-     * Parse the options
-     * @return
+     * Configure the options given the project properties (given by user)
      */
     def configure() {
         options = parseOptions()
@@ -85,12 +89,13 @@ public class CompileJSTask extends DefaultTask {
      */
     @TaskAction
     def run() {
-        final def curOptions = Scalajsld.options()
-        if (!options.equals(curOptions)) {
+        final curOptions = Scalajsld.getOptions()
+        if (options != curOptions) {
             Scalajsld.setOptions(options)
             logger.info('Options changed, linker recreated')
         }
         logger.info('Running linker with ' + options.toString())
+
         Scalajsld.exec()
     }
 
@@ -103,15 +108,23 @@ public class CompileJSTask extends DefaultTask {
     }
 
     /**
-     * Configure the options given the project properties (given by user)
+     * Parse the options given the project properties
      * @return The configured options
      */
-    private def Scalajsld.Options parseOptions() {
-        final def cp = project.configurations.runtime + srcFiles
+    private Scalajsld.Options parseOptions() {
+        final cp = project.configurations.runtime + srcFiles
         def options = Scalajsld.defaultOptions().withClasspath(
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
 
 
+        if (project.hasProperty(OPTIONS)) {
+            def optimizerOptions = project.property(OPTIONS)
+            if (optimizerOptions instanceof Scalajsld.Options) {
+                options = options.withOptimizerOptions(optimizerOptions as Scalajsld.Options)
+            } else {
+                project.error("OptimizerOptions are not of the class Scalajsld.Options : was " + project.property(OPTIONS).getClass())
+            }
+        }
         if (project.hasProperty(MIN_OUTPUT)) {
             destFile = project.file(project.property(MIN_OUTPUT))
         } else if (project.hasProperty(OUTPUT)) {
@@ -120,23 +133,35 @@ public class CompileJSTask extends DefaultTask {
         options = options.withOutput(destFile)
 
         if (fullOpt) {
-            options = options.withFullOpt()
+            options = options.withUseClosureCompiler(true)
         } else if (noOpt) {
-            options = options.withNoOpt()
+            options = options.withDisableOptimizer(true)
         } else {
-            options = options.withFastOpt()
+            options = options.withDisableOptimizer(false)
         }
 
         if (project.hasProperty(MIN_PRETTY) || project.hasProperty(PRETTY)) {
             options = options.withPrettyPrint(true)
         }
 
-        if (project.hasProperty(MIN_SOURCEMAP) || project.hasProperty(SOURCEMAP)) {
-            options = options.withSourceMap(true)
+        if (project.hasProperty(MIN_N_SOURCEMAP) || project.hasProperty(N_SOURCEMAP)) {
+            options = options.withSourceMap(false)
         }
 
         if (project.hasProperty(COMPLIANT)) {
             options = options.withCompliantsSemantics()
+        }
+
+        if (project.hasProperty(SEMANTICS)) {
+            def semanticsObj = project.property(SEMANTICS)
+            if (semanticsObj instanceof Semantics) {
+                options = options.withSemantics(semanticsObj as Semantics)
+            } else {
+                project.logger.error("The object given as \"semantics\" is not of type Semantics : was " + semanticsObj.getClass())
+            }
+
+        } else if (fullOpt) {
+            options = options.withSemantics(options.semantics().withProductionMode(true))
         }
 
 
@@ -179,6 +204,13 @@ public class CompileJSTask extends DefaultTask {
         }
         if (level != Level.Info$.MODULE$) {
             options = options.withLogLevel(level)
+        }
+
+        if (project.hasProperty(BATCH)) {
+            options = options.withBatchMode(true)
+        }
+        if (project.hasProperty(NO_PARALLEL)) {
+            options = options.withParallel(false)
         }
 
 

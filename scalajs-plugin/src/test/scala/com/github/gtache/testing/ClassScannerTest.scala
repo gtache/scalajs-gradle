@@ -54,7 +54,7 @@ class ClassScannerTest {
   val loader = new URLClassLoader(Array(test))
 
   val explicitlySpecified: Set[String] = Set("*A*", "*B", "*C").map(Utils.toRegex)
-  val excluded = Set("*C", "*H").map(Utils.toRegex)
+  val excluded: Set[String] = Set("*C", "*H").map(Utils.toRegex)
   val excludedAll: Set[String] = Set(Utils.toRegex("com.*"))
   val explicitlyEmpty: Set[String] = Set(Utils.toRegex("co.*"))
   val all = Set(packageName + "A", packageName + "AB", packageName + "B", packageName + "C", packageName + "D",
@@ -72,17 +72,17 @@ class ClassScannerTest {
 
 
     val map = nameTasks.zip(taskDefs).toMap
-    assertTrue(map.get(packageName + "A").get.fingerprint.isInstanceOf[SubclassFingerprint])
-    assertTrue(map.get(packageName + "AB").get.fingerprint.isInstanceOf[SubclassFingerprint])
-    assertTrue(map.get(packageName + "B").get.fingerprint.isInstanceOf[SubclassFingerprint])
-    assertTrue(map.get(packageName + "C").get.fingerprint.isInstanceOf[SubclassFingerprint])
-    assertTrue(map.get(packageName + "D").get.fingerprint.isInstanceOf[AnnotatedFingerprint])
-    assertTrue(map.get(packageName + "F").get.fingerprint.isInstanceOf[AnnotatedFingerprint])
-    assertTrue(map.get(packageName + "G").get.fingerprint.isInstanceOf[SubclassFingerprint])
-    assertTrue(map.get(packageName + "H").get.fingerprint.isInstanceOf[SubclassFingerprint])
-    assertTrue(map.get(packageName + "J").get.fingerprint.isInstanceOf[SubclassFingerprint])
-    assertTrue(map.get(packageName + "K").get.fingerprint.isInstanceOf[SubclassFingerprint])
-    assertTrue(map.get(packageName + "M").get.fingerprint.isInstanceOf[AnnotatedFingerprint])
+    assertTrue(map(packageName + "A").fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map(packageName + "AB").fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map(packageName + "B").fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map(packageName + "C").fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map(packageName + "D").fingerprint.isInstanceOf[AnnotatedFingerprint])
+    assertTrue(map(packageName + "F").fingerprint.isInstanceOf[AnnotatedFingerprint])
+    assertTrue(map(packageName + "G").fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map(packageName + "H").fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map(packageName + "J").fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map(packageName + "K").fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map(packageName + "M").fingerprint.isInstanceOf[AnnotatedFingerprint])
   }
 
   def checkContains(nameTasks: Set[String], contained: Set[String], all: Set[String]): Unit = {
@@ -102,10 +102,10 @@ class ClassScannerTest {
     checkContains(nameTasks.toSet, contained, all)
 
     val map = nameTasks.zip(taskDefs).toMap
-    assertTrue(map.get(packageName + "A").get.fingerprint.isInstanceOf[SubclassFingerprint])
-    assertTrue(map.get(packageName + "AB").get.fingerprint.isInstanceOf[SubclassFingerprint])
-    assertTrue(map.get(packageName + "B").get.fingerprint.isInstanceOf[SubclassFingerprint])
-    assertTrue(map.get(packageName + "C").get.fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map(packageName + "A").fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map(packageName + "AB").fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map(packageName + "B").fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map(packageName + "C").fingerprint.isInstanceOf[SubclassFingerprint])
   }
 
   @Test
@@ -116,9 +116,9 @@ class ClassScannerTest {
     checkContains(nameTasks.toSet, contained, all)
 
     val map = nameTasks.zip(taskDefs).toMap
-    assertTrue(map.get(packageName + "A").get.fingerprint.isInstanceOf[SubclassFingerprint])
-    assertTrue(map.get(packageName + "AB").get.fingerprint.isInstanceOf[SubclassFingerprint])
-    assertTrue(map.get(packageName + "B").get.fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map(packageName + "A").fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map(packageName + "AB").fingerprint.isInstanceOf[SubclassFingerprint])
+    assertTrue(map(packageName + "B").fingerprint.isInstanceOf[SubclassFingerprint])
   }
 
   @Test

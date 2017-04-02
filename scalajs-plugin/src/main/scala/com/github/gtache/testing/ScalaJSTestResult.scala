@@ -1,7 +1,7 @@
 package com.github.gtache.testing
 
 import org.scalajs.testadapter.ScalaJSFramework
-import sbt.testing.{Runner, TaskDef}
+import sbt.testing.TaskDef
 
 /**
   * An object containing the testing results.
@@ -24,10 +24,6 @@ object ScalaJSTestResult {
     }
   }
 
-  private def sanitizeClassnames(names: Set[String]): Set[String] = {
-    names.map(s => s.takeWhile(c => c != ':')).filter(s => !s.contains('#'))
-  }
-
   /**
     * Returns all failed classes
     *
@@ -40,6 +36,31 @@ object ScalaJSTestResult {
       println("Testing is not finished")
       Set.empty
     }
+  }
+
+  private def getErroredNames: Set[String] = {
+    statuses.flatMap(s => s.errored).map(t => t.fullyQualifiedName())
+  }
+
+  private def getFailedNames: Set[String] = {
+    statuses.flatMap(s => s.failed).map(t => t.fullyQualifiedName())
+  }
+
+  /**
+    * Checks if testing is finished
+    *
+    * @return true or false
+    */
+  def isFinished: Boolean = {
+    !statuses.exists(s => !s.isFinished)
+  }
+
+  private def sanitizeClassnames(names: Set[String]): Set[String] = {
+    names.map(s => s.takeWhile(c => c != ':')).filter(s => !s.contains('#'))
+  }
+
+  private def getSuccessfulNames: Set[String] = {
+    statuses.flatMap(s => s.succeeded).map(t => t.fullyQualifiedName())
   }
 
   /**
@@ -84,8 +105,8 @@ object ScalaJSTestResult {
       "\n--All : " + getAllNames.toList.sorted.mkString("\n\t") +
       "\n--Success : " + getSuccessfulNames.toList.sorted.mkString("\n\t") +
       "\n--Error : " + getErroredNames.toList.sorted.mkString("\n\t") +
-      "\n--Fail : " + getFailedNames.toList.sorted.mkString("\n\t") +
-      "\n--Skip : " + getSkippedNames.toList.sorted.mkString("\n\t") +
+      "\n--Failed : " + getFailedNames.toList.sorted.mkString("\n\t") +
+      "\n--Skipped : " + getSkippedNames.toList.sorted.mkString("\n\t") +
       "\n--Ignored : " + getIgnoredNames.toList.sorted.mkString("\n\t") +
       "\n--Canceled : " + getCanceledNames.toList.sorted.mkString("\n\t") +
       "\n--Pending : " + getPendingNames.toList.sorted.mkString("\n\t") +
@@ -106,33 +127,12 @@ object ScalaJSTestResult {
     }
   }
 
-  /**
-    * Checks if testing is finished
-    *
-    * @return true or false
-    */
-  def isFinished: Boolean = {
-    !statuses.exists(s => !s.isFinished)
-  }
-
-  private def getErroredNames: Set[String] = {
-    statuses.flatMap(s => s.errored).map(t => t.fullyQualifiedName())
-  }
-
-  private def getFailedNames: Set[String] = {
-    statuses.flatMap(s => s.failed).map(t => t.fullyQualifiedName())
-  }
-
   private def getCanceledNames: Set[String] = {
     statuses.flatMap(s => s.canceled).map(t => t.fullyQualifiedName())
   }
 
   private def getAllNames: Set[String] = {
     statuses.flatMap(s => s.all).map(t => t.fullyQualifiedName())
-  }
-
-  private def getSuccessfulNames: Set[String] = {
-    statuses.flatMap(s => s.succeeded).map(t => t.fullyQualifiedName())
   }
 
   private def getSkippedNames: Set[String] = {
@@ -164,7 +164,6 @@ object ScalaJSTestResult {
   * @param framework The framework which corresponds to this instance
   */
 final class ScalaJSTestStatus(val framework: ScalaJSFramework) {
-  var runner: Runner = null
   var all: List[TaskDef] = List.empty
   var errored: List[TaskDef] = List.empty
   var failed: List[TaskDef] = List.empty
@@ -186,7 +185,6 @@ final class ScalaJSTestStatus(val framework: ScalaJSFramework) {
 
   override def toString: String = {
     "ScalaJSTestStatus for " + framework.name + " : " +
-      "\n--Runner : " + runner +
       "\n--All : " + all.map(t => t.fullyQualifiedName()).mkString("\n\t") +
       "\n--Success : " + succeeded.map(t => t.fullyQualifiedName()).mkString("\n\t") +
       "\n--Error : " + errored.map(t => t.fullyQualifiedName()).mkString("\n\t") +

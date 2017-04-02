@@ -6,12 +6,10 @@ import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.io.FileVirtualJSFile
 import org.scalajs.core.tools.io.MemVirtualJSFile
 import org.scalajs.core.tools.io.VirtualJSFile
-import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.logging.ScalaConsoleLogger
 import org.scalajs.jsenv.ConsoleJSConsole$
 import org.scalajs.jsenv.JSEnv
-import scala.collection.Seq
 
 /**
  * Task used to run a js file
@@ -38,9 +36,7 @@ public class RunJSTask extends DefaultTask {
         } else {
             final JSEnv env = Utils.resolveEnv(project)
             final Level logLevel = Utils.resolveLogLevel(project, LOG_LEVEL, Level.Debug$.MODULE$)
-            final Seq<ResolvedJSDependency> dependencySeq = Utils.getMinimalDependencySeq(project)
-
-
+            final dependencySeq = Utils.getMinimalDependencySeq(project)
             VirtualJSFile code
             if (toExec.first) {
                 code = new FileVirtualJSFile(project.file(toExec.second))
@@ -70,7 +66,7 @@ public class RunJSTask extends DefaultTask {
         } else if (project.hasProperty(EXEC_CODE)) {
             toExec = project.property(EXEC_CODE)
         } else if (project.hasProperty(CLASSNAME)) {
-            final def classname = project.property(CLASSNAME);
+            final classname = project.property(CLASSNAME)
             if (!project.hasProperty(METHNAME)) {
                 toExec = classname + '().main()'
             } else {

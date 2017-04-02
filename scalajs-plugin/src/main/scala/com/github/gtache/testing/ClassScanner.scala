@@ -30,7 +30,7 @@ object ClassScanner {
     def checkSuperclasses(c: Class[_], sF: SubclassFingerprint): Boolean = {
 
       def checkName(c: Class[_], fName: String): Boolean = {
-        c.getName == fName || c.getSimpleName == fName || c.getCanonicalName == fName
+        c.getName == fName || (c.getCanonicalName != null && c.getSimpleName == fName) || c.getCanonicalName == fName
       }
 
 
@@ -46,12 +46,7 @@ object ClassScanner {
               sC = sC.getSuperclass
             }
           }
-          c.getInterfaces.foreach(interf => {
-            if (checkRec(interf, fName)) {
-              return true
-            }
-          })
-          false
+          c.getInterfaces.exists(interf => checkRec(interf, fName))
         }
       }
 
@@ -63,7 +58,7 @@ object ClassScanner {
     val buffer = ArrayBuffer[TaskDef]()
     classes.foreach(c => {
       fingerprints.foreach {
-        case aF: AnnotatedFingerprint => {
+        case aF: AnnotatedFingerprint =>
           try {
             val mirror = runtimeMirror(classL)
             val symb = mirror.classSymbol(c)
@@ -74,19 +69,16 @@ object ClassScanner {
               buffer += new TaskDef(c.getName.stripSuffix(objSuffix), aF, explicitlySpecified.nonEmpty, Array(new SuiteSelector))
             }
           } catch {
-            case e: ClassNotFoundException => {
+            case e: ClassNotFoundException =>
               Console.err.println("Class not found for annotation : " + aF.annotationName())
-            }
           }
-        }
-        case sF: SubclassFingerprint => {
+        case sF: SubclassFingerprint =>
           if (checkSuperclasses(c, sF)) {
             if (!sF.requireNoArgConstructor || c.isInterface || (sF.requireNoArgConstructor && checkZeroArgsConstructor(c))
               && (sF.isModule || (!sF.isModule && !c.getName.endsWith(objSuffix)))) {
               buffer += new TaskDef(c.getName.stripSuffix(objSuffix), sF, explicitlySpecified.nonEmpty, Array(new SuiteSelector))
             }
           }
-        }
         case _ => throw new IllegalArgumentException("Unsupported Fingerprint type")
       }
     })
@@ -100,12 +92,7 @@ object ClassScanner {
     * @return true or false
     */
   def checkZeroArgsConstructor(c: Class[_]): Boolean = {
-    c.getDeclaredConstructors.foreach(cons => {
-      if (cons.getParameterCount == 0) {
-        return true
-      }
-    })
-    false
+    c.getDeclaredConstructors.exists(cons => cons.getParameterCount == 0)
   }
 
   /**
@@ -139,6 +126,7 @@ object ClassScanner {
         meth()
       }
     }
+
     def parseClasses(url: URL, idx: Int, explicitlySpecified: Set[String] = Set.empty, excluded: Set[String] = Set.empty): Array[Class[_]] = {
       val f = Paths.get(url.toURI).toFile
       val packageName = {

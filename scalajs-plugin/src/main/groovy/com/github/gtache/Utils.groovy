@@ -5,10 +5,14 @@ import org.gradle.api.Project
 import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.file.FileCollection
 import org.scalajs.core.tools.io.FileVirtualJSFile
+import org.scalajs.core.tools.io.MemVirtualJSFile
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency
+import org.scalajs.core.tools.jsdep.ResolvedJSDependency$
+import org.scalajs.core.tools.linker.backend.ModuleKind
 import org.scalajs.core.tools.linker.backend.OutputMode
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.jsenv.JSEnv
+import org.scalajs.jsenv.nodejs.JSDOMNodeJSEnv
 import org.scalajs.jsenv.nodejs.NodeJSEnv
 import org.scalajs.jsenv.phantomjs.PhantomJSEnv
 import org.scalajs.jsenv.phantomjs.PhantomJettyClassLoader
@@ -25,19 +29,17 @@ import java.nio.file.Files
 
 import static com.github.gtache.tasks.CompileJSTask.MIN_OUTPUT
 import static com.github.gtache.tasks.CompileJSTask.OUTPUT
+import static org.scalajs.core.ir.Utils.escapeJS
 
 /**
  * Helper class for the plugin
  */
 public final class Utils {
 
-    public static final String SCALA_VERSION = "2.11"
-    public static final String SUB_VERSION = "8"
-    public static final String SCALAJS_VERSION = "0.6.9"
-
     public static final String JETTY_SERVER_VERSION = "8.1.16.v20140903"
     public static final String JETTY_WEBSOCKET_VERSION = "8.1.16.v20140903"
 
+    public static final String CPSeparator = File.pathSeparator
     //All parameters for generated js file
     public static final String JS_REL_DIR = File.separator + 'js' + File.separator
     public static final String EXT = '.js'
@@ -51,9 +53,13 @@ public final class Utils {
     public static final String RUN_FULL = 'runFull'
     public static final String RUN_NOOPT = 'runNoOpt'
 
+    public static final String JAVA_OPT = 'javaOpt'
+
     //Envs
     public static final String RHINO = 'rhino'
     public static final String PHANTOM = 'phantom'
+    public static final String JSENV = 'jsEnv'
+    public static final String JSDOM = 'jsDom'
 
     //LogLevel
     public static final String ERROR_LVL = 'error'
@@ -61,9 +67,18 @@ public final class Utils {
     public static final String INFO_LVL = 'info'
     public static final String DEBUG_LVL = 'debug'
 
+    //OutputMode
+    public static final String ECMA_51_GLOBAL = "ecmascript51global"
+    public static final String ECMA_51_ISOLATED = "ecmascript51isolated"
+    public static final String ECMA_6 = "ecmascript6"
+
+    //Module
+    public static final String COMMONJS_MODULE = "commonJSModule"
+    public static final String USE_MAIN_MODULE = "useMainModuleInit"
+
     public static final String TEST_FRAMEWORKS = 'testFrameworks'
 
-    private static TaskExecutionGraph graph;
+    private static TaskExecutionGraph graph
 
     private Utils() {}
 
@@ -72,7 +87,7 @@ public final class Utils {
      * @param project
      */
     public static void prepareGraph(Project project) {
-        graph = null
+        graph = null //Need to reset, as if we are using a daemon it will be saved
         project.gradle.taskGraph.whenReady { graph = it }
     }
 
@@ -113,7 +128,15 @@ public final class Utils {
      */
     public static JSEnv resolveEnv(Project project) {
         def env
-        if (project.hasProperty(RHINO)) {
+        if (project.hasProperty(JSENV)) {
+            def envObj = project.property(JSENV)
+            if (envObj instanceof JSEnv) {
+                env = envObj as JSEnv
+            } else {
+                project.logger.error("The object given as \"jsEnv\" is not of type JSEnv")
+                env = null
+            }
+        } else if (project.hasProperty(RHINO)) {
             env = new RhinoJSEnv(Scalajsld$.MODULE$.options().semantics(), false)
         } else if (project.hasProperty(PHANTOM)) {
             final URL[] jars = project.configurations.phantomJetty.findAll {
@@ -121,6 +144,8 @@ public final class Utils {
             }.collect { it.toURI().toURL() } as URL[]
             final PhantomJettyClassLoader loader = new PhantomJettyClassLoader(new URLClassLoader(jars), project.buildscript.classLoader)
             env = new PhantomJSEnv("phantomjs", List$.MODULE$.empty(), Map$.MODULE$.empty(), true, loader)
+        } else if (project.hasProperty(JSDOM)) {
+            env = new JSDOMNodeJSEnv("node", Seq$.MODULE$.empty(), Map$.MODULE$.empty())
         } else {
             env = new NodeJSEnv("node", Seq$.MODULE$.empty(), Map$.MODULE$.empty())
         }
@@ -134,11 +159,11 @@ public final class Utils {
      */
     public static OutputMode getOutputMode(String s) {
         String toCompare = s.toLowerCase()
-        if (toCompare == "ecmascript51global") {
+        if (toCompare == ECMA_51_GLOBAL) {
             return OutputMode.ECMAScript51Global$.MODULE$
-        } else if (toCompare == "ecmascript51isolated") {
+        } else if (toCompare == ECMA_51_ISOLATED) {
             return OutputMode.ECMAScript51Isolated$.MODULE$
-        } else if (toCompare == "ecmascript6") {
+        } else if (toCompare == ECMA_6) {
             return OutputMode.ECMAScript6$.MODULE$
         } else {
             return null
@@ -150,7 +175,6 @@ public final class Utils {
      * @return The path of the file
      */
     public static String resolvePath(Project project) {
-        def path
         final def buildPath = project.buildDir.absolutePath
         final def jsPath = buildPath + JS_REL_DIR
         final def baseFilename = jsPath + project.name
@@ -160,7 +184,7 @@ public final class Utils {
         }
         //Performs suboptimal check if TaskExecutionGraph not ready
         final def hasTest = graph != null ? graph.hasTask(':TestJS') : isTaskInStartParameter(project, 'testjs')
-
+        def path
         if (project.hasProperty(MIN_OUTPUT)) {
             path = project.file(project.property(MIN_OUTPUT))
         } else if (project.hasProperty(OUTPUT)) {
@@ -195,9 +219,13 @@ public final class Utils {
     public static Seq getMinimalDependencySeq(Project project) {
         final FileVirtualJSFile file = new FileVirtualJSFile(project.file(resolvePath(project)))
         final ResolvedJSDependency fileD = ResolvedJSDependency.minimal(file)
-        final Seq<ResolvedJSDependency> dependencySeq = new ArraySeq<>(1)
+        final ResolvedJSDependency configurations = resolveConfigurationLibs(project)
+        final Seq<ResolvedJSDependency> dependencySeq = new ArraySeq<>(configurations == null ? 1 : 2)
         dependencySeq.update(0, fileD)
-        dependencySeq
+        if (configurations != null) {
+            dependencySeq.update(1, configurations)
+        }
+        return dependencySeq
     }
 
     /**
@@ -249,7 +277,7 @@ public final class Utils {
     }
 
     /**
-     * Checks if there is a task is to be executed (explicitely specified)
+     * Checks if there is a task to be executed (explicitely specified)
      * @param project The project whose startparameters we want to use
      * @param task The name task to be checked
      */
@@ -273,6 +301,53 @@ public final class Utils {
             }
         } else {
             return new ArrayList<>()
+        }
+    }
+
+    public static ModuleKind resolveModuleKind(Project project) {
+        return project.hasProperty(COMMONJS_MODULE) ? ModuleKind.CommonJSModule$.MODULE$ : ModuleKind.NoModule$.MODULE$
+    }
+
+    private static Map<String, String> resolveJavaSystemProperties(Project project) {
+        if (project.hasProperty(JAVA_OPT)) {
+            final HashMap<String, String> options = new HashMap<>()
+            final javaOpt = project.property(JAVA_OPT) as String
+            final beginning = javaOpt.substring(0, 2)
+            if (beginning == '-D') {
+                final pairs = javaOpt.substring(2, javaOpt.length()).split(CPSeparator)
+                for (String pair : pairs) {
+                    final keyV = pair.split('=')
+                    if (keyV.length != 2) {
+                        project.logger.error("javaOpt can only be \"-D<key1>=<value2>" + CPSeparator + "<key2>=<value2>...\", but received " + project.property(JAVA_OPT))
+                        throw new IllegalArgumentException()
+                    } else {
+                        options.put(keyV[0], keyV[1])
+                    }
+                }
+                options.each { project.logger.warn(it.getKey() + '->' + it.getValue()) }
+                return options
+            } else {
+                project.logger.error("javaOpt can only be \"-D<key1>=<value2>" + CPSeparator + "<key2>=<value2>...\", but received " + project.property(JAVA_OPT))
+                throw new IllegalArgumentException()
+            }
+        }
+        return new HashMap<String, String>()
+    }
+
+    private static ResolvedJSDependency resolveConfigurationLibs(Project project) {
+        final javaSystemProperties = resolveJavaSystemProperties(project)
+        if (javaSystemProperties.isEmpty()) {
+            return null
+        } else {
+            final formattedProps = javaSystemProperties.collect {
+                "\"" + escapeJS(it.getKey()) + "\": \"" + escapeJS(it.getValue()) + "\""
+            }
+            formattedProps.each { project.logger.warn(it) }
+            final String code =
+                    "var __ScalaJSEnv = (typeof __ScalaJSEnv === \"object\" && __ScalaJSEnv) ? __ScalaJSEnv : {};\n" +
+                            "__ScalaJSEnv.javaSystemProperties = {" + formattedProps.join(", ") + "};\n"
+
+            return ResolvedJSDependency$.MODULE$.minimal(new MemVirtualJSFile("setJavaSystemProperties.js").withContent(code))
         }
     }
 
