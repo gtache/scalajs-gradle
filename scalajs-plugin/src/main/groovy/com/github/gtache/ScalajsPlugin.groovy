@@ -156,6 +156,7 @@ final class ScalajsPlugin implements Plugin<Project> {
         envs.add(JSENV)
         envs.add(RHINO)
         envs.add(PHANTOM)
+        envs.add(JSDOM)
         output.add(MIN_OUTPUT)
         output.add(OUTPUT)
         outputMode.add(MIN_OUTPUTMODE)
