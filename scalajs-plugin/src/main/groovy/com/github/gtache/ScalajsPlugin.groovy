@@ -126,7 +126,8 @@ final class ScalajsPlugin implements Plugin<Project> {
                 }
             }
             tasks.withType(ScalaCompile) {
-                scalaCompileOptions.additionalParameters = ["-Xplugin:" + project.configurations.scalaCompilePlugin.findAll {
+                def existingParameters = scalaCompileOptions.additionalParameters ?: []
+                scalaCompileOptions.additionalParameters = existingParameters + ["-Xplugin:" + project.configurations.scalaCompilePlugin.findAll {
                     it.absolutePath.contains('scalajs-compiler')
                 }.get(0).absolutePath]
             }
