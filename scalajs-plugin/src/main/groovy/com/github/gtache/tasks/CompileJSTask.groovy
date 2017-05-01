@@ -187,6 +187,7 @@ public class CompileJSTask extends DefaultTask {
             options = options.withCheckIR(true)
         }
 
+        options = options.withModuleKind(Utils.resolveModuleKind(project))
 
         if (project.hasProperty(MIN_RELSM)) {
             options = options.withRelativizeSourceMap(Option.apply(new URI((String) project.property(MIN_RELSM))))

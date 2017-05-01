@@ -54,8 +54,9 @@ To add the JUnit plugin or the dependencies, please refer to the *build.gradle* 
 -`-Pd | -Pdebug` for Debug level    
 -`-Pq | -Pquiet` for Warn level    
 -`-Pqq | -Preally-quiet` for Error level   
--`-Pbatch` to turn on batch mode
+-`-Pbatch` to turn on batch mode    
 -`-PnoParallel` to set parallel to false   
+-`-PcommonJSModule` to configure CommonJS module system 
 
 ### Options for RunJS
 -`-Pclassname` is the fully qualified name of the class to run    
@@ -67,7 +68,7 @@ To add the JUnit plugin or the dependencies, please refer to the *build.gradle* 
 -It will run the fast optimized file by default.  
 RunJS will depend on FastOptJS (default), FullOptJS or NoOptJS accordingly.    
 -Adding `-Pphantom` will run the file in a phantomjs environment (needs phantomjs on path).    
--Adding `-Prhino` will run the file in a rhino environment.
+-Adding `-Prhino` will run the file in a rhino environment.    
 -Adding `-PjsDom` will run the file with Node.js on a JSDOM window.    
 -You can change the level of logging with `-PrunLogLevel=Warn` for example.   
 -You can add java system properties with '-PjavaOpt="-D<key1>=<val1>;<key2>=<val2>;..." (replace semicolon with colon if you are on an Unix system)
@@ -88,9 +89,9 @@ You can change the level of logging with `-PtestLogLevel=Error` for example.
 *Note that retest / test-quick need a Gradle daemon to work*.
 
 ### Options for Scalajsp    
--`-Ps` | `-Psupported` will display the supported sjsir versions
--`-Pi` | `-Pinfo` will display informations about the file(s)
--`-Pf` | `-Pfilename` to choose which file(s) to see (eg : 'build/classes/main/com/github/gtache/DummyObject$.sjsir')
+-`-Ps` | `-Psupported` will display the supported sjsir versions    
+-`-Pi` | `-Pinfo` will display informations about the file(s)    
+-`-Pf` | `-Pfilename` to choose which file(s) to see (eg : 'build/classes/main/com/github/gtache/DummyObject$.sjsir')    
 -`-Pj` | `-Pjarfile` to choose a jar
 
 ### Making options 'permanent'
@@ -117,16 +118,16 @@ ext {
 => Solution : `gradlew --stop` to stop the daemon containing the linker. Then rerun the desired command as usual. (This problem should be fixed now)
 
 ## Changelog    
-###0.3.0 (uses Scala 2.12.1 or Scala 2.11.8 with scalajs 0.6.15)  
--Updates to Scala 2.12 and Scalajs 0.6.15
--Adds Scalajsp
--Adds JSDOMNode environment
--Adds custom environment option
--Adds custom semantics option
--Adds custom OptimizerOptions option
--Adds batchMode, parallel
--Adds Java system properties
--Various improvements / bugfixes
+###0.3.0 (uses Scala 2.12.1 or Scala 2.11.8 with scalajs 0.6.15)   
+-Updates to Scala 2.12 and Scalajs 0.6.15    
+-Adds Scalajsp    
+-Adds JSDOMNode environment    
+-Adds custom environment option    
+-Adds custom semantics option    
+-Adds custom OptimizerOptions option    
+-Adds batchMode, parallel    
+-Adds Java system properties    
+-Various improvements / bugfixes    
 
 ###0.2.0 (uses Scala 2.11.8 with scalajs 0.6.9)  
 -Adds support for RhinoJS and PhantomJS    
