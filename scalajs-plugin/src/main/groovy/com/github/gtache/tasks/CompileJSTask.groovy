@@ -132,6 +132,8 @@ public class CompileJSTask extends DefaultTask {
         }
         options = options.withOutput(destFile)
 
+        options = options.withModuleKind(Utils.resolveModuleKind(project))
+
         if (fullOpt) {
             options = options.withUseClosureCompiler(true)
         } else if (noOpt) {
