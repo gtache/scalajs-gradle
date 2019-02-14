@@ -21,7 +21,7 @@ final class ScalaJSEventHandler(testStatus: ScalaJSTestStatus) extends EventHand
         n.suiteId() + ':' + n.testName()
       case t: TestSelector =>
         event.fullyQualifiedName() + ':' + t.testName()
-      case s: SuiteSelector =>
+      case _: SuiteSelector =>
         event.fullyQualifiedName
       case n: NestedSuiteSelector =>
         event.fullyQualifiedName() + '.' + n.suiteId()

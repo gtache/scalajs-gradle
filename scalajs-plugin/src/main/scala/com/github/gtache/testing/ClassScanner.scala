@@ -69,7 +69,7 @@ object ClassScanner {
               buffer += new TaskDef(c.getName.stripSuffix(objSuffix), aF, explicitlySpecified.nonEmpty, Array(new SuiteSelector))
             }
           } catch {
-            case e: ClassNotFoundException =>
+            case _: ClassNotFoundException =>
               Console.err.println("Class not found for annotation : " + aF.annotationName())
           }
         case sF: SubclassFingerprint =>

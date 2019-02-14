@@ -51,9 +51,7 @@ object ScalaJSTestResult {
     *
     * @return true or false
     */
-  def isFinished: Boolean = {
-    !statuses.exists(s => !s.isFinished)
-  }
+  def isFinished: Boolean = statuses.forall(s => s.isFinished)
 
   private def sanitizeClassnames(names: Set[String]): Set[String] = {
     names.map(s => s.takeWhile(c => c != ':')).filter(s => !s.contains('#'))
