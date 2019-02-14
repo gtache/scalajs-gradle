@@ -5,15 +5,15 @@ group 'com.github.gtache'
 
 
 String scalaVersion = project.hasProperty('scalaVersion') ? project.property('scalaVersion') : '2.12'
-String subVersion = project.hasProperty('subVersion') ? project.property('subVersion') : '1'
+String subVersion = project.hasProperty('subVersion') ? project.property('subVersion') : '7'
 String scalaFullVersion = scalaVersion + '.' + subVersion
-String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.15'
+String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.26'
 String scalaJSM = scalaJSVersion.substring(0,3)
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 
-version 'sjs'+scalaJSM+'_'+scalaVersion+'_0.3.0'
+version 'sjs'+scalaJSM+'_'+scalaVersion+'_0.4.0'
 
 apply plugin: 'idea'
 apply plugin: 'scala'
@@ -53,7 +53,7 @@ dependencies {
     compile group: 'org.scala-js', name: 'scalajs-js-envs_' + scalaVersion, version: scalaJSVersion
     compile group: 'org.scala-js', name: 'scalajs-tools_' + scalaVersion, version: scalaJSVersion
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'com.google.guava', name: 'guava', version: '21.0'
+    testCompile group: 'com.google.guava', name: 'guava', version: '27.0.1'
 }
 
 signing {
@@ -132,7 +132,3 @@ if (project.hasProperty('upload')) {
 }
 
 tasks.getByName('compileGroovy').dependsOn('compileScala')
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.4.1'
-}
