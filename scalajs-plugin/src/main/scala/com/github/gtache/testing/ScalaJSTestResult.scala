@@ -157,7 +157,7 @@ object ScalaJSTestResult {
 }
 
 /**
-  * A class storing informations about a TestFramework (results of test)
+  * A class storing information about a TestFramework (results of test)
   *
   * @param framework The framework which corresponds to this instance
   */

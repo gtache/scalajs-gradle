@@ -10,7 +10,7 @@ import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.logging.ScalaConsoleLogger
 import org.scalajs.jsenv.ComJSEnv
 import org.scalajs.jsenv.ConsoleJSConsole$
-import org.scalajs.testadapter.ScalaJSFramework
+import org.scalajs.testadapter.TestAdapter
 import sbt.testing.*
 import scala.Option
 import scala.collection.JavaConverters
@@ -52,7 +52,7 @@ class TestJSTask extends DefaultTask {
         for (int i = 0; i < defaultFrameworks.length(); ++i) {
             allFrameworks.$plus$eq(defaultFrameworks.apply(i))
         }
-        final List<ScalaJSFramework> frameworks = JavaConverters.asJavaIterableConverter(new FrameworkDetector(libEnv, ModuleKind.NoModule$.MODULE$, Option.apply(null)).instantiatedScalaJSFrameworks(
+        final List<TestAdapter> frameworks = JavaConverters.asJavaIterableConverter(new FrameworkDetector(libEnv, ModuleKind.NoModule$.MODULE$, Option.apply(null)).instantiatedScalaJSFrameworks(
                 allFrameworks.toSeq(),
                 new ScalaConsoleLogger(Utils.resolveLogLevel(project, LOG_LEVEL, Level.Info$.MODULE$)),
                 ConsoleJSConsole$.MODULE$
@@ -61,8 +61,8 @@ class TestJSTask extends DefaultTask {
         final URL[] urls = project.sourceSets.test.runtimeClasspath.collect { it.toURI().toURL() } as URL[]
         final URLClassLoader classL = new URLClassLoader(urls)
 
-        frameworks.each { ScalaJSFramework framework ->
-            project.logger.info("Framework found : " + framework.name())
+        frameworks.each { TestAdapter framework ->
+            project.logger.info("Framework found : " + framework)
         }
 
         final String objWildcard = '\\$?'
@@ -96,7 +96,7 @@ class TestJSTask extends DefaultTask {
         scala.collection.immutable.Set<String> excludedScala = JavaConverters.asScalaSetConverter(excluded).asScala().toSet()
 
         Logger[] simpleLoggerArray = new SimpleLogger() as Logger[]
-        frameworks.each { ScalaJSFramework framework ->
+        frameworks.each { TestAdapter framework ->
             final Runner runner = framework.runner(new String[0], new String[0], null)
             final Fingerprint[] fingerprints = framework.fingerprints()
             final Task[] tasks = runner.tasks(ClassScanner.scan(classL, fingerprints, explicitlySpecifiedScala, excludedScala))

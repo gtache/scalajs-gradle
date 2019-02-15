@@ -145,9 +145,9 @@ public final class Utils {
             final PhantomJettyClassLoader loader = new PhantomJettyClassLoader(new URLClassLoader(jars), project.buildscript.classLoader)
             env = new PhantomJSEnv("phantomjs", List$.MODULE$.empty(), Map$.MODULE$.empty(), true, loader)
         } else if (project.hasProperty(JSDOM)) {
-            env = new JSDOMNodeJSEnv("node", Seq$.MODULE$.empty(), Map$.MODULE$.empty())
+            env = new JSDOMNodeJSEnv("node", Seq$.MODULE$.empty(), Map$.MODULE$.empty()) //TODO add internal
         } else {
-            env = new NodeJSEnv("node", Seq$.MODULE$.empty(), Map$.MODULE$.empty())
+            env = new NodeJSEnv("node", Seq$.MODULE$.empty(), Map$.MODULE$.empty()) //TODO deprecated
         }
         return env
     }

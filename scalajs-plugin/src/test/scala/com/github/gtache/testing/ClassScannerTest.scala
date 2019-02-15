@@ -57,7 +57,7 @@ class ClassScannerTest {
   val excluded: Set[String] = Set("*C", "*H").map(Utils.toRegex)
   val excludedAll: Set[String] = Set(Utils.toRegex("com.*"))
   val explicitlyEmpty: Set[String] = Set(Utils.toRegex("co.*"))
-  val all = Set(packageName + "A", packageName + "AB", packageName + "B", packageName + "C", packageName + "D",
+  val all: Set[String] = Set(packageName + "A", packageName + "AB", packageName + "B", packageName + "C", packageName + "D",
     packageName + "E", packageName + "F", packageName + "G", packageName + "H", packageName + "I", packageName + "J",
     packageName + "K", packageName + "L", packageName + "M", packageName + "N")
 

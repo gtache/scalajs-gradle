@@ -39,7 +39,7 @@ final class FrameworkDetector(jsEnv: JSEnv,
       val config = TestAdapter.Config()
         .withJSConsole(console)
         .withLogger(logger)
-        .withModuleSettings(ModuleKind.ESModule, Option(p._2))
+        .withModuleSettings(ModuleKind.CommonJSModule, Option(p._2))
       new TestAdapter(
         jsEnv.asInstanceOf[ComJSEnv],
         config)
@@ -117,6 +117,9 @@ final class FrameworkDetector(jsEnv: JSEnv,
             "The module identifier must be specified for CommonJS modules")
         }
         s"""require("${escapeJS(moduleIdent)}")"""
+      case ModuleKind.ESModule =>
+        //TODO
+        jsGlobalExpr
     }
   }
 

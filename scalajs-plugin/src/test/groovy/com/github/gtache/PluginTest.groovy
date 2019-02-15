@@ -140,7 +140,7 @@ class PluginTest extends GroovyTestCase {
             this.id = id
             this.numThreads = numThreads
             this.lock = lock
-            this.numOps = p.size() / numThreads
+            this.numOps = (int) (p.size() / numThreads)
         }
 
         @Override
@@ -188,7 +188,6 @@ class PluginTest extends GroovyTestCase {
             assertEquals(Semantics.Defaults(), options.semantics())
             assertEquals(Level.Info$.MODULE$, options.logLevel())
             assertFalse(options.cp().isEmpty())
-            assertFalse(options.jsoutput())
             assertTrue(options.sourceMap())
             assertFalse(options.checkIR())
             assertFalse(options.fullOpt())
