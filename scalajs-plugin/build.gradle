@@ -8,12 +8,12 @@ String scalaVersion = project.hasProperty('scalaVersion') ? project.property('sc
 String subVersion = project.hasProperty('subVersion') ? project.property('subVersion') : '7'
 String scalaFullVersion = scalaVersion + '.' + subVersion
 String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.26'
-String scalaJSM = scalaJSVersion.substring(0,3)
+String scalaJSM = scalaJSVersion.substring(0, 3)
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 
-version 'sjs'+scalaJSM+'_'+scalaVersion+'_0.4.0'
+version 'sjs' + scalaJSM + '_' + scalaVersion + '_0.4.0'
 
 apply plugin: 'idea'
 apply plugin: 'scala'
@@ -131,4 +131,16 @@ if (project.hasProperty('upload')) {
     }
 }
 
-tasks.getByName('compileGroovy').dependsOn('compileScala')
+task copyBuildConfig(type: Copy) {
+    from buildDir.absolutePath + "/gen/buildconfig/classes"
+    into buildDir.absolutePath + "/classes/scala"
+}
+
+compileScala {
+    dependsOn copyBuildConfig
+}
+
+compileGroovy {
+    classpath = classpath + files(compileScala.destinationDir)
+    dependsOn compileScala
+}

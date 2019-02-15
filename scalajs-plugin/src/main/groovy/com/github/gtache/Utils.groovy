@@ -67,11 +67,6 @@ public final class Utils {
     public static final String INFO_LVL = 'info'
     public static final String DEBUG_LVL = 'debug'
 
-    //OutputMode
-    public static final String ECMA_51_GLOBAL = "ecmascript51global"
-    public static final String ECMA_51_ISOLATED = "ecmascript51isolated"
-    public static final String ECMA_6 = "ecmascript6"
-
     //Module
     public static final String COMMONJS_MODULE = "commonJSModule"
     public static final String USE_MAIN_MODULE = "useMainModuleInit"
@@ -145,29 +140,13 @@ public final class Utils {
             final PhantomJettyClassLoader loader = new PhantomJettyClassLoader(new URLClassLoader(jars), project.buildscript.classLoader)
             env = new PhantomJSEnv("phantomjs", List$.MODULE$.empty(), Map$.MODULE$.empty(), true, loader)
         } else if (project.hasProperty(JSDOM)) {
-            env = new JSDOMNodeJSEnv("node", Seq$.MODULE$.empty(), Map$.MODULE$.empty()) //TODO add internal
+            env = new JSDOMNodeJSEnv("node", List$.MODULE$.empty(), Map$.MODULE$.empty()) //TODO add internal
         } else {
-            env = new NodeJSEnv("node", Seq$.MODULE$.empty(), Map$.MODULE$.empty()) //TODO deprecated
+            NodeJSEnv.Config config = new NodeJSEnv.Config("node", List$.MODULE$.empty(), Map$.MODULE$.empty(), true)
+            //TODO sourcemap
+            env = new NodeJSEnv(config) //TODO deprecated
         }
         return env
-    }
-
-    /**
-     * Returns the outputMode corresponding to a string
-     * @param s The string
-     * @return the outputMode, or null
-     */
-    public static OutputMode getOutputMode(String s) {
-        String toCompare = s.toLowerCase()
-        if (toCompare == ECMA_51_GLOBAL) {
-            return OutputMode.ECMAScript51Global$.MODULE$
-        } else if (toCompare == ECMA_51_ISOLATED) {
-            return OutputMode.ECMAScript51Isolated$.MODULE$
-        } else if (toCompare == ECMA_6) {
-            return OutputMode.ECMAScript6$.MODULE$
-        } else {
-            return null
-        }
     }
 
     /**

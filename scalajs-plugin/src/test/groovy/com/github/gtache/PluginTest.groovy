@@ -19,8 +19,6 @@ class PluginTest extends GroovyTestCase {
 
     static final O_FILE = 'js2/js.js'
     static final OUTPUT_FILE = 'js2/js2.js'
-    static final M_MODE = ECMA_6
-    static final OUTPUT_MODE = ECMA_51_GLOBAL
     static final R_FILE = 'bla.js'
     static final REL_FILE = 'blabla.js'
     static final LOG_LEVEL = DEBUG
@@ -35,8 +33,6 @@ class PluginTest extends GroovyTestCase {
                 MIN_N_SOURCEMAP,
                 N_SOURCEMAP,
                 //"compliantAsInstanceOfs",
-                MIN_OUTPUTMODE + "=" + M_MODE,
-                OUTPUTMODE + "=" + OUTPUT_MODE,
                 MIN_CHECKIR,
                 CHECKIR,
                 MIN_RELSM + "=" + R_FILE,
@@ -50,7 +46,6 @@ class PluginTest extends GroovyTestCase {
                 ERR
         ].toSet()
         def outputSet = [MIN_OUTPUT + "=" + O_FILE, OUTPUT + "=" + OUTPUT_FILE].toSet()
-        def outputModeSet = [MIN_OUTPUTMODE + "=" + M_MODE, OUTPUTMODE + "=" + OUTPUT_MODE].toSet()
         def sourceMapSet = [MIN_RELSM + "=" + R_FILE, RELSM + "=" + REL_FILE].toSet()
         def logLevelSet = [CompileJSTask.LOG_LEVEL + "=" + LOG_LEVEL,
                            MIN_DEBUG, DEBUG,
@@ -61,9 +56,10 @@ class PluginTest extends GroovyTestCase {
         optionsSet.each {
             setOptionsSet.add([it].toSet())
         }
-        def ret = (Sets.powerSet(outputSet) + Sets.powerSet(outputModeSet) + Sets.powerSet(sourceMapSet) + Sets.powerSet(logLevelSet) + setOptionsSet).toList()
+        def ret = (Sets.powerSet(outputSet) + Sets.powerSet(sourceMapSet) + Sets.powerSet(logLevelSet) + setOptionsSet).toList()
         def numThreads = Runtime.getRuntime().availableProcessors()
         def threadList = new ArrayList<Thread>()
+        //TODO only download once...
         def lock = new ReentrantLock()
         for (int i = 0; i < numThreads; ++i) {
             threadList.add(new Thread(new CheckRunnable(ret, i, numThreads, lock)))
@@ -226,16 +222,6 @@ class PluginTest extends GroovyTestCase {
                     break
                 case COMPLIANT:
                     //TODO
-                    break
-                case MIN_OUTPUTMODE:
-                    assertEquals(options.outputMode(), getOutputMode((String) project.property(s)))
-                    assertEquals(M_MODE, (String) project.property(s))
-                    break
-                case OUTPUTMODE:
-                    if (!p.contains(MIN_OUTPUTMODE)) {
-                        assertEquals(options.outputMode(), getOutputMode((String) project.property(s)))
-                        assertEquals(OUTPUT_MODE, (String) project.property(s))
-                    }
                     break
                 case MIN_CHECKIR:
                 case CHECKIR:
