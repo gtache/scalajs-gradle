@@ -4,3 +4,4 @@ build/
 js/
 sjsir/
 *.iml
+out/
