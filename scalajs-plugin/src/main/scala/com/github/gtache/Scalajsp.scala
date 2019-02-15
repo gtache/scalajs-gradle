@@ -54,7 +54,7 @@ object Scalajsp {
     stdout.flush()
   }
 
-  private def readFromFile(fileName: String) = {
+  private def readFromFile(fileName: String) : VirtualScalaJSIRFile = {
     val file = new File(fileName)
 
     if (!file.exists)
@@ -65,7 +65,7 @@ object Scalajsp {
       FileVirtualScalaJSIRFile(file)
   }
 
-  private def readFromJar(jar: File, name: String) = {
+  private def readFromJar(jar: File, name: String) : VirtualScalaJSIRFile = {
     val jarFile =
       try {
         new ZipFile(jar)

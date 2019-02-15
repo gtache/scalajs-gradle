@@ -6,7 +6,7 @@ import org.scalajs.core.tools.json._
 import org.scalajs.core.tools.linker.backend.ModuleKind
 import org.scalajs.core.tools.logging._
 import org.scalajs.jsenv._
-import org.scalajs.testadapter.ScalaJSFramework
+import org.scalajs.testadapter.TestAdapter
 
 import scala.collection.mutable
 
@@ -26,20 +26,23 @@ final class FrameworkDetector(jsEnv: JSEnv,
   }
 
   /**
-    * Returns a list of instantiated ScalaJSFramework (one for each detected TestFramework). Calls detect()
+    * Returns a list of instantiated TestAdapter (one for each detected TestFramework). Calls detect()
     *
     * @param frameworks The list of TestFramework to search
     * @param logger     The logger to use
     * @param console    The jsConsole to use
-    * @return The list of ScalaJSFramework
+    * @return The list of TestAdapter
     */
-  def instantiatedScalaJSFrameworks(frameworks: Seq[TestFramework], logger: Logger, console: JSConsole): List[ScalaJSFramework] = {
-    detect(frameworks).map(pair => {
-      new ScalaJSFramework(
-        pair._2,
+  def instantiatedScalaJSFrameworks(frameworks: Seq[TestFramework], logger: Logger, console: JSConsole): List[TestAdapter] = {
+    //TODO Only one TestAdapter?
+    detect(frameworks).map(p => {
+      val config = TestAdapter.Config()
+        .withJSConsole(console)
+        .withLogger(logger)
+        .withModuleSettings(ModuleKind.ESModule, Option(p._2))
+      new TestAdapter(
         jsEnv.asInstanceOf[ComJSEnv],
-        logger,
-        console)
+        config)
     }).toList
   }
 

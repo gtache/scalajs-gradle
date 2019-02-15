@@ -1,6 +1,6 @@
 package com.github.gtache.testing
 
-import org.scalajs.testadapter.ScalaJSFramework
+import org.scalajs.testadapter.TestAdapter
 import sbt.testing.TaskDef
 
 /**
@@ -151,8 +151,8 @@ object ScalaJSTestResult {
     * @param f The framework
     * @return An option containing the framework, or None
     */
-  def getStatusFor(f: ScalaJSFramework): Option[ScalaJSFramework] = {
-    statuses.find(s => f.name == s.framework.name).map(s => s.framework)
+  def getStatusFor(f: TestAdapter): Option[ScalaJSTestStatus] = {
+    statuses.find(s => f == s.framework)
   }
 }
 
@@ -161,7 +161,7 @@ object ScalaJSTestResult {
   *
   * @param framework The framework which corresponds to this instance
   */
-final class ScalaJSTestStatus(val framework: ScalaJSFramework) {
+final class ScalaJSTestStatus(val framework: TestAdapter) {
   var all: List[TaskDef] = List.empty
   var errored: List[TaskDef] = List.empty
   var failed: List[TaskDef] = List.empty
@@ -182,7 +182,7 @@ final class ScalaJSTestStatus(val framework: ScalaJSFramework) {
   }
 
   override def toString: String = {
-    "ScalaJSTestStatus for " + framework.name + " : " +
+    "ScalaJSTestStatus for " + framework + " : " +
       "\n--All : " + all.map(t => t.fullyQualifiedName()).mkString("\n\t") +
       "\n--Success : " + succeeded.map(t => t.fullyQualifiedName()).mkString("\n\t") +
       "\n--Error : " + errored.map(t => t.fullyQualifiedName()).mkString("\n\t") +
