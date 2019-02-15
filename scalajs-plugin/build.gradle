@@ -53,7 +53,7 @@ dependencies {
     compile group: 'org.scala-js', name: 'scalajs-js-envs_' + scalaVersion, version: scalaJSVersion
     compile group: 'org.scala-js', name: 'scalajs-tools_' + scalaVersion, version: scalaJSVersion
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'com.google.guava', name: 'guava', version: '27.0.1'
+    testCompile group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
 }
 
 signing {

@@ -4,9 +4,8 @@ import java.io.File
 import java.net.URI
 
 import org.scalajs.core.tools.io._
-import org.scalajs.core.tools.linker.backend.{LinkerBackend, ModuleKind, OutputMode}
-import org.scalajs.core.tools.linker.frontend.LinkerFrontend
-import org.scalajs.core.tools.linker.{ClearableLinker, Linker, ModuleInitializer}
+import org.scalajs.core.tools.linker.backend.ModuleKind
+import org.scalajs.core.tools.linker.{CheckedBehavior => _, Semantics => _, _}
 import org.scalajs.core.tools.logging._
 import org.scalajs.core.tools.sem._
 
@@ -58,31 +57,20 @@ object Scalajsld {
     val logger = new ScalaConsoleLogger(options.logLevel)
     val outFile = WritableFileVirtualJSFile(options.output)
     if (optionsChanged || linker == null) {
-      val semantics: Semantics =
-        if (options.fullOpt) {
-          options.semantics.optimized
-        }
-        else {
-          options.semantics
-        }
 
-      val frontendConfig = LinkerFrontend.Config()
+      val config = StandardLinker.Config()
+        .withBatchMode(options.batchMode)
         .withCheckIR(options.checkIR)
-
-      val backendConfig = LinkerBackend.Config()
-        .withRelativizeSourceMapBase(options.relativizeSourceMap)
-        .withPrettyPrint(options.prettyPrint)
-
-
-      val config = Linker.Config()
-        .withBackendConfig(backendConfig)
-        .withFrontendConfig(frontendConfig)
         .withClosureCompilerIfAvailable(options.fullOpt)
+        .withESFeatures(options.esFeatures)
+        .withModuleKind(options.moduleKind)
         .withOptimizer(!options.noOpt)
         .withParallel(options.parallel)
+        .withPrettyPrint(options.prettyPrint)
+        .withRelativizeSourceMapBase(options.relativizeSourceMap)
+        .withSemantics(if (options.fullOpt) options.semantics.optimized else options.semantics)
         .withSourceMap(options.sourceMap)
-      linker = new ClearableLinker(() => Linker(semantics, options.outputMode, options.moduleKind,
-        config), options.batchMode)
+      linker = new ClearableLinker(() => StandardLinker(config), options.batchMode)
       if (cache == null) {
         cache = (new IRFileCache).newCache
       }
@@ -105,9 +93,7 @@ object Scalajsld {
     * @param cp                  the classpath
     * @param moduleInitializers  the initializers
     * @param output              the output file
-    * @param jsoutput            Deprecated
     * @param semantics           the semantics to be used
-    * @param outputMode          the output mode
     * @param moduleKind          the type of the modules
     * @param noOpt               with no optimization
     * @param fullOpt             with full optimization
@@ -123,9 +109,8 @@ object Scalajsld {
   case class Options(cp: Seq[File] = Seq.empty,
                      moduleInitializers: Seq[ModuleInitializer] = Seq.empty,
                      output: File = null,
-                     jsoutput: Boolean = false,
                      semantics: Semantics = Semantics.Defaults,
-                     outputMode: OutputMode = OutputMode.ECMAScript51Isolated,
+                     esFeatures: ESFeatures = ESFeatures.Defaults,
                      moduleKind: ModuleKind = ModuleKind.NoModule,
                      noOpt: Boolean = false,
                      fullOpt: Boolean = false,
@@ -151,16 +136,8 @@ object Scalajsld {
       this.copy(output = newOutput)
     }
 
-    def withJsOutput(newJsOutput: Boolean): Options = {
-      this.copy(jsoutput = newJsOutput)
-    }
-
     def withSemantics(newSemantics: Semantics): Options = {
       this.copy(semantics = newSemantics)
-    }
-
-    def withOutputMode(newOutputMode: OutputMode): Options = {
-      this.copy(outputMode = newOutputMode)
     }
 
     def withModuleKind(newModuleKind: ModuleKind): Options = {
@@ -188,6 +165,7 @@ object Scalajsld {
     }
 
     def withOptimizerOptions(newOptions: Options): Options = {
+      //TODO Copy instead
       this.withBypassLinkingErrors(newOptions.bypassLinkingErrors)
         .withParallel(newOptions.parallel)
         .withBatchMode(newOptions.batchMode)
@@ -195,6 +173,15 @@ object Scalajsld {
         .withPrettyPrint(newOptions.prettyPrint)
         .withCheckIR(newOptions.checkIR)
         .withUseClosureCompiler(newOptions.fullOpt)
+        .withClasspath(newOptions.cp)
+        .withLogLevel(newOptions.logLevel)
+        .withModuleInitializers(newOptions.moduleInitializers)
+        .withModuleKind(newOptions.moduleKind)
+        .withOutput(newOptions.output)
+        .withRelativizeSourceMap(newOptions.relativizeSourceMap)
+        .withSourceMap(newOptions.sourceMap)
+        .withSemantics(newOptions.semantics)
+        .withStdLib(newOptions.stdLib)
     }
 
     def withDisableOptimizer(newFastOpt: Boolean): Options = {
@@ -228,9 +215,8 @@ object Scalajsld {
     override def toString: String = {
       "cp : " + cp.foldLeft("")((acc: String, c: File) => acc + "\n" + c.getAbsolutePath) + "\n" +
         "moduleInitializers : " + moduleInitializers.mkString(", ") + "\n" +
-        "output : " + output + " jsoutput : " + jsoutput + "\n" +
         "semantics : " + semantics + "\n" +
-        "outputMode : " + outputMode + "\n" +
+        "esFeatures : " + esFeatures + "\n" +
         "moduleKind : " + moduleKind + "\n" +
         "NoOpt : " + noOpt + " ; fullOpt : " + fullOpt + "\n" +
         "prettyPrint : " + prettyPrint + "\n" +
@@ -250,9 +236,8 @@ object Scalajsld {
           this.cp == that.cp &&
             this.moduleInitializers == that.moduleInitializers &&
             this.output == that.output &&
-            this.jsoutput == that.jsoutput &&
+            this.esFeatures == that.esFeatures &&
             this.semantics == that.semantics &&
-            this.outputMode == that.outputMode &&
             this.moduleKind == that.moduleKind &&
             this.noOpt == that.noOpt &&
             this.fullOpt == that.fullOpt &&
@@ -273,9 +258,8 @@ object Scalajsld {
       cp.hashCode +
         47 * moduleInitializers.hashCode +
         2 * output.hashCode +
-        3 * jsoutput.hashCode +
+        3 * esFeatures.hashCode +
         5 * semantics.hashCode +
-        7 * outputMode.hashCode +
         71 * moduleKind.hashCode +
         11 * noOpt.hashCode +
         13 * fullOpt.hashCode +
