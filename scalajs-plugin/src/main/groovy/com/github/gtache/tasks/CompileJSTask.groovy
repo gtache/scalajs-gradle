@@ -12,6 +12,7 @@ import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.sem.Semantics
 import scala.Option
 import scala.collection.JavaConverters
+import scala.collection.Seq
 
 /**
  * Task used to compile sjsir and classes file to a js file.
@@ -19,6 +20,8 @@ import scala.collection.JavaConverters
 public class CompileJSTask extends DefaultTask {
     final String description = "Compiles all sjsir files into a single javascript file"
 
+    //TODO update config
+    //TODO also update scalajs-plugin-test while at it
     //Linker configs
     public static final String MIN_OUTPUT = 'o'
     public static final String OUTPUT = 'output'
@@ -114,7 +117,7 @@ public class CompileJSTask extends DefaultTask {
     private Scalajsld.Options parseOptions() {
         final cp = project.configurations.runtime + srcFiles
         def options = Scalajsld.defaultOptions().withClasspath(
-                JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
+                JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq() as Seq<File>)
 
 
         if (project.hasProperty(OPTIONS)) {

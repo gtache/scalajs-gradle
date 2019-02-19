@@ -95,7 +95,7 @@ final class ScalajsPlugin implements Plugin<Project> {
             runJS.dependsOn(fastOptJS)
         }
 
-        final scalajsp = tasks.create('Scalajsp', ScalajspTask.class)
+        tasks.create('Scalajsp', ScalajspTask.class)
 
         project.afterEvaluate {
             tasks.withType(CompileJSTask) {
