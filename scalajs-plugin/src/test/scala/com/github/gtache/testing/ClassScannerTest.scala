@@ -87,6 +87,8 @@ class ClassScannerTest {
 
   def checkContains(nameTasks: Set[String], contained: Set[String], all: Set[String]): Unit = {
     contained.foreach { s =>
+      println("nameTasks : " + nameTasks)
+      println("s : " + s)
       assertTrue(s + " in " + contained.mkString(" ; "), nameTasks.contains(s))
     }
     all.filterNot(contained).foreach { s =>

@@ -4,6 +4,7 @@ import com.github.gtache.tasks.CompileJSTask
 import com.github.gtache.tasks.RunJSTask
 import com.github.gtache.tasks.ScalajspTask
 import com.github.gtache.tasks.TestJSTask
+import com.github.gtache.tasks.VersionTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.execution.TaskExecutionGraph
@@ -62,21 +63,18 @@ final class ScalajsPlugin implements Plugin<Project> {
 
 
         final tasks = project.tasks
-
+        tasks.create('SJSVersion', VersionTask.class)
         final noOptJS = tasks.create('NoOptJS', CompileJSTask.class)
         noOptJS.destFile = jsFile
         noOptJS.noOpt()
-        project.logger.info(noOptJS.name + ' task added')
 
         final fastOptJS = tasks.create('FastOptJS', CompileJSTask.class)
         fastOptJS.destFile = jsFastFile
         fastOptJS.fastOpt()
-        project.logger.info(fastOptJS.name + ' task added')
 
         final fullOptJS = tasks.create('FullOptJS', CompileJSTask.class)
         fullOptJS.destFile = jsFullFile
         fullOptJS.fullOpt()
-        project.logger.info(fullOptJS.name + ' task added')
 
         final runJS = tasks.create('RunJS', RunJSTask.class)
 
@@ -96,10 +94,8 @@ final class ScalajsPlugin implements Plugin<Project> {
             testJS.dependsOn(fastOptJS)
             runJS.dependsOn(fastOptJS)
         }
-        project.logger.info(testJS.name + ' task added')
 
         final scalajsp = tasks.create('Scalajsp', ScalajspTask.class)
-        project.logger.info(scalajsp.name + ' task added')
 
         project.afterEvaluate {
             tasks.withType(CompileJSTask) {

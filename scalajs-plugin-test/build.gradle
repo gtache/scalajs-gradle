@@ -14,7 +14,7 @@ buildscript {
     String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.15'
     String scalaJSM = scalaJSVersion.substring(0,3)
 
-    String pluginVersion = '0.3.0'
+    String pluginVersion = '0.4.0'
     String pluginFullVersion = 'sjs'+scalaJSM+'_'+scalaVersion+'_'+pluginVersion
     repositories {
         mavenLocal()

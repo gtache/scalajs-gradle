@@ -18,7 +18,7 @@ version 'sjs' + scalaJSM + '_' + scalaVersion + '_0.4.0'
 apply plugin: 'idea'
 apply plugin: 'scala'
 apply plugin: 'groovy'
-apply plugin: 'maven'
+apply plugin: 'maven' //TODO migrate to maven-publish
 apply plugin: 'signing'
 
 sourceCompatibility = 1.8

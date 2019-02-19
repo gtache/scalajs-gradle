@@ -156,13 +156,6 @@ class UtilsTest extends GroovyTestCase {
     }
 
     @Test
-    public void testGetOutputMode() {
-        assertEquals(OutputMode.ECMAScript51Global$.MODULE$, getOutputMode(ECMA_51_GLOBAL))
-        assertEquals(OutputMode.ECMAScript51Isolated$.MODULE$, getOutputMode(ECMA_51_ISOLATED))
-        assertEquals(OutputMode.ECMAScript6$.MODULE$, getOutputMode(ECMA_6))
-    }
-
-    @Test
     public void testGetMinimalDependencySeq() {
         final Project project = getFreshProject()
         final jsFastPath = project.name + FASTOPT_SUFFIX
