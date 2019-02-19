@@ -50,7 +50,7 @@ class ClassScannerTest {
   }
 
   val fingerprints: Array[Fingerprint] = Array(annFingerprint, scalAnnFingerprint, subFingerprint, subFingerprint2, subFingerprint3)
-  val test: URL = this.getClass.getResource("../../../../")
+  val test: URL = this.getClass.getResource("../../../../") //TODO make it work for Gradle 5, path changed most likely
   val loader = new URLClassLoader(Array(test))
 
   val explicitlySpecified: Set[String] = Set("*A*", "*B", "*C").map(Utils.toRegex)
@@ -87,8 +87,6 @@ class ClassScannerTest {
 
   def checkContains(nameTasks: Set[String], contained: Set[String], all: Set[String]): Unit = {
     contained.foreach { s =>
-      println("nameTasks : " + nameTasks)
-      println("s : " + s)
       assertTrue(s + " in " + contained.mkString(" ; "), nameTasks.contains(s))
     }
     all.filterNot(contained).foreach { s =>
