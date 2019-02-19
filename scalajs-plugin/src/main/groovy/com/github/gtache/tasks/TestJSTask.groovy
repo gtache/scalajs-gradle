@@ -117,11 +117,10 @@ class TestJSTask extends DefaultTask {
         }
 
         project.logger.lifecycle(ScalaJSTestResult.toString())
-        boolean success = ScalaJSTestResult.isSuccess()
         ScalaJSTestResult.save()
 
         //Make build fail
-        if (!success) {
+        if (!ScalaJSTestResult.isSuccess()) {
             throw new Exception("There were failures while testing")
         }
     }
