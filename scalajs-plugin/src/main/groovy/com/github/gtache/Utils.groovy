@@ -12,9 +12,10 @@ import org.scalajs.core.tools.linker.backend.ModuleKind
 import org.scalajs.core.tools.linker.backend.OutputMode
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.jsenv.JSEnv
-import org.scalajs.jsenv.nodejs.JSDOMNodeJSEnv
+import org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv
 import org.scalajs.jsenv.nodejs.NodeJSEnv
 import org.scalajs.jsenv.phantomjs.PhantomJSEnv
+import org.scalajs.jsenv.phantomjs.PhantomJSEnv$
 import org.scalajs.jsenv.phantomjs.PhantomJettyClassLoader
 import org.scalajs.jsenv.rhino.RhinoJSEnv
 import scala.collection.Map$
@@ -69,6 +70,7 @@ public final class Utils {
 
     //Module
     public static final String COMMONJS_MODULE = "commonJSModule"
+    public static final String ES_MODULE = "esModule"
     public static final String USE_MAIN_MODULE = "useMainModuleInit"
 
     public static final String TEST_FRAMEWORKS = 'testFrameworks'
@@ -122,29 +124,43 @@ public final class Utils {
      * @return The environment to use (Default : Node)
      */
     public static JSEnv resolveEnv(Project project) {
-        def env
+        JSEnv env
         if (project.hasProperty(JSENV)) {
             def envObj = project.property(JSENV)
             if (envObj instanceof JSEnv) {
-                env = envObj as JSEnv
+                env = envObj
             } else {
-                project.logger.error("The object given as \"jsEnv\" is not of type JSEnv")
+                project.logger.error("JSEnv not of type JSEnv ; was " + envObj.getClass())
                 env = null
             }
         } else if (project.hasProperty(RHINO)) {
+            //TODO will be deprecated
             env = new RhinoJSEnv(Scalajsld$.MODULE$.options().semantics(), false)
         } else if (project.hasProperty(PHANTOM)) {
             final URL[] jars = project.configurations.phantomJetty.findAll {
                 it.absolutePath.contains('jetty')
             }.collect { it.toURI().toURL() } as URL[]
             final PhantomJettyClassLoader loader = new PhantomJettyClassLoader(new URLClassLoader(jars), project.buildscript.classLoader)
-            env = new PhantomJSEnv("phantomjs", List$.MODULE$.empty(), Map$.MODULE$.empty(), true, loader)
+            def config = PhantomJSEnv.Config$.MODULE$.apply()
+                    .withExecutable("phantomjs")
+                    .withArgs(List$.MODULE$.empty())
+                    .withEnv(Map$.MODULE$.empty())
+                    .withAutoExit(true)
+                    .withJettyClassLoader(loader)
+            env = new PhantomJSEnv(config)
         } else if (project.hasProperty(JSDOM)) {
-            env = new JSDOMNodeJSEnv("node", List$.MODULE$.empty(), Map$.MODULE$.empty()) //TODO add internal
+            def config = new JSDOMNodeJSEnv.Config$().apply()
+                    .withExecutable("node")
+                    .withArgs(List$.MODULE$.empty())
+                    .withEnv(Map$.MODULE$.empty())
+            env = new JSDOMNodeJSEnv(config)
         } else {
-            NodeJSEnv.Config config = new NodeJSEnv.Config("node", List$.MODULE$.empty(), Map$.MODULE$.empty(), true)
-            //TODO sourcemap
-            env = new NodeJSEnv(config) //TODO deprecated
+            def config = NodeJSEnv.Config$.MODULE$.apply()
+                    .withExecutable("node")
+                    .withArgs(List$.MODULE$.empty())
+                    .withEnv(Map$.MODULE$.empty())
+                    .withSourceMap(true)
+            env = new NodeJSEnv(config)
         }
         return env
     }
