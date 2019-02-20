@@ -144,6 +144,10 @@ object Scalajsld {
       this.copy(moduleKind = newModuleKind)
     }
 
+    def withEsFeatures(esFeatures: ESFeatures): Options = {
+      this.copy(esFeatures = esFeatures)
+    }
+
     def withSourceMap(newSourceMap: Boolean): Options = {
       this.copy(sourceMap = newSourceMap)
     }
@@ -182,6 +186,7 @@ object Scalajsld {
         .withSourceMap(newOptions.sourceMap)
         .withSemantics(newOptions.semantics)
         .withStdLib(newOptions.stdLib)
+        .withEsFeatures(newOptions.esFeatures)
     }
 
     def withDisableOptimizer(newFastOpt: Boolean): Options = {
