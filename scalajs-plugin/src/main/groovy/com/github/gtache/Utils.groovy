@@ -175,7 +175,7 @@ public final class Utils {
         final def baseFilename = jsPath + project.name
         if (graph == null) {
             project.logger.warn('TaskGraph not ready yet : Possible error when computing output file\n' +
-                    'Run with TestJS explicitely to be sure it works')
+                    'Run with TestJS explicitly to be sure it works')
         }
         //Performs suboptimal check if TaskExecutionGraph not ready
         final def hasTest = graph != null ? graph.hasTask(':TestJS') : isTaskInStartParameter(project, 'testjs')
@@ -207,7 +207,7 @@ public final class Utils {
     }
 
     /**
-     * Returns the minimal ResolvedDependency Seq, which is comprised of only the generated js file.
+     * Returns the minimal ResolvedDependency Seq, which is composed of only the generated js file.
      * @param project The project
      * @return the (mutable) seq of only one element
      */
@@ -239,7 +239,7 @@ public final class Utils {
                     }
                 }
             }
-            catch (AccessDeniedException e) {
+            catch (AccessDeniedException ignored) {
                 //Files.isWritable doesnt work 100% apparently => can't use project.delete, throws exception sometimes
             }
         }
@@ -300,7 +300,13 @@ public final class Utils {
     }
 
     public static ModuleKind resolveModuleKind(Project project) {
-        return project.hasProperty(COMMONJS_MODULE) ? ModuleKind.CommonJSModule$.MODULE$ : ModuleKind.NoModule$.MODULE$
+        if (project.hasProperty(COMMONJS_MODULE)) {
+            return ModuleKind.CommonJSModule$.MODULE$
+        } else if (project.hasProperty(ES_MODULE)) {
+            return ModuleKind.ESModule$.MODULE$
+        } else {
+            return ModuleKind.NoModule$.MODULE$
+        }
     }
 
     private static Map<String, String> resolveJavaSystemProperties(Project project) {
