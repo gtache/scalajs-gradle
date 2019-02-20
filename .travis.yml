@@ -6,6 +6,13 @@ scala:
 before_install:
     - sudo apt-get -qq update
     
+jsenv:
+    phantom
+    rhino
+optim:
+    NoOpt
+    Fast
+    Full
 script: 
     - cd ./scalajs-plugin/
     - chmod +x gradlew
@@ -14,20 +21,20 @@ script:
     - cd ../scalajs-plugin-test/
     - chmod +x gradlew
 
-    - ./gradlew RunJS -Pclassname="com.github.gtache.DummyObject" -Pmethname="printSomething(\"blabla\")" -Prhino
-    - ./gradlew RunJS -Pclassname="com.github.gtache.DummyScalaTag" -Pphantom
+    - ./gradlew RunJS -Pclassname="com.github.gtache.DummyObject" -Pmethname="printSomething(\"blabla\")" -P${jsenv}
+    - ./gradlew RunJS -Pclassname="com.github.gtache.DummyScalaTag" -P${jsenv}
     - ./gradlew clean
-    - ./gradlew RunJS -PtoExec="com.github.gtache.DummyScalaTag().main()" -PrunFull -Prhino
+    - ./gradlew RunJS -PtoExec="com.github.gtache.DummyScalaTag().main()" -Prun${optim} -P${jsenv}
     - ./gradlew clean
-    - ./gradlew RunJS -PtoExec="com.github.gtache.DummyObject().main()" -Pclassname="com.github.gtache.DummyScalaTag" -PrunNoOpt
+    - ./gradlew RunJS -PtoExec="com.github.gtache.DummyObject().main()" -Pclassname="com.github.gtache.DummyScalaTag" -P${jsenv}
     - ./gradlew clean
-    - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js" -PrunFull -Pphantom
-    - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js" -PrunNoOpt -Prhino
+    - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js" -Prun${optim} -P${jsenv}
     - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js"
     - ./gradlew TestJS
-    - ./gradlew TestJS -Ptest-only=*JUnit*
-    - ./gradlew TestJS -Ptest-only=*Scala* -Prhino
-    - ./gradlew TestJS -Pretest -Pphantom
+    - ./gradlew TestJS -Ptest-only='*JUnit*'
+    - ./gradlew TestJS -Ptest-only='*Scala*' -P${jsenv}
+    - ./gradlew TestJS -Pretest -P${jsenv}
+    - ./gradlew TestJS -Ptest-quick='*Scala*' -P${jsenv}
 
 
 before_cache:
