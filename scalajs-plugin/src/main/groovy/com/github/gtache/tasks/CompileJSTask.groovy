@@ -10,7 +10,6 @@ import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.linker.ModuleInitializer
 import org.scalajs.core.tools.linker.backend.ModuleKind
 import org.scalajs.core.tools.linker.backend.OutputMode
-import org.scalajs.core.tools.linker.backend.OutputMode$
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.sem.Semantics
 import scala.Option

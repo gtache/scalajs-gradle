@@ -124,6 +124,31 @@ object Scalajsld {
                      stdLib: Option[File] = None,
                      logLevel: Level = Level.Info) {
 
+    def withCompliantsSemantics(): Options = {
+      this.copy(semantics = semantics.withAsInstanceOfs(CheckedBehavior.Compliant))
+    }
+
+    def withOptimizerOptions(newOptions: Options): Options = {
+      //TODO Copy instead
+      this.withBypassLinkingErrors(newOptions.bypassLinkingErrors)
+        .withParallel(newOptions.parallel)
+        .withBatchMode(newOptions.batchMode)
+        .withDisableOptimizer(!newOptions.noOpt)
+        .withPrettyPrint(newOptions.prettyPrint)
+        .withCheckIR(newOptions.checkIR)
+        .withUseClosureCompiler(newOptions.fullOpt)
+        .withClasspath(newOptions.cp)
+        .withLogLevel(newOptions.logLevel)
+        .withModuleInitializers(newOptions.moduleInitializers)
+        .withModuleKind(newOptions.moduleKind)
+        .withOutput(newOptions.output)
+        .withRelativizeSourceMap(newOptions.relativizeSourceMap)
+        .withSourceMap(newOptions.sourceMap)
+        .withSemantics(newOptions.semantics)
+        .withStdLib(newOptions.stdLib)
+        .withEsFeatures(newOptions.esFeatures)
+    }
+
     def withClasspath(newCp: Seq[File]): Options = {
       this.copy(cp = newCp)
     }
@@ -162,31 +187,6 @@ object Scalajsld {
 
     def withLogLevel(newLogLevel: Level): Options = {
       this.copy(logLevel = newLogLevel)
-    }
-
-    def withCompliantsSemantics(): Options = {
-      this.copy(semantics = semantics.withAsInstanceOfs(CheckedBehavior.Compliant))
-    }
-
-    def withOptimizerOptions(newOptions: Options): Options = {
-      //TODO Copy instead
-      this.withBypassLinkingErrors(newOptions.bypassLinkingErrors)
-        .withParallel(newOptions.parallel)
-        .withBatchMode(newOptions.batchMode)
-        .withDisableOptimizer(!newOptions.noOpt)
-        .withPrettyPrint(newOptions.prettyPrint)
-        .withCheckIR(newOptions.checkIR)
-        .withUseClosureCompiler(newOptions.fullOpt)
-        .withClasspath(newOptions.cp)
-        .withLogLevel(newOptions.logLevel)
-        .withModuleInitializers(newOptions.moduleInitializers)
-        .withModuleKind(newOptions.moduleKind)
-        .withOutput(newOptions.output)
-        .withRelativizeSourceMap(newOptions.relativizeSourceMap)
-        .withSourceMap(newOptions.sourceMap)
-        .withSemantics(newOptions.semantics)
-        .withStdLib(newOptions.stdLib)
-        .withEsFeatures(newOptions.esFeatures)
     }
 
     def withDisableOptimizer(newFastOpt: Boolean): Options = {

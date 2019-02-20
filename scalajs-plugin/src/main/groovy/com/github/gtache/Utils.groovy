@@ -9,17 +9,14 @@ import org.scalajs.core.tools.io.MemVirtualJSFile
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency$
 import org.scalajs.core.tools.linker.backend.ModuleKind
-import org.scalajs.core.tools.linker.backend.OutputMode
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.jsenv.JSEnv
 import org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv
 import org.scalajs.jsenv.nodejs.NodeJSEnv
 import org.scalajs.jsenv.phantomjs.PhantomJSEnv
-import org.scalajs.jsenv.phantomjs.PhantomJSEnv$
 import org.scalajs.jsenv.phantomjs.PhantomJettyClassLoader
 import org.scalajs.jsenv.rhino.RhinoJSEnv
 import scala.collection.Map$
-import scala.collection.Seq$
 import scala.collection.immutable.List$
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.ArraySeq

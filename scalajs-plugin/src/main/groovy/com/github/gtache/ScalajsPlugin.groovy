@@ -1,10 +1,6 @@
 package com.github.gtache
 
-import com.github.gtache.tasks.CompileJSTask
-import com.github.gtache.tasks.RunJSTask
-import com.github.gtache.tasks.ScalajspTask
-import com.github.gtache.tasks.TestJSTask
-import com.github.gtache.tasks.VersionTask
+import com.github.gtache.tasks.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.execution.TaskExecutionGraph

@@ -3,7 +3,6 @@ package com.github.gtache
 import com.github.gtache.testing.TestFramework
 import org.gradle.api.Project
 import org.junit.Test
-import org.scalajs.core.tools.linker.backend.OutputMode
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.jsenv.nodejs.NodeJSEnv
 import org.scalajs.jsenv.phantomjs.PhantomJSEnv

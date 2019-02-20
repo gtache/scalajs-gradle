@@ -38,29 +38,6 @@ object ScalaJSTestResult {
     }
   }
 
-  private def getErroredNames: Set[String] = {
-    statuses.flatMap(s => s.errored).map(t => t.fullyQualifiedName())
-  }
-
-  private def getFailedNames: Set[String] = {
-    statuses.flatMap(s => s.failed).map(t => t.fullyQualifiedName())
-  }
-
-  /**
-    * Checks if testing is finished
-    *
-    * @return true or false
-    */
-  def isFinished: Boolean = statuses.forall(s => s.isFinished)
-
-  private def sanitizeClassnames(names: Set[String]): Set[String] = {
-    names.map(s => s.takeWhile(c => c != ':')).filter(s => !s.contains('#'))
-  }
-
-  private def getSuccessfulNames: Set[String] = {
-    statuses.flatMap(s => s.succeeded).map(t => t.fullyQualifiedName())
-  }
-
   /**
     * Returns the successful classes from the last run
     *
@@ -68,6 +45,10 @@ object ScalaJSTestResult {
     */
   def getLastSuccessfulClassnames: Set[String] = {
     sanitizeClassnames(lastStatuses.flatMap(s => s.succeeded).map(t => t.fullyQualifiedName())).diff(getLastFailedClassnames)
+  }
+
+  private def sanitizeClassnames(names: Set[String]): Set[String] = {
+    names.map(s => s.takeWhile(c => c != ':')).filter(s => !s.contains('#'))
   }
 
   /**
@@ -111,6 +92,21 @@ object ScalaJSTestResult {
       (if (isSuccess) "\nAll tests passed" else "\nSome tests failed")
   }
 
+  private def getFailedNames: Set[String] = {
+    statuses.flatMap(s => s.failed).map(t => t.fullyQualifiedName())
+  }
+
+  /**
+    * Checks if testing is finished
+    *
+    * @return true or false
+    */
+  def isFinished: Boolean = statuses.forall(s => s.isFinished)
+
+  private def getSuccessfulNames: Set[String] = {
+    statuses.flatMap(s => s.succeeded).map(t => t.fullyQualifiedName())
+  }
+
   /**
     * Checks if all tests were successful
     *
@@ -123,6 +119,10 @@ object ScalaJSTestResult {
       println("Testing is not finished")
       false
     }
+  }
+
+  private def getErroredNames: Set[String] = {
+    statuses.flatMap(s => s.errored).map(t => t.fullyQualifiedName())
   }
 
   private def getCanceledNames: Set[String] = {
