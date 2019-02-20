@@ -13,6 +13,7 @@ import org.scalajs.core.tools.linker.backend.OutputMode
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.sem.Semantics
 import scala.Option
+import scala.Some
 import scala.collection.JavaConverters
 import scala.collection.Seq
 
@@ -209,9 +210,9 @@ public class CompileJSTask extends DefaultTask {
         if (project.hasProperty(STDLIB)) {
             def stdlib = project.property(STDLIB)
             if (stdlib instanceof String) {
-                options = options.withStdLib(Option<File>.apply(new File(stdlib)))
+                options = options.withStdLib(new Some<File>(new File(stdlib)))
             } else if (stdlib instanceof File) {
-                options = options.withStdLib(Option<File>.apply(stdlib))
+                options = options.withStdLib(new Some<File>(stdlib))
             } else {
                 project.error("Stdlib not of class String or File ; was " + stdlib.getClass())
             }

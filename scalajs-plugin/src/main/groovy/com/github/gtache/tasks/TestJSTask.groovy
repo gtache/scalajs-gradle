@@ -76,29 +76,34 @@ class TestJSTask extends DefaultTask {
         if (project.hasProperty(TEST_ONLY)) {
             explicitlySpecified = ((String) project.property(TEST_ONLY)).split(CPSeparator).toList().toSet()
                     .collect { Utils.toRegex(it) }
+            project.logger.info("Regex to add " + explicitlySpecified)
             if (explicitlySpecified.isEmpty()) {
                 explicitlySpecified.add("")
             }
         } else if (project.hasProperty(TEST_QUICK)) {
+            //FIXME if last run didn't contain explicitlySpecified, will run them anyway
             explicitlySpecified = ((String) project.property(TEST_QUICK)).split(CPSeparator).toList().toSet()
                     .collect { Utils.toRegex(it) }
+            project.logger.info("Regex to add " + explicitlySpecified)
             if (explicitlySpecified.isEmpty()) {
                 explicitlySpecified.add("")
             }
             excluded = JavaConverters.asJavaCollectionConverter(ScalaJSTestResult$.MODULE$.lastSuccessfulClassnames).asJavaCollection().toSet()
                     .collect { it + objWildcard }
+            project.logger.info("Excluding " + excluded)
             if (excluded.isEmpty()) {
                 excluded.add("")
             }
         } else if (project.hasProperty(RETEST)) {
             explicitlySpecified = JavaConverters.asJavaCollectionConverter(ScalaJSTestResult$.MODULE$.lastFailedClassnames).asJavaCollection().toSet()
                     .collect { it + objWildcard }
+            project.logger.info("Retesting " + explicitlySpecified)
             if (explicitlySpecified.isEmpty()) {
                 explicitlySpecified.add("")
             }
         }
-        scala.collection.immutable.Set<String> explicitlySpecifiedScala = JavaConverters.asScalaSetConverter(explicitlySpecified).asScala().toSet()
-        scala.collection.immutable.Set<String> excludedScala = JavaConverters.asScalaSetConverter(excluded).asScala().toSet()
+        scala.collection.immutable.Set<String> explicitlySpecifiedScala = JavaConverters.asScalaSet(explicitlySpecified).toSet()
+        scala.collection.immutable.Set<String> excludedScala = JavaConverters.asScalaSet(excluded).toSet()
 
         Logger[] simpleLoggerArray = new SimpleLogger() as Logger[]
         JavaConverters.asJavaCollection(frameworksO).each { frameworkO ->
@@ -126,6 +131,7 @@ class TestJSTask extends DefaultTask {
 
         project.logger.lifecycle(ScalaJSTestResult.toString())
         ScalaJSTestResult.save()
+        project.logger.info("LastStatuses : " + ScalaJSTestResult$.MODULE$.lastStatuses)
 
         //Make build fail
         if (!ScalaJSTestResult.isSuccess()) {
