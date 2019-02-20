@@ -22,5 +22,7 @@ object TestFrameworks {
   * @param classNames The names of the class which correspond to a framework
   */
 class TestFramework(val classNames: String*) {
-
+  def toList: List[String] = {
+    classNames.toList
+  }
 }

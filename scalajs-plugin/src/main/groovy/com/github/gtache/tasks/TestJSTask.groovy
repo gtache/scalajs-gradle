@@ -5,7 +5,6 @@ import com.github.gtache.testing.*
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency
-import org.scalajs.core.tools.linker.backend.ModuleKind
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.logging.ScalaConsoleLogger
 import org.scalajs.jsenv.ComJSEnv
@@ -52,18 +51,24 @@ class TestJSTask extends DefaultTask {
         for (int i = 0; i < defaultFrameworks.length(); ++i) {
             allFrameworks.$plus$eq(defaultFrameworks.apply(i))
         }
-        final List<TestAdapter> frameworks = JavaConverters.asJavaIterableConverter(new FrameworkDetector(libEnv, ModuleKind.NoModule$.MODULE$, Option.apply(null)).instantiatedScalaJSFrameworks(
-                allFrameworks.toSeq(),
-                new ScalaConsoleLogger(Utils.resolveLogLevel(project, LOG_LEVEL, Level.Info$.MODULE$)),
-                ConsoleJSConsole$.MODULE$
-        )).asJava().toList()
+        def config = TestAdapter.Config$.MODULE$.apply()
+                .withJSConsole(ConsoleJSConsole$.MODULE$)
+                .withLogger(new ScalaConsoleLogger(Utils.resolveLogLevel(project, LOG_LEVEL, Level.Info$.MODULE$)))
+                .withModuleSettings(Utils.resolveModuleKind(project), Option.empty())
+        TestAdapter adapter = new TestAdapter(libEnv, config)
+        def jFrameworks = JavaConverters.bufferAsJavaList(allFrameworks)
+        jFrameworks = jFrameworks.collect {
+            it.toList()
+        }
+        def frameworksO = adapter.loadFrameworks(JavaConverters.asScalaBuffer(jFrameworks).toList())
+        JavaConverters.asJavaCollection(frameworksO).each {
+            if (it.nonEmpty()) {
+                project.logger.info("Framework found : " + it.get().name())
+            }
+        }
 
         final URL[] urls = project.sourceSets.test.runtimeClasspath.collect { it.toURI().toURL() } as URL[]
         final URLClassLoader classL = new URLClassLoader(urls)
-
-        frameworks.each { TestAdapter framework ->
-            project.logger.info("Framework found : " + framework)
-        }
 
         final String objWildcard = '\\$?'
         Set<String> explicitlySpecified = new HashSet<>()
@@ -96,23 +101,26 @@ class TestJSTask extends DefaultTask {
         scala.collection.immutable.Set<String> excludedScala = JavaConverters.asScalaSetConverter(excluded).asScala().toSet()
 
         Logger[] simpleLoggerArray = new SimpleLogger() as Logger[]
-        frameworks.each { TestAdapter framework ->
-            final Runner runner = framework.runner(new String[0], new String[0], null)
-            final Fingerprint[] fingerprints = framework.fingerprints()
-            final Task[] tasks = runner.tasks(ClassScanner.scan(classL, fingerprints, explicitlySpecifiedScala, excludedScala))
-            project.logger.info("Executing " + framework.name())
-            if (tasks.length == 0) {
-                project.logger.info("No tasks found")
-            } else {
-                final ScalaJSTestStatus testStatus = new ScalaJSTestStatus(framework)
-                final EventHandler eventHandler = new ScalaJSEventHandler(testStatus)
-                ScalaJSTestResult$.MODULE$.statuses_$eq(ScalaJSTestResult.statuses().$plus(testStatus) as scala.collection.immutable.Set<ScalaJSTestStatus>)
-                tasks.each { Task t ->
-                    t.execute(eventHandler, simpleLoggerArray)
+        JavaConverters.asJavaCollection(frameworksO).each { frameworkO ->
+            if (frameworkO.nonEmpty()) {
+                def framework = frameworkO.get()
+                final Runner runner = framework.runner(new String[0], new String[0], null)
+                final Fingerprint[] fingerprints = framework.fingerprints()
+                final Task[] tasks = runner.tasks(ClassScanner.scan(classL, fingerprints, explicitlySpecifiedScala, excludedScala))
+                project.logger.info("Executing " + framework.name())
+                if (tasks.length == 0) {
+                    project.logger.info("No tasks found")
+                } else {
+                    final ScalaJSTestStatus testStatus = new ScalaJSTestStatus(framework)
+                    final EventHandler eventHandler = new ScalaJSEventHandler(testStatus)
+                    ScalaJSTestResult$.MODULE$.statuses_$eq(ScalaJSTestResult.statuses().$plus(testStatus) as scala.collection.immutable.Set<ScalaJSTestStatus>)
+                    tasks.each { Task t ->
+                        t.execute(eventHandler, simpleLoggerArray)
+                    }
+                    project.logger.lifecycle('\n')
+                    runner.done()
+                    testStatus.finished_$eq(true)
                 }
-                project.logger.lifecycle('\n')
-                runner.done()
-                testStatus.finished_$eq(true)
             }
         }
 

@@ -1,7 +1,6 @@
 package com.github.gtache.testing
 
-import org.scalajs.testadapter.TestAdapter
-import sbt.testing.TaskDef
+import sbt.testing.{Framework, TaskDef}
 
 /**
   * An object containing the testing results.
@@ -146,13 +145,13 @@ object ScalaJSTestResult {
   }
 
   /**
-    * Returns the ScalaJSTestStatus for the given ScalaJSFramework
+    * Returns the ScalaJSTestStatus for the given Framework
     *
     * @param f The framework
     * @return An option containing the framework, or None
     */
-  def getStatusFor(f: TestAdapter): Option[ScalaJSTestStatus] = {
-    statuses.find(s => f == s.framework)
+  def getStatusFor(f: Framework): Option[ScalaJSTestStatus] = {
+    statuses.find(s => f.name() == s.framework.name())
   }
 }
 
@@ -161,7 +160,7 @@ object ScalaJSTestResult {
   *
   * @param framework The framework which corresponds to this instance
   */
-final class ScalaJSTestStatus(val framework: TestAdapter) {
+final class ScalaJSTestStatus(val framework: Framework) {
   var all: List[TaskDef] = List.empty
   var errored: List[TaskDef] = List.empty
   var failed: List[TaskDef] = List.empty
