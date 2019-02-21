@@ -56,6 +56,7 @@ final class ScalajsPlugin implements Plugin<Project> {
 
         final runNoOpt = project.hasProperty(RUN_NOOPT)
         final runFull = project.hasProperty(RUN_FULL)
+        final runFast = project.hasProperty(RUN_FAST)
 
 
         final tasks = project.tasks

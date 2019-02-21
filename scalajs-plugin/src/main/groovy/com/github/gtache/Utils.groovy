@@ -48,6 +48,7 @@ public final class Utils {
     public static final String FULLOPT_TEST_SUFFIX = TEST_SUFFIX + FULLOPT_SUFFIX
     public static final String FASTOPT_TEST_SUFFIX = TEST_SUFFIX + FASTOPT_SUFFIX
 
+    public static final String RUN_FAST = 'runFast'
     public static final String RUN_FULL = 'runFull'
     public static final String RUN_NOOPT = 'runNoOpt'
 

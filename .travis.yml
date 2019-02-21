@@ -7,12 +7,12 @@ before_install:
     - sudo apt-get -qq update
     
 jsenv:
-    phantom
-    rhino
+    - phantom
+    - rhino
 optim:
-    NoOpt
-    Fast
-    Full
+    - NoOpt
+    - Fast
+    - Full
 script: 
     - cd ./scalajs-plugin/
     - chmod +x gradlew
