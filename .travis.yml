@@ -17,9 +17,9 @@ matrix:
         - env: jsenv=rhino optim=NoOpt
         - env: jsenv=rhino optim=Fast
         - env: jsenv=rhino optim=Full
-        - env: jsenv=jsDom optim=NoOpt
-        - env: jsenv=jsDom optim=Fast
-        - env: jsenv=jsDom optim=Full
+        - env: jsenv=node optim=NoOpt
+        - env: jsenv=node optim=Fast
+        - env: jsenv=node optim=Full
         
 script: 
     - cd ./scalajs-plugin/
