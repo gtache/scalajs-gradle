@@ -6,13 +6,15 @@ scala:
 before_install:
     - sudo apt-get -qq update
     
-jsenv:
-    - phantom
-    - rhino
-optim:
-    - NoOpt
-    - Fast
-    - Full
+matrix:
+    include:
+        - env: jsenv=phantom optim=NoOpt
+        - env: jsenv=phantom optim=Fast
+        - env: jsenv=phantom optim=Full
+        - env: jsenv=rhino optim=NoOpt
+        - env: jsenv=rhino optim=Fast
+        - env: jsenv=rhino optim=Full
+        
 script: 
     - cd ./scalajs-plugin/
     - chmod +x gradlew
