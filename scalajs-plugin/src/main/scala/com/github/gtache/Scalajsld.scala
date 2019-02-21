@@ -115,7 +115,7 @@ object Scalajsld {
                      noOpt: Boolean = false,
                      fullOpt: Boolean = false,
                      prettyPrint: Boolean = false,
-                     sourceMap: Boolean = false,
+                     sourceMap: Boolean = true,
                      relativizeSourceMap: Option[URI] = None,
                      bypassLinkingErrors: Boolean = false,
                      batchMode: Boolean = false,
@@ -129,24 +129,23 @@ object Scalajsld {
     }
 
     def withOptimizerOptions(newOptions: Options): Options = {
-      //TODO Copy instead
-      this.withBypassLinkingErrors(newOptions.bypassLinkingErrors)
-        .withParallel(newOptions.parallel)
-        .withBatchMode(newOptions.batchMode)
-        .withDisableOptimizer(!newOptions.noOpt)
-        .withPrettyPrint(newOptions.prettyPrint)
-        .withCheckIR(newOptions.checkIR)
-        .withUseClosureCompiler(newOptions.fullOpt)
-        .withClasspath(newOptions.cp)
-        .withLogLevel(newOptions.logLevel)
-        .withModuleInitializers(newOptions.moduleInitializers)
-        .withModuleKind(newOptions.moduleKind)
-        .withOutput(newOptions.output)
-        .withRelativizeSourceMap(newOptions.relativizeSourceMap)
-        .withSourceMap(newOptions.sourceMap)
-        .withSemantics(newOptions.semantics)
-        .withStdLib(newOptions.stdLib)
-        .withEsFeatures(newOptions.esFeatures)
+      this.copy(bypassLinkingErrors = newOptions.bypassLinkingErrors,
+        parallel = newOptions.parallel,
+        batchMode = newOptions.batchMode,
+        noOpt = newOptions.noOpt,
+        prettyPrint = newOptions.prettyPrint,
+        checkIR = newOptions.checkIR,
+        fullOpt = newOptions.fullOpt,
+        cp = newOptions.cp,
+        logLevel = newOptions.logLevel,
+        moduleInitializers = newOptions.moduleInitializers,
+        moduleKind = newOptions.moduleKind,
+        output = newOptions.output,
+        relativizeSourceMap = newOptions.relativizeSourceMap,
+        sourceMap = newOptions.sourceMap,
+        semantics = newOptions.semantics,
+        stdLib = newOptions.stdLib,
+        esFeatures = newOptions.esFeatures)
     }
 
     def withClasspath(newCp: Seq[File]): Options = {
@@ -189,12 +188,12 @@ object Scalajsld {
       this.copy(logLevel = newLogLevel)
     }
 
-    def withDisableOptimizer(newFastOpt: Boolean): Options = {
-      this.copy(noOpt = !newFastOpt)
+    def withDisableOptimizer(disable: Boolean): Options = {
+      this.copy(noOpt = disable)
     }
 
-    def withUseClosureCompiler(newFullOpt: Boolean): Options = {
-      this.copy(fullOpt = newFullOpt)
+    def withUseClosureCompiler(enabled: Boolean): Options = {
+      this.copy(fullOpt = enabled)
     }
 
     def withPrettyPrint(newPrettyPrint: Boolean): Options = {

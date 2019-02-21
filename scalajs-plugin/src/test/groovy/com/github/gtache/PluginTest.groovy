@@ -4,7 +4,10 @@ import com.github.gtache.tasks.CompileJSTask
 import com.google.common.collect.Sets
 import org.gradle.api.Project
 import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
+import org.junit.After
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.core.tools.sem.Semantics
 import scala.Option
@@ -15,6 +18,7 @@ import static com.github.gtache.BuildConfig.*
 import static com.github.gtache.Utils.*
 import static com.github.gtache.tasks.CompileJSTask.*
 
+@RunWith(JUnit4.class)
 class PluginTest extends GroovyTestCase {
 
     static final O_FILE = 'js2/js.js'
@@ -22,6 +26,12 @@ class PluginTest extends GroovyTestCase {
     static final R_FILE = 'bla.js'
     static final REL_FILE = 'blabla.js'
     static final LOG_LEVEL = DEBUG
+
+
+    @After
+    public void cleanup() {
+        TestUtils.clean()
+    }
 
     @Test
     public void testAllConfigurations() {
@@ -57,9 +67,8 @@ class PluginTest extends GroovyTestCase {
             setOptionsSet.add([it].toSet())
         }
         def ret = (Sets.powerSet(outputSet) + Sets.powerSet(sourceMapSet) + Sets.powerSet(logLevelSet) + setOptionsSet).toList()
-        def numThreads = Runtime.getRuntime().availableProcessors()
+        def numThreads = 1 //TODO Can't access same project folder with multiple threads
         def threadList = new ArrayList<Thread>()
-        //TODO only download once...
         def lock = new ReentrantLock()
         for (int i = 0; i < numThreads; ++i) {
             threadList.add(new Thread(new CheckRunnable(ret, i, numThreads, lock)))
@@ -85,7 +94,8 @@ class PluginTest extends GroovyTestCase {
                 "FastOptJS",
                 "FullOptJS",
                 "RunJS",
-                "NoOptJS"
+                "NoOptJS",
+                "SJSVersion"
         ]
         allTasks.each {
             assertTrue(project.tasks.findByPath(it) != null)
@@ -146,7 +156,7 @@ class PluginTest extends GroovyTestCase {
             for (int i = lowerBound; i < upperBound; ++i) {
                 checkProperties(p.get(i))
                 counter += 1
-                println("ID : " + id + " finished : " + counter + "/" + numOps)
+                println("Thread #" + id + " finished : " + counter + "/" + numOps)
             }
         }
 

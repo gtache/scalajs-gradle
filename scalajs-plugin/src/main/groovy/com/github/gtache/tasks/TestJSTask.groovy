@@ -3,6 +3,7 @@ package com.github.gtache.tasks
 import com.github.gtache.Utils
 import com.github.gtache.testing.*
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.logging.Level
@@ -134,7 +135,7 @@ class TestJSTask extends DefaultTask {
 
         //Make build fail
         if (!ScalaJSTestResult.isSuccess()) {
-            throw new Exception("There were failures while testing")
+            throw new GradleException("There were failures while testing")
         }
     }
 }
