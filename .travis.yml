@@ -3,8 +3,11 @@ jdk:
     - oraclejdk8
 scala:
     - 2.12.7
+sudo: false
+
 before_install:
-    - sudo apt-get -qq update
+    - nvm install 10
+    - node --version
     
 matrix:
     include:
@@ -14,6 +17,9 @@ matrix:
         - env: jsenv=rhino optim=NoOpt
         - env: jsenv=rhino optim=Fast
         - env: jsenv=rhino optim=Full
+        - env: jsenv=jsDom optim=NoOpt
+        - env: jsenv=jsDom optim=Fast
+        - env: jsenv=jsDom optim=Full
         
 script: 
     - cd ./scalajs-plugin/
@@ -40,7 +46,8 @@ script:
 
 
 before_cache:
-    - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
     - $HOME/.gradle/caches/

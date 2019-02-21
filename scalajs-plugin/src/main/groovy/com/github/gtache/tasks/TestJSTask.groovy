@@ -131,7 +131,6 @@ class TestJSTask extends DefaultTask {
 
         project.logger.lifecycle(ScalaJSTestResult.toString())
         ScalaJSTestResult.save()
-        project.logger.info("LastStatuses : " + ScalaJSTestResult$.MODULE$.lastStatuses)
 
         //Make build fail
         if (!ScalaJSTestResult.isSuccess()) {
