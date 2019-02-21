@@ -11,7 +11,7 @@ sourceCompatibility = 1.8
 
 buildscript {
     String scalaVersion = project.hasProperty('scalaVersion') ? project.property('scalaVersion') : '2.12'
-    String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.15'
+    String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.26'
     String scalaJSM = scalaJSVersion.substring(0,3)
 
     String pluginVersion = '0.4.0'
@@ -31,9 +31,9 @@ configurations {
 
 //Duplication because buildscript{} and the rest of the build file don't share variables
 String scalaVersion = project.hasProperty('scalaVersion') ? project.property('scalaVersion') : '2.12'
-String subVersion = project.hasProperty('subVersion') ? project.property('subVersion') : '1'
+String subVersion = project.hasProperty('subVersion') ? project.property('subVersion') : '7'
 String scalaFullVersion = scalaVersion + '.' + subVersion
-String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.15'
+String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.26'
 String scalaJSM = scalaJSVersion.substring(0,3)
 String scalaJSV = scalaJSM+'_'+scalaVersion
 
@@ -43,18 +43,18 @@ repositories {
 }
 
 dependencies {
-    compile group: 'com.lihaoyi', name: 'scalatags_sjs'+scalaJSV, version: '0.6.3'
+    compile group: 'com.lihaoyi', name: 'scalatags_sjs'+scalaJSV, version: '0.6.7'
     testCompile group: 'org.scala-js', name: 'scalajs-junit-test-runtime_'+scalaVersion, version: scalaJSVersion
-    testCompile group: 'org.scalactic', name: 'scalactic_sjs'+scalaJSV, version: '3.0.1'
-    testCompile group: 'org.scalatest', name: 'scalatest_sjs'+scalaJSV, version: '3.0.1'
-    testCompile group: 'org.scalacheck', name: 'scalacheck_sjs'+scalaJSV, version: '1.13.4'
-    testCompile group: 'com.lihaoyi', name: 'utest_sjs'+scalaJSV, version: '0.4.5'
-    testCompile group: 'io.monix', name: 'minitest_sjs'+scalaJSV, version: '0.27'
+    testCompile group: 'org.scalactic', name: 'scalactic_sjs'+scalaJSV, version: '3.0.5'
+    testCompile group: 'org.scalatest', name: 'scalatest_sjs'+scalaJSV, version: '3.0.5'
+    testCompile group: 'org.scalacheck', name: 'scalacheck_sjs'+scalaJSV, version: '1.14.0'
+    testCompile group: 'com.lihaoyi', name: 'utest_sjs'+scalaJSV, version: '0.6.6'
+    testCompile group: 'io.monix', name: 'minitest_sjs'+scalaJSV, version: '2.3.2'
     testCompile group: 'com.github.japgolly.nyaya', name: 'nyaya-prop_sjs'+scalaJSV, version: '0.8.1'
     testCompile group: 'com.github.japgolly.nyaya', name: 'nyaya-gen_sjs'+scalaJSV, version: '0.8.1'
     testCompile group: 'com.github.japgolly.nyaya', name: 'nyaya-test_sjs'+scalaJSV, version: '0.8.1'
-    testCompile group: 'com.github.scalaprops', name: 'scalaprops_sjs'+scalaJSV, version: '0.4.1'
-    testCompile group: 'com.github.scalaprops', name: 'scalaprops-scalazlaws_sjs'+scalaJSV, version: '0.4.1'
+    testCompile group: 'com.github.scalaprops', name: 'scalaprops_sjs'+scalaJSV, version: '0.5.5'
+    testCompile group: 'com.github.scalaprops', name: 'scalaprops-scalazlaws_sjs'+scalaJSV, version: '0.5.5'
     scalaTestCompile group: 'org.scala-js', name: 'scalajs-junit-test-plugin_'+scalaFullVersion, version: scalaJSVersion
 }
 
@@ -71,7 +71,6 @@ ext {
     testFrameworks = ["utest.runner.Framework"]
     testFrameworks += "minitest.runner.Framework"
     testFrameworks += "org.scalacheck.ScalaCheckFramework"
-    testFrameworks += "scalaprops.ScalapropsFramework"
     testFrameworks += "scalaprops.ScalapropsFramework"
     linkLogLevel = "Debug"
     testLogLevel = "Debug"

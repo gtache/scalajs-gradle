@@ -1,5 +1,6 @@
 package com.github.gtache.testing
 
+import java.io.File
 import java.net.{URL, URLClassLoader}
 
 import com.github.gtache.Utils
@@ -50,8 +51,16 @@ class ClassScannerTest {
   }
 
   val fingerprints: Array[Fingerprint] = Array(annFingerprint, scalAnnFingerprint, subFingerprint, subFingerprint2, subFingerprint3)
-  val test: URL = this.getClass.getResource("../../../../") //TODO make it work for Gradle 5, path changed most likely
-  val loader = new URLClassLoader(Array(test))
+  val langRoot = "build/classes/"
+
+  val rootURLs: Array[URL] =
+    if (this.getClass.getResource("../../../../").toString.contains("java"))
+      Array(
+        new File(langRoot + "scala/test").toURI.toURL,
+        new File(langRoot + "groovy/test").toURI.toURL,
+        new File(langRoot + "java/test").toURI.toURL)
+    else Array(new File("out/test/classes/").toURI.toURL)
+  var loader = new URLClassLoader(rootURLs)
 
   val explicitlySpecified: Set[String] = Set("*A*", "*B", "*C").map(Utils.toRegex)
   val excluded: Set[String] = Set("*C", "*H").map(Utils.toRegex)
