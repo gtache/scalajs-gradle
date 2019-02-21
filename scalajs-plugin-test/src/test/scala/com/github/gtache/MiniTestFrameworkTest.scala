@@ -11,10 +11,6 @@ object MiniTestFrameworkTest extends SimpleTestSuite {
     assert(1 + 1 != 3)
   }
 
-  test("fail") {
-    assert(false)
-  }
-
   test("should throw") {
     class DummyException extends RuntimeException("DUMMY")
     def test(): String = throw new DummyException
