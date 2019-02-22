@@ -15,8 +15,8 @@ import scala.Option
 import java.util.concurrent.locks.ReentrantLock
 
 import static com.github.gtache.BuildConfig.*
-import static com.github.gtache.Utils.*
-import static com.github.gtache.tasks.CompileJSTask.*
+import static com.github.gtache.ScalaUtils.*
+import static com.github.gtache.Scalajsld.*
 
 @RunWith(JUnit4.class)
 class PluginTest extends GroovyTestCase {
@@ -25,7 +25,7 @@ class PluginTest extends GroovyTestCase {
     static final OUTPUT_FILE = 'js2/js2.js'
     static final R_FILE = 'bla.js'
     static final REL_FILE = 'blabla.js'
-    static final LOG_LEVEL = DEBUG
+    static final LOG_LEVEL = DEBUG()
 
 
     @After
@@ -36,31 +36,31 @@ class PluginTest extends GroovyTestCase {
     @Test
     public void testAllConfigurations() {
         def optionsSet = [
-                MIN_OUTPUT + "=" + O_FILE,
-                OUTPUT + "=" + OUTPUT_FILE,
-                MIN_PRETTY,
-                PRETTY,
-                MIN_N_SOURCEMAP,
-                N_SOURCEMAP,
+                MIN_OUTPUT() + "=" + O_FILE,
+                OUTPUT() + "=" + OUTPUT_FILE,
+                MIN_PRETTY(),
+                PRETTY(),
+                MIN_N_SOURCEMAP(),
+                N_SOURCEMAP(),
                 //"compliantAsInstanceOfs",
-                MIN_CHECKIR,
-                CHECKIR,
-                MIN_RELSM + "=" + R_FILE,
-                RELSM + "=" + REL_FILE,
-                CompileJSTask.LOG_LEVEL + "=" + LOG_LEVEL,
-                MIN_DEBUG,
-                DEBUG,
-                MIN_WARN,
-                WARN,
-                MIN_ERR,
-                ERR
+                MIN_CHECKIR(),
+                CHECKIR(),
+                MIN_RELSM() + "=" + R_FILE,
+                RELSM() + "=" + REL_FILE,
+                LOG_LEVEL() + "=" + LOG_LEVEL,
+                MIN_DEBUG(),
+                DEBUG(),
+                MIN_WARN(),
+                WARN(),
+                MIN_ERR(),
+                ERR()
         ].toSet()
-        def outputSet = [MIN_OUTPUT + "=" + O_FILE, OUTPUT + "=" + OUTPUT_FILE].toSet()
-        def sourceMapSet = [MIN_RELSM + "=" + R_FILE, RELSM + "=" + REL_FILE].toSet()
-        def logLevelSet = [CompileJSTask.LOG_LEVEL + "=" + LOG_LEVEL,
-                           MIN_DEBUG, DEBUG,
-                           MIN_WARN, WARN,
-                           MIN_ERR, ERR].toSet()
+        def outputSet = [MIN_OUTPUT() + "=" + O_FILE, OUTPUT() + "=" + OUTPUT_FILE].toSet()
+        def sourceMapSet = [MIN_RELSM() + "=" + R_FILE, RELSM() + "=" + REL_FILE].toSet()
+        def logLevelSet = [LOG_LEVEL() + "=" + LOG_LEVEL,
+                           MIN_DEBUG(), DEBUG(),
+                           MIN_WARN(), WARN(),
+                           MIN_ERR(), ERR()].toSet()
         def setOptionsSet = new HashSet<Set<String>>()
         setOptionsSet.add(optionsSet)
         optionsSet.each {
@@ -184,11 +184,11 @@ class PluginTest extends GroovyTestCase {
         }
 
         private void checkDefault(Project project) {
-            final jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR)
+            final jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR())
             final jsBase = jsDir.absolutePath + File.separator + project.name
-            final jsFile = project.file(jsBase + EXT)
-            final jsFastFile = project.file(jsBase + FASTOPT_SUFFIX)
-            final jsFullFile = project.file(jsBase + FULLOPT_SUFFIX)
+            final jsFile = project.file(jsBase + EXT())
+            final jsFastFile = project.file(jsBase + FASTOPT_SUFFIX())
+            final jsFullFile = project.file(jsBase + FULLOPT_SUFFIX())
             def options = ((CompileJSTask) project.tasks.findByName('FastOptJS')).options
             assertEquals(jsFastFile.path, options.output().path)
             assertEquals(Semantics.Defaults(), options.semantics())
@@ -210,68 +210,68 @@ class PluginTest extends GroovyTestCase {
         private void checkProperty(String s, Set<String> p, Project project) {
             final options = ((CompileJSTask) project.tasks.findByName('FastOptJS')).options
             switch (s) {
-                case MIN_OUTPUT:
+                case MIN_OUTPUT():
                     def projectP = project.file(project.property(s)).path
                     assertEquals(options.output().path, projectP)
                     assertEquals(project.file(O_FILE).path, projectP)
                     break
-                case OUTPUT:
-                    if (!p.contains(MIN_OUTPUT)) {
+                case OUTPUT():
+                    if (!p.contains(MIN_OUTPUT())) {
                         def projectP = project.file(project.property(s)).path
                         assertEquals(options.output().path, project.file(project.property(s)).path)
                         assertEquals(project.file(OUTPUT_FILE).path, projectP)
                     }
                     break
-                case MIN_PRETTY:
-                case PRETTY:
+                case MIN_PRETTY():
+                case PRETTY():
                     assertTrue(options.prettyPrint())
                     break
-                case MIN_N_SOURCEMAP:
-                case N_SOURCEMAP:
+                case MIN_N_SOURCEMAP():
+                case N_SOURCEMAP():
                     assertFalse(options.sourceMap())
                     break
-                case COMPLIANT:
+                case COMPLIANT():
                     //TODO
                     break
-                case MIN_CHECKIR:
-                case CHECKIR:
+                case MIN_CHECKIR():
+                case CHECKIR():
                     assertTrue(options.checkIR())
                     break
-                case MIN_RELSM:
+                case MIN_RELSM():
                     def projectP = project.file(project.property(s)).path
                     assertEquals(options.relativizeSourceMap().get(), project.file((String) project.property(s)).toURI())
                     assertEquals(project.file(R_FILE).path, projectP)
                     break
-                case RELSM:
-                    if (!p.contains(MIN_RELSM)) {
+                case RELSM():
+                    if (!p.contains(MIN_RELSM())) {
                         def projectP = project.file(project.property(s)).path
                         assertEquals(options.relativizeSourceMap().get(), project.file((String) project.property(s)).toURI())
                         assertEquals(project.file(REL_FILE).path, projectP)
                     }
                     break
-                case CompileJSTask.LOG_LEVEL:
-                    if (!(p.contains(MIN_WARN) || p.contains(MIN_ERR) || p.contains(MIN_DEBUG) ||
-                            p.contains(WARN) || p.contains(ERR) || p.contains(DEBUG))) {
+                case LOG_LEVEL():
+                    if (!(p.contains(MIN_WARN()) || p.contains(MIN_ERR()) || p.contains(MIN_DEBUG()) ||
+                            p.contains(WARN()) || p.contains(ERR()) || p.contains(DEBUG()))) {
                         assertEquals(
-                                resolveLogLevel(project, (String) project.property(CompileJSTask.LOG_LEVEL), Level.Info$.MODULE$),
+                                resolveLogLevel(project, (String) project.property(LOG_LEVEL()), Level.Info$.MODULE$),
                                 options.logLevel())
                         assertEquals(LOG_LEVEL, (String) project.property(s))
                     }
                     break
-                case MIN_DEBUG:
-                case DEBUG:
+                case MIN_DEBUG():
+                case DEBUG():
                     assertEquals(Level.Debug$.MODULE$, options.logLevel())
                     break
-                case MIN_WARN:
-                case WARN:
-                    if (!(p.contains(MIN_DEBUG) || p.contains(DEBUG))) {
+                case MIN_WARN():
+                case WARN():
+                    if (!(p.contains(MIN_DEBUG()) || p.contains(DEBUG()))) {
                         assertEquals(Level.Warn$.MODULE$, options.logLevel())
                     }
                     break
-                case MIN_ERR:
-                case ERR:
-                    if (!(p.contains(MIN_DEBUG) || p.contains(DEBUG) ||
-                            p.contains(MIN_WARN) || p.contains(WARN))) {
+                case MIN_ERR():
+                case ERR():
+                    if (!(p.contains(MIN_DEBUG()) || p.contains(DEBUG()) ||
+                            p.contains(MIN_WARN()) || p.contains(WARN()))) {
                         assertEquals(Level.Error$.MODULE$, options.logLevel())
                     }
                     break

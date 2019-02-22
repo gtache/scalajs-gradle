@@ -15,6 +15,35 @@ import org.scalajs.core.tools.sem._
   */
 object Scalajsld {
 
+  //Linker options
+  val MODULE_INITIALIZERS: String = "moduleInitializers"
+  val MIN_OUTPUT: String = "o"
+  val OUTPUT: String = "output"
+  val SEMANTICS: String = "semantics"
+  val ES_FEATURES: String = "esFeatures"
+  val MODULE_KIND: String = "moduleKind"
+  val COMPLIANT: String = "compliantAsInstanceOfs"
+  val MIN_PRETTY: String = "p"
+  val PRETTY: String = "prettyPrint"
+  val MIN_N_SOURCEMAP: String = "noS"
+  val N_SOURCEMAP: String = "noSourceMap"
+  val MIN_RELSM: String = "r"
+  val RELSM: String = "relativizeSourceMap"
+  val BATCH: String = "batch"
+  val NO_PARALLEL: String = "noParallel"
+  val MIN_CHECKIR: String = "c"
+  val CHECKIR: String = "checkIR"
+  val STDLIB: String = "stdLib"
+  val MIN_DEBUG: String = "d"
+  val DEBUG: String = "debug"
+  val MIN_WARN: String = "q"
+  val WARN: String = "quiet"
+  val MIN_ERR: String = "qq"
+  val ERR: String = "really-quiet"
+  val LOG_LEVEL: String = "linkLogLevel"
+
+  val OPTIONS: String = "oOptions"
+
   private var options: Options = Options()
   private var optionsChanged: Boolean = false
 

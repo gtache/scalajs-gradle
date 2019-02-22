@@ -1,7 +1,8 @@
 package com.github.gtache.tasks
 
+
+import com.github.gtache.ScalaUtils
 import com.github.gtache.Scalajsld
-import com.github.gtache.Utils
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
@@ -17,6 +18,8 @@ import scala.Some
 import scala.collection.JavaConverters
 import scala.collection.Seq
 
+import static com.github.gtache.Scalajsld.*
+
 /**
  * Task used to compile sjsir and classes file to a js file.
  */
@@ -25,35 +28,9 @@ public class CompileJSTask extends DefaultTask {
 
     //TODO also update scalajs-plugin-test while at it
     //Linker configs
-    public static final String MODULE_INITIALIZERS = 'moduleInitializers'
-    public static final String MIN_OUTPUT = 'o'
-    public static final String OUTPUT = 'output'
-    public static final String SEMANTICS = 'semantics'
-    public static final String ES_FEATURES = 'esFeatures'
-    public static final String MODULE_KIND = 'moduleKind'
-    public static final String COMPLIANT = 'compliantAsInstanceOfs'
-    public static final String MIN_PRETTY = 'p'
-    public static final String PRETTY = 'prettyPrint'
-    public static final String MIN_N_SOURCEMAP = 'noS'
-    public static final String N_SOURCEMAP = 'noSourceMap'
-    public static final String MIN_RELSM = 'r'
-    public static final String RELSM = 'relativizeSourceMap'
-    public static final String BATCH = 'batch'
-    public static final String NO_PARALLEL = 'noParallel'
-    public static final String MIN_CHECKIR = 'c'
-    public static final String CHECKIR = 'checkIR'
-    public static final String STDLIB = 'stdLib'
-    public static final String MIN_DEBUG = 'd'
-    public static final String DEBUG = 'debug'
-    public static final String MIN_WARN = 'q'
-    public static final String WARN = 'quiet'
-    public static final String MIN_ERR = 'qq'
-    public static final String ERR = 'really-quiet'
-    public static final String LOG_LEVEL = 'linkLogLevel'
 
-    public static final String OPTIONS = 'oOptions'
 
-    private Scalajsld.Options options
+    private Options options
     @InputFiles
     FileCollection srcFiles
     @OutputFile
@@ -99,19 +76,19 @@ public class CompileJSTask extends DefaultTask {
     def run() {
         final curOptions = Scalajsld.getOptions()
         if (options != curOptions) {
-            Scalajsld.setOptions(options)
+            setOptions(options)
             logger.info('Options changed, linker recreated')
         }
         logger.info('Running linker with ' + options.toString())
 
-        Scalajsld.exec()
+        exec()
     }
 
     /**
      * Returns the options that will be used with the linker
      * @return The options
      */
-    public Scalajsld.Options getOptions() {
+    public Options getOptions() {
         return options
     }
 
@@ -119,37 +96,37 @@ public class CompileJSTask extends DefaultTask {
      * Parse the options given the project properties
      * @return The configured options
      */
-    private Scalajsld.Options parseOptions() {
+    private Options parseOptions() {
         final cp = project.configurations.runtime + srcFiles
-        def options = Scalajsld.defaultOptions().withClasspath(
+        def options = defaultOptions().withClasspath(
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq() as Seq<File>)
 
 
-        if (project.hasProperty(OPTIONS)) {
-            def optimizerOptions = project.property(OPTIONS)
-            if (optimizerOptions instanceof Scalajsld.Options) {
+        if (project.hasProperty(OPTIONS())) {
+            def optimizerOptions = project.property(OPTIONS())
+            if (optimizerOptions instanceof Options) {
                 options = options.withOptimizerOptions(optimizerOptions)
             } else {
                 project.error("OptimizerOptions not of class Scalajsld.Options ; was " + optimizerOptions.getClass())
             }
         }
-        if (project.hasProperty(MODULE_INITIALIZERS)) {
-            def moduleInitializers = project.property(MODULE_INITIALIZERS)
+        if (project.hasProperty(MODULE_INITIALIZERS())) {
+            def moduleInitializers = project.property(MODULE_INITIALIZERS())
             if (moduleInitializers instanceof Seq<ModuleInitializer>) {
                 options = options.withModuleInitializers(moduleInitializers)
             } else {
                 project.error("ModuleInitializers not of class Seq<ModuleInitializer> ; was " + moduleInitializers.getClass())
             }
         }
-        if (project.hasProperty(MIN_OUTPUT)) {
-            destFile = project.file(project.property(MIN_OUTPUT))
-        } else if (project.hasProperty(OUTPUT)) {
-            destFile = project.file(project.property(OUTPUT))
+        if (project.hasProperty(MIN_OUTPUT())) {
+            destFile = project.file(project.property(MIN_OUTPUT()))
+        } else if (project.hasProperty(OUTPUT())) {
+            destFile = project.file(project.property(OUTPUT()))
         }
         options = options.withOutput(destFile)
 
-        if (project.hasProperty(SEMANTICS)) {
-            def semanticsObj = project.property(SEMANTICS)
+        if (project.hasProperty(SEMANTICS())) {
+            def semanticsObj = project.property(SEMANTICS())
             if (semanticsObj instanceof Semantics) {
                 options = options.withSemantics(semanticsObj)
             } else {
@@ -160,8 +137,8 @@ public class CompileJSTask extends DefaultTask {
             options = options.withSemantics(options.semantics().withProductionMode(true))
         }
 
-        if (project.hasProperty(ES_FEATURES)) {
-            def esFeatures = project.property(ES_FEATURES)
+        if (project.hasProperty(ES_FEATURES())) {
+            def esFeatures = project.property(ES_FEATURES())
             //FIXME? Groovy doesn't see type ESFeatures
             if (esFeatures instanceof OutputMode) {
                 options = options.withEsFeatures(esFeatures)
@@ -170,45 +147,45 @@ public class CompileJSTask extends DefaultTask {
             }
         }
 
-        if (project.hasProperty(MODULE_KIND)) {
-            def moduleKind = project.property(MODULE_KIND)
+        if (project.hasProperty(MODULE_KIND())) {
+            def moduleKind = project.property(MODULE_KIND())
             if (moduleKind instanceof ModuleKind) {
                 options = options.withModuleKind(moduleKind)
             } else {
                 project.error("ModuleKind not of class ModuleKind ; was " + moduleKind.getClass())
             }
         } else {
-            options = options.withModuleKind(Utils.resolveModuleKind(project))
+            options = options.withModuleKind(ScalaUtils.resolveModuleKind(project))
         }
 
-        if (project.hasProperty(COMPLIANT)) {
+        if (project.hasProperty(COMPLIANT())) {
             options = options.withCompliantsSemantics()
         }
 
-        if (project.hasProperty(MIN_PRETTY) || project.hasProperty(PRETTY)) {
+        if (project.hasProperty(MIN_PRETTY()) || project.hasProperty(PRETTY())) {
             options = options.withPrettyPrint(true)
         }
-        if (project.hasProperty(MIN_N_SOURCEMAP) || project.hasProperty(N_SOURCEMAP)) {
+        if (project.hasProperty(MIN_N_SOURCEMAP()) || project.hasProperty(N_SOURCEMAP())) {
             options = options.withSourceMap(false)
         }
 
-        if (project.hasProperty(MIN_RELSM)) {
-            options = options.withRelativizeSourceMap(Option.apply(new URI((String) project.property(MIN_RELSM))))
-        } else if (project.hasProperty(RELSM)) {
-            options = options.withRelativizeSourceMap(Option.apply(new URI((String) project.property(RELSM))))
+        if (project.hasProperty(MIN_RELSM())) {
+            options = options.withRelativizeSourceMap(Option.apply(new URI((String) project.property(MIN_RELSM()))))
+        } else if (project.hasProperty(RELSM())) {
+            options = options.withRelativizeSourceMap(Option.apply(new URI((String) project.property(RELSM()))))
         }
 
-        if (project.hasProperty(BATCH)) {
+        if (project.hasProperty(BATCH())) {
             options = options.withBatchMode(true)
         }
-        if (project.hasProperty(NO_PARALLEL)) {
+        if (project.hasProperty(NO_PARALLEL())) {
             options = options.withParallel(false)
         }
-        if (project.hasProperty(MIN_CHECKIR) || project.hasProperty(CHECKIR)) {
+        if (project.hasProperty(MIN_CHECKIR()) || project.hasProperty(CHECKIR())) {
             options = options.withCheckIR(true)
         }
-        if (project.hasProperty(STDLIB)) {
-            def stdlib = project.property(STDLIB)
+        if (project.hasProperty(STDLIB())) {
+            def stdlib = project.property(STDLIB())
             if (stdlib instanceof String) {
                 options = options.withStdLib(new Some<File>(new File(stdlib)))
             } else if (stdlib instanceof File) {
@@ -217,12 +194,12 @@ public class CompileJSTask extends DefaultTask {
                 project.error("Stdlib not of class String or File ; was " + stdlib.getClass())
             }
         }
-        Level level = Utils.resolveLogLevel(project, LOG_LEVEL, Level.Info$.MODULE$)
-        if (project.hasProperty(MIN_DEBUG) || project.hasProperty(DEBUG)) {
+        Level level = ScalaUtils.resolveLogLevel(project, LOG_LEVEL(), Level.Info$.MODULE$)
+        if (project.hasProperty(MIN_DEBUG()) || project.hasProperty(DEBUG())) {
             level = Level.Debug$.MODULE$
-        } else if (project.hasProperty(MIN_WARN) || project.hasProperty(WARN)) {
+        } else if (project.hasProperty(MIN_WARN()) || project.hasProperty(WARN())) {
             level = Level.Warn$.MODULE$
-        } else if (project.hasProperty(MIN_ERR) || project.hasProperty(ERR)) {
+        } else if (project.hasProperty(MIN_ERR()) || project.hasProperty(ERR())) {
             level = Level.Error$.MODULE$
         }
         if (level != Level.Info$.MODULE$) {

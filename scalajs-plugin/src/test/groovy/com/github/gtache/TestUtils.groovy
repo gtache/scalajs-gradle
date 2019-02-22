@@ -12,7 +12,7 @@ class TestUtils {
     public static final ProjectBuilder builder = ProjectBuilder.builder().withProjectDir(projectDir)
 
     public static void clean() {
-        Utils.deleteRecursive(projectDir)
+        ScalaUtils.deleteRecursive(projectDir)
     }
 
     public static Project getFreshProject() {

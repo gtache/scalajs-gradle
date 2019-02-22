@@ -3,7 +3,7 @@ package com.github.gtache.testing
 import java.io.File
 import java.net.{URL, URLClassLoader}
 
-import com.github.gtache.Utils
+import com.github.gtache.ScalaUtils
 import org.junit.Assert._
 import org.junit.Test
 import sbt.testing.{AnnotatedFingerprint, Fingerprint, SubclassFingerprint}
@@ -62,10 +62,10 @@ class ClassScannerTest {
     else Array(new File("out/test/classes/").toURI.toURL)
   var loader = new URLClassLoader(rootURLs)
 
-  val explicitlySpecified: Set[String] = Set("*A*", "*B", "*C").map(Utils.toRegex)
-  val excluded: Set[String] = Set("*C", "*H").map(Utils.toRegex)
-  val excludedAll: Set[String] = Set(Utils.toRegex("com.*"))
-  val explicitlyEmpty: Set[String] = Set(Utils.toRegex("co.*"))
+  val explicitlySpecified: Set[String] = Set("*A*", "*B", "*C").map(ScalaUtils.toRegex)
+  val excluded: Set[String] = Set("*C", "*H").map(ScalaUtils.toRegex)
+  val excludedAll: Set[String] = Set(ScalaUtils.toRegex("com.*"))
+  val explicitlyEmpty: Set[String] = Set(ScalaUtils.toRegex("co.*"))
   val all: Set[String] = Set(packageName + "A", packageName + "AB", packageName + "B", packageName + "C", packageName + "D",
     packageName + "E", packageName + "F", packageName + "G", packageName + "H", packageName + "I", packageName + "J",
     packageName + "K", packageName + "L", packageName + "M", packageName + "N")

@@ -1,6 +1,7 @@
 package com.github.gtache.tasks
 
-import com.github.gtache.Utils
+
+import com.github.gtache.ScalaUtils
 import com.github.gtache.testing.*
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -17,7 +18,7 @@ import scala.collection.JavaConverters
 import scala.collection.Seq
 import scala.collection.mutable.ArrayBuffer
 
-import static com.github.gtache.Utils.CPSeparator
+import static com.github.gtache.ScalaUtils.CPSeparator
 
 /**
  * A task used to run tests for various frameworks
@@ -40,10 +41,10 @@ class TestJSTask extends DefaultTask {
      */
     @TaskAction
     def run() {
-        final Seq<ResolvedJSDependency> dependencySeq = Utils.getMinimalDependencySeq(project)
-        final libEnv = (ComJSEnv) Utils.resolveEnv(project).loadLibs(dependencySeq)
+        final Seq<ResolvedJSDependency> dependencySeq = ScalaUtils.getMinimalDependencySeq(project)
+        final libEnv = (ComJSEnv) ScalaUtils.resolveEnv(project).loadLibs(dependencySeq)
 
-        final List<TestFramework> customTestFrameworks = Utils.resolveTestFrameworks(project)
+        final List<TestFramework> customTestFrameworks = JavaConverters.seqAsJavaList(ScalaUtils.resolveTestFrameworks(project))
         final ArrayBuffer<TestFramework> allFrameworks = new ArrayBuffer<>()
         customTestFrameworks.each {
             allFrameworks.$plus$eq(it)
@@ -54,8 +55,8 @@ class TestJSTask extends DefaultTask {
         }
         def config = TestAdapter.Config$.MODULE$.apply()
                 .withJSConsole(ConsoleJSConsole$.MODULE$)
-                .withLogger(new ScalaConsoleLogger(Utils.resolveLogLevel(project, LOG_LEVEL, Level.Info$.MODULE$)))
-                .withModuleSettings(Utils.resolveModuleKind(project), Option.empty())
+                .withLogger(new ScalaConsoleLogger(ScalaUtils.resolveLogLevel(project, LOG_LEVEL, Level.Info$.MODULE$)))
+                .withModuleSettings(ScalaUtils.resolveModuleKind(project), Option.empty())
         TestAdapter adapter = new TestAdapter(libEnv, config)
         def jFrameworks = JavaConverters.bufferAsJavaList(allFrameworks)
         jFrameworks = jFrameworks.collect {
@@ -75,16 +76,16 @@ class TestJSTask extends DefaultTask {
         Set<String> explicitlySpecified = new HashSet<>()
         Set<String> excluded = new HashSet<String>()
         if (project.hasProperty(TEST_ONLY)) {
-            explicitlySpecified = ((String) project.property(TEST_ONLY)).split(CPSeparator).toList().toSet()
-                    .collect { Utils.toRegex(it) }
+            explicitlySpecified = ((String) project.property(TEST_ONLY)).split(CPSeparator()).toList().toSet()
+                    .collect { ScalaUtils.toRegex(it) }
             project.logger.info("Regex to add " + explicitlySpecified)
             if (explicitlySpecified.isEmpty()) {
                 explicitlySpecified.add("")
             }
         } else if (project.hasProperty(TEST_QUICK)) {
             //FIXME if last run didn't contain explicitlySpecified, will run them anyway
-            explicitlySpecified = ((String) project.property(TEST_QUICK)).split(CPSeparator).toList().toSet()
-                    .collect { Utils.toRegex(it) }
+            explicitlySpecified = ((String) project.property(TEST_QUICK)).split(CPSeparator()).toList().toSet()
+                    .collect { ScalaUtils.toRegex(it) }
             project.logger.info("Regex to add " + explicitlySpecified)
             if (explicitlySpecified.isEmpty()) {
                 explicitlySpecified.add("")
