@@ -17,6 +17,6 @@ class SjsirTask extends DefaultTask {
     }
 
     public static List<Tuple2<String, String>> listSJSIR(FileCollection cp) {
-        return ScalaUtils.listClasspath(cp, 'sjsir')
+        return ScalaUtils.listClasspathC(cp, 'sjsir')
     }
 }
