@@ -13,7 +13,7 @@ object TestFrameworks {
   val Specs2 = new TestFramework("org.specs2.runner.Specs2Framework", "org.specs2.runner.SpecsFramework")
   val JUnit = new TestFramework("com.novocode.junit.JUnitFramework")
 
-  val defaultFrameworks = Seq(ScalaCheck, ScalaTest, Specs, Specs2, JUnit)
+  val defaultFrameworks: Seq[TestFramework] = Seq(ScalaCheck, ScalaTest, Specs, Specs2, JUnit)
 }
 
 /**
@@ -22,5 +22,7 @@ object TestFrameworks {
   * @param classNames The names of the class which correspond to a framework
   */
 class TestFramework(val classNames: String*) {
-
+  def toList: List[String] = {
+    classNames.toList
+  }
 }

@@ -8,9 +8,16 @@ import static com.github.gtache.BuildConfig.SCALA_FULL_VERSION
 
 class TestUtils {
 
+    private static final projectDir = new File("testGradle")
+    public static final ProjectBuilder builder = ProjectBuilder.builder().withProjectDir(projectDir)
+
+    public static void clean() {
+        ScalaUtils.deleteRecursive(projectDir)
+    }
+
     public static Project getFreshProject() {
 
-        Project proj = ProjectBuilder.builder().build()
+        Project proj = builder.build()
 
         proj.buildscript {
             repositories {

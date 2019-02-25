@@ -2,10 +2,25 @@ language: scala
 jdk:
     - oraclejdk8
 scala:
-    - 2.12.1
+    - 2.12.7
+sudo: false
+
 before_install:
-    - sudo apt-get -qq update
+    - nvm install 10
+    - node --version
     
+matrix:
+    include:
+        - env: jsenv=phantom optim=NoOpt
+        - env: jsenv=phantom optim=Fast
+        - env: jsenv=phantom optim=Full
+        - env: jsenv=rhino optim=NoOpt
+        - env: jsenv=rhino optim=Fast
+        - env: jsenv=rhino optim=Full
+        - env: jsenv=node optim=NoOpt
+        - env: jsenv=node optim=Fast
+        - env: jsenv=node optim=Full
+        
 script: 
     - cd ./scalajs-plugin/
     - chmod +x gradlew
@@ -14,24 +29,25 @@ script:
     - cd ../scalajs-plugin-test/
     - chmod +x gradlew
 
-    - ./gradlew RunJS -Pclassname="com.github.gtache.DummyObject" -Pmethname="printSomething(\"blabla\")" -Prhino
-    - ./gradlew RunJS -Pclassname="com.github.gtache.DummyScalaTag" -Pphantom
+    - ./gradlew RunJS -Pclassname="com.github.gtache.DummyObject" -Pmethname="printSomething(\"blabla\")" -P${jsenv}
+    - ./gradlew RunJS -Pclassname="com.github.gtache.DummyScalaTag" -P${jsenv}
     - ./gradlew clean
-    - ./gradlew RunJS -PtoExec="com.github.gtache.DummyScalaTag().main()" -PrunFull -Prhino
+    - ./gradlew RunJS -PtoExec="com.github.gtache.DummyScalaTag().main()" -Prun${optim} -P${jsenv}
     - ./gradlew clean
-    - ./gradlew RunJS -PtoExec="com.github.gtache.DummyObject().main()" -Pclassname="com.github.gtache.DummyScalaTag" -PrunNoOpt
+    - ./gradlew RunJS -PtoExec="com.github.gtache.DummyObject().main()" -Pclassname="com.github.gtache.DummyScalaTag" -P${jsenv}
     - ./gradlew clean
-    - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js" -PrunFull -Pphantom
-    - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js" -PrunNoOpt -Prhino
+    - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js" -Prun${optim} -P${jsenv}
     - ./gradlew RunJS -PfileToExec="testjs/testRunWithFile.js"
     - ./gradlew TestJS
-    - ./gradlew TestJS -Ptest-only=*JUnit*
-    - ./gradlew TestJS -Ptest-only=*Scala* -Prhino
-    - ./gradlew TestJS -Pretest -Pphantom
+    - ./gradlew TestJS -Ptest-only='*JUnit*'
+    - ./gradlew TestJS -Ptest-only='*Scala*' -P${jsenv}
+    - ./gradlew TestJS -Pretest -P${jsenv}
+    - ./gradlew TestJS -Ptest-quick='*Scala*' -P${jsenv}
 
 
 before_cache:
-    - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
     - $HOME/.gradle/caches/

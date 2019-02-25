@@ -56,6 +56,7 @@ To add the JUnit plugin or the dependencies, please refer to the *build.gradle* 
 -`-Pqq | -Preally-quiet` for Error level   
 -`-Pbatch` to turn on batch mode    
 -`-PnoParallel` to set parallel to false   
+-`-PcommonJSModule` to configure CommonJS module system 
 
 ### Options for RunJS
 -`-Pclassname` is the fully qualified name of the class to run    

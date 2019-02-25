@@ -1,1 +1,3 @@
 testall.bat
+*.hprof
+.idea/

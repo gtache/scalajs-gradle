@@ -1,6 +1,7 @@
 package com.github.gtache.tasks
 
-import com.github.gtache.Utils
+
+import com.github.gtache.ScalaUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.io.FileVirtualJSFile
@@ -34,9 +35,9 @@ public class RunJSTask extends DefaultTask {
         if (toExec.second == null) {
             logger.error('Nothing to execute')
         } else {
-            final JSEnv env = Utils.resolveEnv(project)
-            final Level logLevel = Utils.resolveLogLevel(project, LOG_LEVEL, Level.Debug$.MODULE$)
-            final dependencySeq = Utils.getMinimalDependencySeq(project)
+            final JSEnv env = ScalaUtils.resolveEnv(project)
+            final Level logLevel = ScalaUtils.resolveLogLevel(project, LOG_LEVEL, Level.Debug$.MODULE$)
+            final dependencySeq = ScalaUtils.getMinimalDependencySeq(project)
             VirtualJSFile code
             if (toExec.first) {
                 code = new FileVirtualJSFile(project.file(toExec.second))

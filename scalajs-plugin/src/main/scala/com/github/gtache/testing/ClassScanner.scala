@@ -34,23 +34,23 @@ object ClassScanner {
       }
 
 
-      def checkRec(c: Class[_], fName: String): Boolean = {
+      def checkRecursive(c: Class[_], fName: String): Boolean = {
         if (checkName(c, fName)) {
           true
         } else {
           var sC = c.getSuperclass
           while (sC != null) {
-            if (checkRec(sC, fName)) {
+            if (checkRecursive(sC, fName)) {
               return true
             } else {
               sC = sC.getSuperclass
             }
           }
-          c.getInterfaces.exists(interf => checkRec(interf, fName))
+          c.getInterfaces.exists(interf => checkRecursive(interf, fName))
         }
       }
 
-      checkRec(c, sF.superclassName())
+      checkRecursive(c, sF.superclassName())
     }
 
     val objSuffix = "$"
@@ -69,7 +69,7 @@ object ClassScanner {
               buffer += new TaskDef(c.getName.stripSuffix(objSuffix), aF, explicitlySpecified.nonEmpty, Array(new SuiteSelector))
             }
           } catch {
-            case e: ClassNotFoundException =>
+            case _: ClassNotFoundException =>
               Console.err.println("Class not found for annotation : " + aF.annotationName())
           }
         case sF: SubclassFingerprint =>

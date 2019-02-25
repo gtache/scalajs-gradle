@@ -5,20 +5,20 @@ group 'com.github.gtache'
 
 
 String scalaVersion = project.hasProperty('scalaVersion') ? project.property('scalaVersion') : '2.12'
-String subVersion = project.hasProperty('subVersion') ? project.property('subVersion') : '1'
+String subVersion = project.hasProperty('subVersion') ? project.property('subVersion') : '7'
 String scalaFullVersion = scalaVersion + '.' + subVersion
-String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.15'
-String scalaJSM = scalaJSVersion.substring(0,3)
+String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.26'
+String scalaJSM = scalaJSVersion.substring(0, 3)
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 
-version 'sjs'+scalaJSM+'_'+scalaVersion+'_0.3.0'
+version 'sjs' + scalaJSM + '_' + scalaVersion + '_0.4.0'
 
 apply plugin: 'idea'
 apply plugin: 'scala'
 apply plugin: 'groovy'
-apply plugin: 'maven'
+apply plugin: 'maven-publish' //TODO migrate to maven-publish
 apply plugin: 'signing'
 
 sourceCompatibility = 1.8
@@ -53,33 +53,30 @@ dependencies {
     compile group: 'org.scala-js', name: 'scalajs-js-envs_' + scalaVersion, version: scalaJSVersion
     compile group: 'org.scala-js', name: 'scalajs-tools_' + scalaVersion, version: scalaJSVersion
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'com.google.guava', name: 'guava', version: '21.0'
+    testCompile group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
 }
 
 signing {
-    required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
-    sign configurations.archives
+    required { isReleaseVersion && gradle.taskGraph.hasTask("PublishToMavenRepository") }
+    sign publishing.publications
 }
-
-signArchives.onlyIf { project.hasProperty('uploadArchives') }
-
 task javadocJar(type: Jar) {
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
     from javadoc
 }
 
 task groovydocJar(type: Jar) {
-    classifier = 'groovydoc'
+    archiveClassifier = 'groovydoc'
     from groovydoc
 }
 
 task scaladocJar(type: Jar) {
-    classifier = 'scaladoc'
+    archiveClassifier = 'scaladoc'
     from scaladoc
 }
 
 task sourcesJar(type: Jar) {
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
@@ -87,43 +84,48 @@ artifacts {
     archives javadocJar, groovydocJar, scaladocJar, sourcesJar
 }
 
-if (project.hasProperty('upload')) {
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
+publishing {
+    repositories {
+        maven {
+            def release = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshot = "https://oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith("SNAPSHOT") ? snapshot : release
+            credentials {
+                username = project.property("ossrhUsername")
+                password = project.property("ossrhPassword")
+            }
+        }
+    }
+    publications {
+        maven(MavenPublication) {
+            artifactId = 'scalajs-plugin'
+            groupId = 'com.github.gtache'
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            artifact groovydocJar
+            artifact scaladocJar
+            pom {
+                name = 'Scala.JS Plugin'
+                description = 'Adds Scala.js support'
+                url = 'https://github.com/gtache/scalajs-gradle'
+                licenses {
+                    license {
+                        name = 'Scala License'
+                        url = 'http://www.scala-lang.org/license.html'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:ssh://git@github.com:gtache/scalajs-gradle.git'
+                    developerConnection = 'scm:git:ssh://git@github.com:gtache/scalajs-gradle.git'
+                    url = 'https://github.com/gtache/scalajs-gradle'
                 }
 
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                pom.project {
-                    name 'Scala.JS plugin'
-                    packaging 'jar'
-                    description 'A plugin used to build Scala.js on Gradle.'
-                    url 'https://github.com/gtache/scalajs-gradle'
-                    licenses {
-                        license {
-                            name 'Scala License'
-                            url 'http://www.scala-lang.org/license.html'
-                        }
-                    }
-                    scm {
-                        connection 'scm:git:ssh://git@github.com:gtache/scalajs-gradle.git'
-                        developerConnection 'scm:git:ss://git@github.com:gtache/scalajs-gradle.git'
-                        url 'https://github.com/gtache/scalajs-gradle'
-                    }
-
-                    developers {
-                        developer {
-                            id 'gtache'
-                            name 'Guillaume Tâche'
-                            email 'guillaume.tache@hotmail.com'
-                        }
+                developers {
+                    developer {
+                        id = 'gtache'
+                        name = 'Guillaume Tâche'
+                        email = 'guillaume.tache@hotmail.com'
                     }
                 }
             }
@@ -131,8 +133,17 @@ if (project.hasProperty('upload')) {
     }
 }
 
-tasks.getByName('compileGroovy').dependsOn('compileScala')
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.4.1'
+task copyBuildConfig(type: Copy) {
+    from buildDir.absolutePath + "/gen/buildconfig/classes"
+    into buildDir.absolutePath + "/classes/scala"
+}
+
+compileScala {
+    dependsOn copyBuildConfig
+}
+
+compileGroovy {
+    classpath = classpath + files(compileScala.destinationDir)
+    dependsOn compileScala
 }

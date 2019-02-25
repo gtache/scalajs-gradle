@@ -4,3 +4,7 @@ sjsir/
 js/
 build/
 *.iml
+out/
+diff/
+classes/
+testGradle/

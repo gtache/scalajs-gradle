@@ -3,17 +3,16 @@ package com.github.gtache
 import com.github.gtache.testing.TestFramework
 import org.gradle.api.Project
 import org.junit.Test
-import org.scalajs.core.tools.linker.backend.OutputMode
 import org.scalajs.core.tools.logging.Level
 import org.scalajs.jsenv.nodejs.NodeJSEnv
 import org.scalajs.jsenv.phantomjs.PhantomJSEnv
 import org.scalajs.jsenv.rhino.RhinoJSEnv
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.JavaConverters
 
+import static com.github.gtache.ScalaUtils.*
+import static com.github.gtache.Scalajsld.MIN_OUTPUT
+import static com.github.gtache.Scalajsld.OUTPUT
 import static com.github.gtache.TestUtils.*
-import static com.github.gtache.Utils.*
-import static com.github.gtache.tasks.CompileJSTask.MIN_OUTPUT
-import static com.github.gtache.tasks.CompileJSTask.OUTPUT
 
 class UtilsTest extends GroovyTestCase {
 
@@ -21,80 +20,80 @@ class UtilsTest extends GroovyTestCase {
     public void testResolvePath() {
         Project project = getFreshProject()
         final dummyString = 'foo/bar.js'
-        def jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR)
-        def jsPath = project.file(jsDir.path + File.separator + project.name + EXT).path
-        def jsFastPath = project.file(jsDir.path + File.separator + project.name + FASTOPT_SUFFIX).path
-        def jsFullPath = project.file(jsDir.path + File.separator + project.name + FULLOPT_SUFFIX).path
+        def jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR())
+        def jsPath = project.file(jsDir.path + File.separator + project.name + EXT()).path
+        def jsFastPath = project.file(jsDir.path + File.separator + project.name + FASTOPT_SUFFIX()).path
+        def jsFullPath = project.file(jsDir.path + File.separator + project.name + FULLOPT_SUFFIX()).path
         def dummyPath = project.file(dummyString).toString()
         applyPlugin(project)
         assertEquals(jsFastPath, resolvePath(project))
         deleteRecursive(project.projectDir)
 
         project = getFreshProject()
-        jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR)
-        jsPath = project.file(jsDir.path + File.separator + project.name + EXT).path
-        jsFastPath = project.file(jsDir.path + File.separator + project.name + FASTOPT_SUFFIX).path
-        jsFullPath = project.file(jsDir.path + File.separator + project.name + FULLOPT_SUFFIX).path
-        setProperty(project, RUN_FULL)
+        jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR())
+        jsPath = project.file(jsDir.path + File.separator + project.name + EXT()).path
+        jsFastPath = project.file(jsDir.path + File.separator + project.name + FASTOPT_SUFFIX()).path
+        jsFullPath = project.file(jsDir.path + File.separator + project.name + FULLOPT_SUFFIX()).path
+        setProperty(project, RUN_FULL())
         applyPlugin(project)
         assertEquals(jsFullPath, resolvePath(project))
         deleteRecursive(project.projectDir)
 
         project = getFreshProject()
-        jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR)
-        jsPath = project.file(jsDir.path + File.separator + project.name + EXT).path
-        jsFastPath = project.file(jsDir.path + File.separator + project.name + FASTOPT_SUFFIX).path
-        jsFullPath = project.file(jsDir.path + File.separator + project.name + FULLOPT_SUFFIX).path
-        setProperty(project, RUN_NOOPT)
+        jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR())
+        jsPath = project.file(jsDir.path + File.separator + project.name + EXT()).path
+        jsFastPath = project.file(jsDir.path + File.separator + project.name + FASTOPT_SUFFIX()).path
+        jsFullPath = project.file(jsDir.path + File.separator + project.name + FULLOPT_SUFFIX()).path
+        setProperty(project, RUN_NOOPT())
         applyPlugin(project)
         assertEquals(jsPath, resolvePath(project))
         deleteRecursive(project.projectDir)
 
         project = getFreshProject()
-        jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR)
-        jsPath = project.file(jsDir.path + File.separator + project.name + EXT).path
-        jsFastPath = project.file(jsDir.path + File.separator + project.name + FASTOPT_SUFFIX).path
-        jsFullPath = project.file(jsDir.path + File.separator + project.name + FULLOPT_SUFFIX).path
-        setProperty(project, RUN_FULL)
-        setProperty(project, RUN_NOOPT)
+        jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR())
+        jsPath = project.file(jsDir.path + File.separator + project.name + EXT()).path
+        jsFastPath = project.file(jsDir.path + File.separator + project.name + FASTOPT_SUFFIX()).path
+        jsFullPath = project.file(jsDir.path + File.separator + project.name + FULLOPT_SUFFIX()).path
+        setProperty(project, RUN_FULL())
+        setProperty(project, RUN_NOOPT())
         applyPlugin(project)
         assertEquals(jsFullPath, resolvePath(project))
         deleteRecursive(project.projectDir)
 
         project = getFreshProject()
         dummyPath = project.file(dummyString).toString()
-        setProperty(project, MIN_OUTPUT, dummyString)
+        setProperty(project, MIN_OUTPUT(), dummyString)
         applyPlugin(project)
         assertEquals(dummyPath, resolvePath(project))
         deleteRecursive(project.projectDir)
 
         project = getFreshProject()
         dummyPath = project.file(dummyString).toString()
-        setProperty(project, OUTPUT, dummyString)
+        setProperty(project, OUTPUT(), dummyString)
         applyPlugin(project)
         assertEquals(dummyPath, resolvePath(project))
         deleteRecursive(project.projectDir)
 
         project = getFreshProject()
         dummyPath = project.file(dummyString).toString()
-        setProperty(project, MIN_OUTPUT, dummyString)
-        setProperty(project, OUTPUT, 'blabla/bla.js')
+        setProperty(project, MIN_OUTPUT(), dummyString)
+        setProperty(project, OUTPUT(), 'blabla/bla.js')
         applyPlugin(project)
         assertEquals(dummyPath, resolvePath(project))
         deleteRecursive(project.projectDir)
 
         project = getFreshProject()
         dummyPath = project.file(dummyString).toString()
-        setProperty(project, MIN_OUTPUT, dummyString)
-        setProperty(project, RUN_FULL)
+        setProperty(project, MIN_OUTPUT(), dummyString)
+        setProperty(project, RUN_FULL())
         applyPlugin(project)
         assertEquals(dummyPath, resolvePath(project))
         deleteRecursive(project.projectDir)
 
         project = getFreshProject()
         dummyPath = project.file(dummyString).toString()
-        setProperty(project, OUTPUT, dummyString)
-        setProperty(project, RUN_FULL)
+        setProperty(project, OUTPUT(), dummyString)
+        setProperty(project, RUN_FULL())
         applyPlugin(project)
         assertEquals(dummyPath, resolvePath(project))
         deleteRecursive(project.projectDir)
@@ -109,13 +108,13 @@ class UtilsTest extends GroovyTestCase {
         deleteRecursive(project.projectDir)
 
         project = getFreshProject()
-        setProperty(project, RHINO)
+        setProperty(project, RHINO())
         applyPlugin(project)
         assertEquals(RhinoJSEnv.class, resolveEnv(project).getClass())
         deleteRecursive(project.projectDir)
 
         project = getFreshProject()
-        setProperty(project, PHANTOM)
+        setProperty(project, PHANTOM())
         applyPlugin(project)
         assertEquals(PhantomJSEnv.class, resolveEnv(project).getClass())
         deleteRecursive(project.projectDir)
@@ -156,16 +155,9 @@ class UtilsTest extends GroovyTestCase {
     }
 
     @Test
-    public void testGetOutputMode() {
-        assertEquals(OutputMode.ECMAScript51Global$.MODULE$, getOutputMode(ECMA_51_GLOBAL))
-        assertEquals(OutputMode.ECMAScript51Isolated$.MODULE$, getOutputMode(ECMA_51_ISOLATED))
-        assertEquals(OutputMode.ECMAScript6$.MODULE$, getOutputMode(ECMA_6))
-    }
-
-    @Test
     public void testGetMinimalDependencySeq() {
         final Project project = getFreshProject()
-        final jsFastPath = project.name + FASTOPT_SUFFIX
+        final jsFastPath = project.name + FASTOPT_SUFFIX()
         applyPlugin(project)
         final seq = getMinimalDependencySeq(project)
         assertEquals(1, seq.size())
@@ -235,11 +227,11 @@ class UtilsTest extends GroovyTestCase {
         final String test2 = "com.test.Test2"
         testFrameworks.add(test1)
         testFrameworks.add(test2)
-        project.extensions.add(TEST_FRAMEWORKS, testFrameworks)
-        final List<TestFramework> resolvedFrameworks = resolveTestFrameworks(project)
+        project.extensions.add(TEST_FRAMEWORKS(), testFrameworks)
+        final List<TestFramework> resolvedFrameworks = JavaConverters.seqAsJavaList(resolveTestFrameworks(project))
         assertEquals(2, resolvedFrameworks.size())
-        final List<ArrayBuffer<String>> resolvedFrameworksName = resolvedFrameworks.collect {
-            it.classNames()
+        final List<List<String>> resolvedFrameworksName = resolvedFrameworks.collect {
+            JavaConverters.seqAsJavaList(it.toList())
         }
         boolean found1 = false
         boolean found2 = false

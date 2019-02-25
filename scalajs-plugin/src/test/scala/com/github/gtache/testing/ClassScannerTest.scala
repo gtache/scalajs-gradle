@@ -1,8 +1,9 @@
 package com.github.gtache.testing
 
+import java.io.File
 import java.net.{URL, URLClassLoader}
 
-import com.github.gtache.Utils
+import com.github.gtache.ScalaUtils
 import org.junit.Assert._
 import org.junit.Test
 import sbt.testing.{AnnotatedFingerprint, Fingerprint, SubclassFingerprint}
@@ -50,14 +51,22 @@ class ClassScannerTest {
   }
 
   val fingerprints: Array[Fingerprint] = Array(annFingerprint, scalAnnFingerprint, subFingerprint, subFingerprint2, subFingerprint3)
-  val test: URL = this.getClass.getResource("../../../../")
-  val loader = new URLClassLoader(Array(test))
+  val langRoot = "build/classes/"
 
-  val explicitlySpecified: Set[String] = Set("*A*", "*B", "*C").map(Utils.toRegex)
-  val excluded: Set[String] = Set("*C", "*H").map(Utils.toRegex)
-  val excludedAll: Set[String] = Set(Utils.toRegex("com.*"))
-  val explicitlyEmpty: Set[String] = Set(Utils.toRegex("co.*"))
-  val all = Set(packageName + "A", packageName + "AB", packageName + "B", packageName + "C", packageName + "D",
+  val rootURLs: Array[URL] =
+    if (this.getClass.getResource("../../../../").toString.contains("java"))
+      Array(
+        new File(langRoot + "scala/test").toURI.toURL,
+        new File(langRoot + "groovy/test").toURI.toURL,
+        new File(langRoot + "java/test").toURI.toURL)
+    else Array(new File("out/test/classes/").toURI.toURL)
+  var loader = new URLClassLoader(rootURLs)
+
+  val explicitlySpecified: Set[String] = Set("*A*", "*B", "*C").map(ScalaUtils.toRegex)
+  val excluded: Set[String] = Set("*C", "*H").map(ScalaUtils.toRegex)
+  val excludedAll: Set[String] = Set(ScalaUtils.toRegex("com.*"))
+  val explicitlyEmpty: Set[String] = Set(ScalaUtils.toRegex("co.*"))
+  val all: Set[String] = Set(packageName + "A", packageName + "AB", packageName + "B", packageName + "C", packageName + "D",
     packageName + "E", packageName + "F", packageName + "G", packageName + "H", packageName + "I", packageName + "J",
     packageName + "K", packageName + "L", packageName + "M", packageName + "N")
 
@@ -85,15 +94,6 @@ class ClassScannerTest {
     assertTrue(map(packageName + "M").fingerprint.isInstanceOf[AnnotatedFingerprint])
   }
 
-  def checkContains(nameTasks: Set[String], contained: Set[String], all: Set[String]): Unit = {
-    contained.foreach { s =>
-      assertTrue(s + " in " + contained.mkString(" ; "), nameTasks.contains(s))
-    }
-    all.filterNot(contained).foreach { s =>
-      assertFalse(s + " not in " + contained.mkString(" ; "), nameTasks.contains(s))
-    }
-  }
-
   @Test
   def testScannerExplicitely(): Unit = {
     val taskDefs = ClassScanner.scan(loader, fingerprints, explicitlySpecified)
@@ -106,6 +106,15 @@ class ClassScannerTest {
     assertTrue(map(packageName + "AB").fingerprint.isInstanceOf[SubclassFingerprint])
     assertTrue(map(packageName + "B").fingerprint.isInstanceOf[SubclassFingerprint])
     assertTrue(map(packageName + "C").fingerprint.isInstanceOf[SubclassFingerprint])
+  }
+
+  def checkContains(nameTasks: Set[String], contained: Set[String], all: Set[String]): Unit = {
+    contained.foreach { s =>
+      assertTrue(s + " in " + contained.mkString(" ; "), nameTasks.contains(s))
+    }
+    all.filterNot(contained).foreach { s =>
+      assertFalse(s + " not in " + contained.mkString(" ; "), nameTasks.contains(s))
+    }
   }
 
   @Test

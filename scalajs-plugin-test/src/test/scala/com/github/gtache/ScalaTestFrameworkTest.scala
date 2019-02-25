@@ -35,8 +35,4 @@ class ScalaTestFrameworkTestSuite extends FunSuite {
       Set.empty.head
     }
   }
-
-  test("Fail") {
-    assert(false)
-  }
 }

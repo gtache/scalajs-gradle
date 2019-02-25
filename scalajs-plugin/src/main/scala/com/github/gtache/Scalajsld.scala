@@ -4,9 +4,8 @@ import java.io.File
 import java.net.URI
 
 import org.scalajs.core.tools.io._
-import org.scalajs.core.tools.linker.backend.{LinkerBackend, ModuleKind, OutputMode}
-import org.scalajs.core.tools.linker.frontend.LinkerFrontend
-import org.scalajs.core.tools.linker.{ClearableLinker, Linker, ModuleInitializer}
+import org.scalajs.core.tools.linker.backend.ModuleKind
+import org.scalajs.core.tools.linker.{CheckedBehavior => _, Semantics => _, _}
 import org.scalajs.core.tools.logging._
 import org.scalajs.core.tools.sem._
 
@@ -15,6 +14,35 @@ import org.scalajs.core.tools.sem._
   * (see https://github.com/scala-js/scala-js/blob/master/cli/src/main/scala/org/scalajs/cli/Scalajsld.scala)
   */
 object Scalajsld {
+
+  //Linker options
+  val MODULE_INITIALIZERS: String = "moduleInitializers"
+  val MIN_OUTPUT: String = "o"
+  val OUTPUT: String = "output"
+  val SEMANTICS: String = "semantics"
+  val ES_FEATURES: String = "esFeatures"
+  val MODULE_KIND: String = "moduleKind"
+  val COMPLIANT: String = "compliantAsInstanceOfs"
+  val MIN_PRETTY: String = "p"
+  val PRETTY: String = "prettyPrint"
+  val MIN_N_SOURCEMAP: String = "noS"
+  val N_SOURCEMAP: String = "noSourceMap"
+  val MIN_RELSM: String = "r"
+  val RELSM: String = "relativizeSourceMap"
+  val BATCH: String = "batch"
+  val NO_PARALLEL: String = "noParallel"
+  val MIN_CHECKIR: String = "c"
+  val CHECKIR: String = "checkIR"
+  val STDLIB: String = "stdLib"
+  val MIN_DEBUG: String = "d"
+  val DEBUG: String = "debug"
+  val MIN_WARN: String = "q"
+  val WARN: String = "quiet"
+  val MIN_ERR: String = "qq"
+  val ERR: String = "really-quiet"
+  val LOG_LEVEL: String = "linkLogLevel"
+
+  val OPTIONS: String = "oOptions"
 
   private var options: Options = Options()
   private var optionsChanged: Boolean = false
@@ -58,31 +86,20 @@ object Scalajsld {
     val logger = new ScalaConsoleLogger(options.logLevel)
     val outFile = WritableFileVirtualJSFile(options.output)
     if (optionsChanged || linker == null) {
-      val semantics: Semantics =
-        if (options.fullOpt) {
-          options.semantics.optimized
-        }
-        else {
-          options.semantics
-        }
 
-      val frontendConfig = LinkerFrontend.Config()
+      val config = StandardLinker.Config()
+        .withBatchMode(options.batchMode)
         .withCheckIR(options.checkIR)
-
-      val backendConfig = LinkerBackend.Config()
-        .withRelativizeSourceMapBase(options.relativizeSourceMap)
-        .withPrettyPrint(options.prettyPrint)
-
-
-      val config = Linker.Config()
-        .withBackendConfig(backendConfig)
-        .withFrontendConfig(frontendConfig)
         .withClosureCompilerIfAvailable(options.fullOpt)
+        .withESFeatures(options.esFeatures)
+        .withModuleKind(options.moduleKind)
         .withOptimizer(!options.noOpt)
         .withParallel(options.parallel)
+        .withPrettyPrint(options.prettyPrint)
+        .withRelativizeSourceMapBase(options.relativizeSourceMap)
+        .withSemantics(if (options.fullOpt) options.semantics.optimized else options.semantics)
         .withSourceMap(options.sourceMap)
-      linker = new ClearableLinker(() => Linker(semantics, options.outputMode, options.moduleKind,
-        config), options.batchMode)
+      linker = new ClearableLinker(() => StandardLinker(config), options.batchMode)
       if (cache == null) {
         cache = (new IRFileCache).newCache
       }
@@ -105,9 +122,7 @@ object Scalajsld {
     * @param cp                  the classpath
     * @param moduleInitializers  the initializers
     * @param output              the output file
-    * @param jsoutput            Deprecated
     * @param semantics           the semantics to be used
-    * @param outputMode          the output mode
     * @param moduleKind          the type of the modules
     * @param noOpt               with no optimization
     * @param fullOpt             with full optimization
@@ -123,14 +138,13 @@ object Scalajsld {
   case class Options(cp: Seq[File] = Seq.empty,
                      moduleInitializers: Seq[ModuleInitializer] = Seq.empty,
                      output: File = null,
-                     jsoutput: Boolean = false,
                      semantics: Semantics = Semantics.Defaults,
-                     outputMode: OutputMode = OutputMode.ECMAScript51Isolated,
+                     esFeatures: ESFeatures = ESFeatures.Defaults,
                      moduleKind: ModuleKind = ModuleKind.NoModule,
                      noOpt: Boolean = false,
                      fullOpt: Boolean = false,
                      prettyPrint: Boolean = false,
-                     sourceMap: Boolean = false,
+                     sourceMap: Boolean = true,
                      relativizeSourceMap: Option[URI] = None,
                      bypassLinkingErrors: Boolean = false,
                      batchMode: Boolean = false,
@@ -138,6 +152,30 @@ object Scalajsld {
                      checkIR: Boolean = false,
                      stdLib: Option[File] = None,
                      logLevel: Level = Level.Info) {
+
+    def withCompliantsSemantics(): Options = {
+      this.copy(semantics = semantics.withAsInstanceOfs(CheckedBehavior.Compliant))
+    }
+
+    def withOptimizerOptions(newOptions: Options): Options = {
+      this.copy(bypassLinkingErrors = newOptions.bypassLinkingErrors,
+        parallel = newOptions.parallel,
+        batchMode = newOptions.batchMode,
+        noOpt = newOptions.noOpt,
+        prettyPrint = newOptions.prettyPrint,
+        checkIR = newOptions.checkIR,
+        fullOpt = newOptions.fullOpt,
+        cp = newOptions.cp,
+        logLevel = newOptions.logLevel,
+        moduleInitializers = newOptions.moduleInitializers,
+        moduleKind = newOptions.moduleKind,
+        output = newOptions.output,
+        relativizeSourceMap = newOptions.relativizeSourceMap,
+        sourceMap = newOptions.sourceMap,
+        semantics = newOptions.semantics,
+        stdLib = newOptions.stdLib,
+        esFeatures = newOptions.esFeatures)
+    }
 
     def withClasspath(newCp: Seq[File]): Options = {
       this.copy(cp = newCp)
@@ -151,20 +189,16 @@ object Scalajsld {
       this.copy(output = newOutput)
     }
 
-    def withJsOutput(newJsOutput: Boolean): Options = {
-      this.copy(jsoutput = newJsOutput)
-    }
-
     def withSemantics(newSemantics: Semantics): Options = {
       this.copy(semantics = newSemantics)
     }
 
-    def withOutputMode(newOutputMode: OutputMode): Options = {
-      this.copy(outputMode = newOutputMode)
-    }
-
     def withModuleKind(newModuleKind: ModuleKind): Options = {
       this.copy(moduleKind = newModuleKind)
+    }
+
+    def withEsFeatures(esFeatures: ESFeatures): Options = {
+      this.copy(esFeatures = esFeatures)
     }
 
     def withSourceMap(newSourceMap: Boolean): Options = {
@@ -183,26 +217,12 @@ object Scalajsld {
       this.copy(logLevel = newLogLevel)
     }
 
-    def withCompliantsSemantics(): Options = {
-      this.copy(semantics = semantics.withAsInstanceOfs(CheckedBehavior.Compliant))
+    def withDisableOptimizer(disable: Boolean): Options = {
+      this.copy(noOpt = disable)
     }
 
-    def withOptimizerOptions(newOptions: Options): Options = {
-      this.withBypassLinkingErrors(newOptions.bypassLinkingErrors)
-        .withParallel(newOptions.parallel)
-        .withBatchMode(newOptions.batchMode)
-        .withDisableOptimizer(!newOptions.noOpt)
-        .withPrettyPrint(newOptions.prettyPrint)
-        .withCheckIR(newOptions.checkIR)
-        .withUseClosureCompiler(newOptions.fullOpt)
-    }
-
-    def withDisableOptimizer(newFastOpt: Boolean): Options = {
-      this.copy(noOpt = !newFastOpt)
-    }
-
-    def withUseClosureCompiler(newFullOpt: Boolean): Options = {
-      this.copy(fullOpt = newFullOpt)
+    def withUseClosureCompiler(enabled: Boolean): Options = {
+      this.copy(fullOpt = enabled)
     }
 
     def withPrettyPrint(newPrettyPrint: Boolean): Options = {
@@ -228,9 +248,8 @@ object Scalajsld {
     override def toString: String = {
       "cp : " + cp.foldLeft("")((acc: String, c: File) => acc + "\n" + c.getAbsolutePath) + "\n" +
         "moduleInitializers : " + moduleInitializers.mkString(", ") + "\n" +
-        "output : " + output + " jsoutput : " + jsoutput + "\n" +
         "semantics : " + semantics + "\n" +
-        "outputMode : " + outputMode + "\n" +
+        "esFeatures : " + esFeatures + "\n" +
         "moduleKind : " + moduleKind + "\n" +
         "NoOpt : " + noOpt + " ; fullOpt : " + fullOpt + "\n" +
         "prettyPrint : " + prettyPrint + "\n" +
@@ -250,9 +269,8 @@ object Scalajsld {
           this.cp == that.cp &&
             this.moduleInitializers == that.moduleInitializers &&
             this.output == that.output &&
-            this.jsoutput == that.jsoutput &&
+            this.esFeatures == that.esFeatures &&
             this.semantics == that.semantics &&
-            this.outputMode == that.outputMode &&
             this.moduleKind == that.moduleKind &&
             this.noOpt == that.noOpt &&
             this.fullOpt == that.fullOpt &&
@@ -273,9 +291,8 @@ object Scalajsld {
       cp.hashCode +
         47 * moduleInitializers.hashCode +
         2 * output.hashCode +
-        3 * jsoutput.hashCode +
+        3 * esFeatures.hashCode +
         5 * semantics.hashCode +
-        7 * outputMode.hashCode +
         71 * moduleKind.hashCode +
         11 * noOpt.hashCode +
         13 * fullOpt.hashCode +
