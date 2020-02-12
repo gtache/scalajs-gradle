@@ -15,7 +15,7 @@ ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 println("Scala Version is "+scalaFullVersion)
 
-version 'sjs'+scalaJSM+'_'+scalaVersion+'_0.3.8'
+version 'sjs'+scalaJSM+'_'+scalaVersion+'_0.3.9'
 
 apply plugin: 'idea'
 apply plugin: 'scala'
