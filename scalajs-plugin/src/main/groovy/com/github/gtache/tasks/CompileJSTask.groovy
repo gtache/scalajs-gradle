@@ -2,9 +2,11 @@ package com.github.gtache.tasks
 
 import com.github.gtache.Scalajsld
 import com.github.gtache.Utils
+
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.linker.backend.OutputMode
@@ -44,6 +46,7 @@ public class CompileJSTask extends DefaultTask {
     public static final String NO_PARALLEL = 'noParallel'
     public static final String BATCH = 'batch'
     public static final String OPTIONS = 'oOptions'
+
 
     private Scalajsld.Options options
     @InputFiles
@@ -100,19 +103,11 @@ public class CompileJSTask extends DefaultTask {
     }
 
     /**
-     * Returns the options that will be used with the linker
-     * @return The options
-     */
-    public Scalajsld.Options getOptions() {
-        return options
-    }
-
-    /**
      * Parse the options given the project properties
      * @return The configured options
      */
     private Scalajsld.Options parseOptions() {
-        final cp = project.configurations.runtime + srcFiles
+        final cp = project.configurations.runtimeClasspath + srcFiles
         def options = Scalajsld.defaultOptions().withClasspath(
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
 

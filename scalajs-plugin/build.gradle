@@ -1,132 +1,42 @@
 plugins {
-    id 'de.fuerstenau.buildconfig' version '1.1.8'
+    id 'groovy'
+    id 'java-gradle-plugin'
+    id 'com.gradle.plugin-publish' version '1.0.0'
 }
-group 'com.github.machaval'
 
+group 'io.github.machaval'
+version pluginVersion
 
-String scalaVersion = project.hasProperty('scalaVersion') ? project.property('scalaVersion') : '2.12'
-String subVersion = project.hasProperty('subVersion') ? project.property('subVersion') : '1'
-String scalaFullVersion = scalaVersion + '.' + subVersion
-String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.21'
-String scalaJSM = scalaJSVersion.substring(0,3)
-
-ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
-
-
-println("Scala Version is "+scalaFullVersion)
-
-version 'sjs'+scalaJSM+'_'+scalaVersion+'_0.3.9'
-
-apply plugin: 'idea'
-apply plugin: 'scala'
-apply plugin: 'groovy'
-apply plugin: 'maven'
-apply plugin: 'signing'
+pluginBundle {
+    website = 'https://github.com/machaval/scalajs-gradle'
+    vcsUrl = 'https://github.com/machaval/scalajs-gradle'
+    tags = ['scalajs', 'scala', 'js']
+}
 
 sourceCompatibility = 1.8
-
-buildConfig {
-    appName = project.name       // sets value of NAME field
-    version = project.version // sets value of VERSION field,
-    // 'unspecified' if project.version is not set
-
-    clsName = 'BuildConfig'      // sets the name of the BuildConfig class
-    packageName = "com.github.gtache"  // sets the package of the BuildConfig class,
-    // 'de.fuerstenau.buildconfig' if project.group is not set
-    charset = 'UTF-8'            // sets charset of the generated class,
-    // 'UTF-8' if not set otherwise
-    buildConfigField 'String', 'SCALA_VERSION', scalaVersion
-    buildConfigField 'String', 'SUB_VERSION', subVersion
-    buildConfigField 'String', 'SCALA_FULL_VERSION', scalaFullVersion
-    buildConfigField 'String', 'SCALAJS_VERSION', scalaJSVersion
-    buildConfigField 'String', 'PLUGIN_VERSION', project.version.toString()
-}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile gradleApi()
-    compile localGroovy() //Use same version as the one used by Gradle
-    compile 'org.scala-lang:scala-compiler:' + scalaFullVersion
-    compile 'org.scala-lang:scala-library:' + scalaFullVersion
-    compile group: 'org.scala-js', name: 'scalajs-sbt-test-adapter_' + scalaVersion, version: scalaJSVersion
-    compile group: 'org.scala-js', name: 'scalajs-js-envs_' + scalaVersion, version: scalaJSVersion
-    compile group: 'org.scala-js', name: 'scalajs-tools_' + scalaVersion, version: scalaJSVersion
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-}
-
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
-
-task groovydocJar(type: Jar) {
-    classifier = 'groovydoc'
-    from groovydoc
-}
-
-task scaladocJar(type: Jar) {
-    classifier = 'scaladoc'
-    from scaladoc
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives javadocJar, groovydocJar, scaladocJar, sourcesJar
+    api gradleApi()
+    api localGroovy() //Use same version as the one used by Gradle
+    api project(":base")
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 
 
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                // beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                repository(url: "http://repository-master.mulesoft.org/nexus/content/repositories/releases") {
-                    authentication(userName: userName, password: password)
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: userName, password: password)
-                }
-
-                pom.project {
-                    name 'Scala.JS plugin'
-                    packaging 'jar'
-                    description 'A plugin used to build Scala.js on Gradle.'
-                    url 'https://github.com/gtache/scalajs-gradle'
-                    licenses {
-                        license {
-                            name 'Scala License'
-                            url 'http://www.scala-lang.org/license.html'
-                        }
-                    }
-                    scm {
-                        connection 'scm:git:ssh://git@github.com:gtache/scalajs-gradle.git'
-                        developerConnection 'scm:git:ss://git@github.com:gtache/scalajs-gradle.git'
-                        url 'https://github.com/gtache/scalajs-gradle'
-                    }
-
-                    developers {
-                        developer {
-                            id 'gtache'
-                            name 'Guillaume Tâche'
-                            email 'guillaume.tache@hotmail.com'
-                        }
-                    }
-                }
-            }
+gradlePlugin {
+    plugins {
+        greetingsPlugin {
+            id = 'io.github.machaval.scalajs'
+            displayName = 'ScalaJs Plugin'
+            description = 'A ScalaJS Gradle Plugin'
+            implementationClass = 'com.github.gtache.ScalajsPlugin'
         }
     }
-
-
-tasks.getByName('compileGroovy').dependsOn('compileScala')
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.4.1'
 }
+
+
+
