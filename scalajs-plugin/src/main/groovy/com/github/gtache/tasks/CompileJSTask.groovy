@@ -2,11 +2,9 @@ package com.github.gtache.tasks
 
 import com.github.gtache.Scalajsld
 import com.github.gtache.Utils
-
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.scalajs.core.tools.linker.backend.OutputMode

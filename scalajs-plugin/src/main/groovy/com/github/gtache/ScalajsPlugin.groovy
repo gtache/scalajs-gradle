@@ -37,9 +37,7 @@ final class ScalajsPlugin implements Plugin<Project> {
             scalaCompilePlugin
         }
 
-        project.logger.info('Adding scalajs-library and scalajs-compiler dependencies')
-        project.dependencies.add('implementation', 'org.scala-js:scalajs-library_2.12:0.6.33')
-        project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_2.12.10:0.6.33')
+//
 
 
         final jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR)
