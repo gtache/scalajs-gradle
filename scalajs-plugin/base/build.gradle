@@ -2,7 +2,6 @@ plugins {
     id 'java'
     id 'java-gradle-plugin'
     id 'scala'
-    id 'maven-publish'
 }
 
 group 'com.github.machaval'

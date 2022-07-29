@@ -2,6 +2,7 @@ plugins {
     id 'groovy'
     id 'java-gradle-plugin'
     id 'com.gradle.plugin-publish' version '1.0.0'
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 group 'io.github.machaval'
@@ -15,13 +16,24 @@ pluginBundle {
 
 sourceCompatibility = 1.8
 
+// needed to prevent inclusion of gradle-api into shadow JAR
+configurations.api.dependencies.remove dependencies.gradleApi()
+configurations.api.dependencies.remove dependencies.localGroovy()
+
 repositories {
     mavenCentral()
 }
 
+shadowJar {
+    archiveClassifier.set('')
+    dependencies {
+        exclude(dependency('org.scala-lang:.*'))
+    }
+}
+
 dependencies {
-    api gradleApi()
-    api localGroovy() //Use same version as the one used by Gradle
+    shadow gradleApi()
+    shadow localGroovy() //Use same version as the one used by Gradle
     api project(":base")
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
