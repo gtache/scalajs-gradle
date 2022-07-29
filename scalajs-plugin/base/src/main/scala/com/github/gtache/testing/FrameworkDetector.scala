@@ -11,6 +11,7 @@ import org.scalajs.testadapter.ScalaJSFramework
 import scala.collection.mutable
 
 /* see https://github.com/scala-js/scala-js/blob/master/sbt-plugin/src/main/scala/scala/scalajs/sbtplugin/FrameworkDetector.scala */
+
 /**
   * A class used to detect all available common TestFramework in a js file
   *

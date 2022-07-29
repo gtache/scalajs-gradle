@@ -37,9 +37,6 @@ final class ScalajsPlugin implements Plugin<Project> {
             scalaCompilePlugin
         }
 
-//
-
-
         final jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR)
         final jsBaseName = jsDir.absolutePath + File.separator + project.name
         final jsFile = project.file(jsBaseName + EXT)
