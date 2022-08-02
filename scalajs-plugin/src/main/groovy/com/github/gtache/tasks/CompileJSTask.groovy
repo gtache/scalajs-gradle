@@ -45,6 +45,7 @@ public class CompileJSTask extends DefaultTask {
     public static final String BATCH = 'batch'
     public static final String OPTIONS = 'oOptions'
 
+
     private Scalajsld.Options options
     @InputFiles
     FileCollection srcFiles
@@ -100,19 +101,11 @@ public class CompileJSTask extends DefaultTask {
     }
 
     /**
-     * Returns the options that will be used with the linker
-     * @return The options
-     */
-    public Scalajsld.Options getOptions() {
-        return options
-    }
-
-    /**
      * Parse the options given the project properties
      * @return The configured options
      */
     private Scalajsld.Options parseOptions() {
-        final cp = project.configurations.runtime + srcFiles
+        final cp = project.configurations.runtimeClasspath + srcFiles
         def options = Scalajsld.defaultOptions().withClasspath(
                 JavaConverters.asScalaSetConverter(cp.getFiles()).asScala().toSet().toSeq())
 
@@ -131,6 +124,8 @@ public class CompileJSTask extends DefaultTask {
             destFile = project.file(project.property(OUTPUT))
         }
         options = options.withOutput(destFile)
+
+        options = options.withModuleKind(Utils.resolveModuleKind(project))
 
         if (fullOpt) {
             options = options.withUseClosureCompiler(true)

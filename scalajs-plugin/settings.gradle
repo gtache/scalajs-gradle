@@ -1,2 +1,3 @@
 rootProject.name = 'scalajs-plugin'
+include 'base'
 

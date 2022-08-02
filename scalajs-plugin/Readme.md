@@ -18,8 +18,8 @@ scalaCompilePlugin 'org.scala-js:scalajs-compiler_2.12.10:0.6.33'
 
 ## Added by the plugin
 This plugin adds :   
--`apply plugin: 'java'`   
--`apply plugin: 'scala'`
+- `apply plugin: 'java'`   
+- `apply plugin: 'scala'`
 
 
 ## Usage

@@ -1,138 +1,57 @@
 plugins {
-    id 'de.fuerstenau.buildconfig' version '1.1.8'
+    id 'groovy'
+    id 'scala'
+    id 'java-gradle-plugin'
+    id 'com.gradle.plugin-publish' version '1.0.0'
 }
-group 'com.github.gtache'
 
+group 'io.github.machaval'
+version pluginVersion
 
-String scalaVersion = project.hasProperty('scalaVersion') ? project.property('scalaVersion') : '2.12'
-String subVersion = project.hasProperty('subVersion') ? project.property('subVersion') : '1'
-String scalaFullVersion = scalaVersion + '.' + subVersion
-String scalaJSVersion = project.hasProperty('scalaJSVersion') ? project.property('scalaJSVersion') : '0.6.15'
-String scalaJSM = scalaJSVersion.substring(0,3)
+pluginBundle {
+    website = 'https://github.com/machaval/scalajs-gradle'
+    vcsUrl = 'https://github.com/machaval/scalajs-gradle'
+    tags = ['scalajs', 'scala', 'js']
+}
 
-ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
+compileGroovy {
+    classpath = classpath + files(compileScala.destinationDir)
+}
 
-
-version 'sjs'+scalaJSM+'_'+scalaVersion+'_0.3.0'
-
-apply plugin: 'idea'
-apply plugin: 'scala'
-apply plugin: 'groovy'
-apply plugin: 'maven'
-apply plugin: 'signing'
+compileGroovy.dependsOn(compileScala)
 
 sourceCompatibility = 1.8
-
-buildConfig {
-    appName = project.name       // sets value of NAME field
-    version = project.version // sets value of VERSION field,
-    // 'unspecified' if project.version is not set
-
-    clsName = 'BuildConfig'      // sets the name of the BuildConfig class
-    packageName = project.group  // sets the package of the BuildConfig class,
-    // 'de.fuerstenau.buildconfig' if project.group is not set
-    charset = 'UTF-8'            // sets charset of the generated class,
-    // 'UTF-8' if not set otherwise
-    buildConfigField 'String', 'SCALA_VERSION', scalaVersion
-    buildConfigField 'String', 'SUB_VERSION', subVersion
-    buildConfigField 'String', 'SCALA_FULL_VERSION', scalaFullVersion
-    buildConfigField 'String', 'SCALAJS_VERSION', scalaJSVersion
-    buildConfigField 'String', 'PLUGIN_VERSION', project.version.toString()
-}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile gradleApi()
-    compile localGroovy() //Use same version as the one used by Gradle
-    compile 'org.scala-lang:scala-compiler:' + scalaFullVersion
-    compile 'org.scala-lang:scala-library:' + scalaFullVersion
-    compile group: 'org.scala-js', name: 'scalajs-sbt-test-adapter_' + scalaVersion, version: scalaJSVersion
-    compile group: 'org.scala-js', name: 'scalajs-js-envs_' + scalaVersion, version: scalaJSVersion
-    compile group: 'org.scala-js', name: 'scalajs-tools_' + scalaVersion, version: scalaJSVersion
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'com.google.guava', name: 'guava', version: '21.0'
+    api gradleApi()
+    api localGroovy() //Use same version as the one used by Gradle
+    api group: 'org.scala-js', name: 'scalajs-sbt-test-adapter_2.12', version: scalaJSVersion
+    api group: 'org.scala-js', name: 'scalajs-js-envs_2.12', version: scalaJSVersion
+    api group: 'org.scala-js', name: 'scalajs-tools_2.12', version: scalaJSVersion
+    api 'org.scala-lang:scala-compiler:' + scalaVersion
+    api 'org.scala-lang:scala-library:' + scalaVersion
+
+
+
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 
-signing {
-    required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
-    sign configurations.archives
-}
 
-signArchives.onlyIf { project.hasProperty('uploadArchives') }
 
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
-
-task groovydocJar(type: Jar) {
-    classifier = 'groovydoc'
-    from groovydoc
-}
-
-task scaladocJar(type: Jar) {
-    classifier = 'scaladoc'
-    from scaladoc
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives javadocJar, groovydocJar, scaladocJar, sourcesJar
-}
-
-if (project.hasProperty('upload')) {
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                pom.project {
-                    name 'Scala.JS plugin'
-                    packaging 'jar'
-                    description 'A plugin used to build Scala.js on Gradle.'
-                    url 'https://github.com/gtache/scalajs-gradle'
-                    licenses {
-                        license {
-                            name 'Scala License'
-                            url 'http://www.scala-lang.org/license.html'
-                        }
-                    }
-                    scm {
-                        connection 'scm:git:ssh://git@github.com:gtache/scalajs-gradle.git'
-                        developerConnection 'scm:git:ss://git@github.com:gtache/scalajs-gradle.git'
-                        url 'https://github.com/gtache/scalajs-gradle'
-                    }
-
-                    developers {
-                        developer {
-                            id 'gtache'
-                            name 'Guillaume Tâche'
-                            email 'guillaume.tache@hotmail.com'
-                        }
-                    }
-                }
-            }
+gradlePlugin {
+    plugins {
+        greetingsPlugin {
+            id = 'io.github.machaval.scalajs'
+            displayName = 'ScalaJs Plugin'
+            description = 'A ScalaJS Gradle Plugin'
+            implementationClass = 'com.github.gtache.ScalajsPlugin'
         }
     }
 }
 
-tasks.getByName('compileGroovy').dependsOn('compileScala')
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.4.1'
-}
+

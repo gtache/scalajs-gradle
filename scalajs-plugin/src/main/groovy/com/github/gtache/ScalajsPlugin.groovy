@@ -1,18 +1,18 @@
 package com.github.gtache
 
 import com.github.gtache.tasks.CompileJSTask
-import com.github.gtache.tasks.RunJSTask
-import com.github.gtache.tasks.ScalajspTask
+
+
 import com.github.gtache.tasks.TestJSTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.tasks.scala.ScalaCompile
 
-import static com.github.gtache.BuildConfig.*
+
 import static com.github.gtache.Utils.*
 import static com.github.gtache.tasks.CompileJSTask.*
-import static com.github.gtache.tasks.ScalajspTask.*
+
 
 /**
  * The main class for the plugin
@@ -35,18 +35,7 @@ final class ScalajsPlugin implements Plugin<Project> {
 
         project.configurations {
             scalaCompilePlugin
-            phantomJetty
         }
-
-        project.logger.info('Adding scalajs-library and scalajs-compiler dependencies')
-        project.dependencies.add('compile', 'org.scala-js:scalajs-library_'
-                + SCALA_VERSION + ':' + SCALAJS_VERSION)
-        project.dependencies.add('scalaCompilePlugin', 'org.scala-js:scalajs-compiler_'
-                + SCALA_FULL_VERSION + ':' + SCALAJS_VERSION)
-        project.logger.info('Adding jetty dependencies')
-        project.dependencies.add('phantomJetty', 'org.eclipse.jetty:jetty-server:' + JETTY_SERVER_VERSION)
-        project.dependencies.add('phantomJetty', 'org.eclipse.jetty:jetty-websocket:' + JETTY_WEBSOCKET_VERSION)
-        project.logger.info('Dependencies added')
 
         final jsDir = project.file(project.buildDir.absolutePath + JS_REL_DIR)
         final jsBaseName = jsDir.absolutePath + File.separator + project.name
@@ -78,7 +67,6 @@ final class ScalajsPlugin implements Plugin<Project> {
         fullOptJS.fullOpt()
         project.logger.info(fullOptJS.name + ' task added')
 
-        final runJS = tasks.create('RunJS', RunJSTask.class)
 
         final classes = 'classes'
         final testClasses = 'testClasses'
@@ -88,18 +76,12 @@ final class ScalajsPlugin implements Plugin<Project> {
 
         if (runFull) {
             testJS.dependsOn(fullOptJS)
-            runJS.dependsOn(fullOptJS)
         } else if (runNoOpt) {
             testJS.dependsOn(noOptJS)
-            runJS.dependsOn(noOptJS)
         } else {
             testJS.dependsOn(fastOptJS)
-            runJS.dependsOn(fastOptJS)
         }
         project.logger.info(testJS.name + ' task added')
-
-        final scalajsp = tasks.create('Scalajsp', ScalajspTask.class)
-        project.logger.info(scalajsp.name + ' task added')
 
         project.afterEvaluate {
             tasks.withType(CompileJSTask) {
@@ -125,8 +107,11 @@ final class ScalajsPlugin implements Plugin<Project> {
                     }
                 }
             }
+
+
             tasks.withType(ScalaCompile) {
-                scalaCompileOptions.additionalParameters = ["-Xplugin:" + project.configurations.scalaCompilePlugin.findAll {
+                def existingParameters = scalaCompileOptions.additionalParameters ?: []
+                scalaCompileOptions.additionalParameters = existingParameters + ["-Xplugin:" + project.configurations.scalaCompilePlugin.findAll {
                     it.absolutePath.contains('scalajs-compiler')
                 }.get(0).absolutePath]
             }
@@ -153,10 +138,8 @@ final class ScalajsPlugin implements Plugin<Project> {
 
         opt.add(RUN_FULL)
         opt.add(RUN_NOOPT)
-        envs.add(JSENV)
-        envs.add(RHINO)
-        envs.add(PHANTOM)
-        envs.add(JSDOM)
+
+
         output.add(MIN_OUTPUT)
         output.add(OUTPUT)
         outputMode.add(MIN_OUTPUTMODE)
@@ -170,10 +153,6 @@ final class ScalajsPlugin implements Plugin<Project> {
         logLevel.add(MIN_ERR)
         logLevel.add(ERR)
         logLevel.add(LOG_LEVEL)
-        filenames.add(MIN_FILENAME)
-        filenames.add(FILENAME)
-        jar.add(MIN_JAR)
-        jar.add(JAR)
 
         linkedProperties.add(opt)
         linkedProperties.add(envs)

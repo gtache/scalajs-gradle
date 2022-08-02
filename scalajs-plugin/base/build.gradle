@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+    id 'java-gradle-plugin'
+    id 'scala'
+}
+
+group 'com.github.machaval'
+version pluginVersion
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api gradleApi()
+
+    api group: 'org.scala-js', name: 'scalajs-sbt-test-adapter_2.12', version: scalaJSVersion
+    api group: 'org.scala-js', name: 'scalajs-js-envs_2.12', version: scalaJSVersion
+    api group: 'org.scala-js', name: 'scalajs-tools_2.12', version: scalaJSVersion
+    api 'org.scala-lang:scala-compiler:' + scalaVersion
+    api 'org.scala-lang:scala-library:' + scalaVersion
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+sourceCompatibility = 1.8
