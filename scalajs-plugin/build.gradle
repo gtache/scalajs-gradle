@@ -1,8 +1,8 @@
 plugins {
     id 'groovy'
+    id 'scala'
     id 'java-gradle-plugin'
     id 'com.gradle.plugin-publish' version '1.0.0'
-    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 group 'io.github.machaval'
@@ -14,29 +14,33 @@ pluginBundle {
     tags = ['scalajs', 'scala', 'js']
 }
 
-sourceCompatibility = 1.8
+compileGroovy {
+    classpath = classpath + files(compileScala.destinationDir)
+}
 
-// needed to prevent inclusion of gradle-api into shadow JAR
-configurations.api.dependencies.remove dependencies.gradleApi()
-configurations.api.dependencies.remove dependencies.localGroovy()
+compileGroovy.dependsOn(compileScala)
+
+sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
 }
 
-shadowJar {
-    archiveClassifier.set('')
-    dependencies {
-        exclude(dependency('org.scala-lang:.*'))
-    }
-}
-
 dependencies {
-    shadow gradleApi()
-    shadow localGroovy() //Use same version as the one used by Gradle
-    api project(":base")
+    api gradleApi()
+    api localGroovy() //Use same version as the one used by Gradle
+    api group: 'org.scala-js', name: 'scalajs-sbt-test-adapter_2.12', version: scalaJSVersion
+    api group: 'org.scala-js', name: 'scalajs-js-envs_2.12', version: scalaJSVersion
+    api group: 'org.scala-js', name: 'scalajs-tools_2.12', version: scalaJSVersion
+    api 'org.scala-lang:scala-compiler:' + scalaVersion
+    api 'org.scala-lang:scala-library:' + scalaVersion
+
+
+
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
+
+
 
 gradlePlugin {
     plugins {
