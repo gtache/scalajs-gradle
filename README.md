@@ -1,3 +1,5 @@
+# No more maintained
+If you want to take over this project, send me an email.
 # scalajs-gradle [![Build Status](https://travis-ci.org/gtache/scalajs-gradle.svg?branch=master)](https://travis-ci.org/gtache/scalajs-gradle)
 
 ## Requirements
