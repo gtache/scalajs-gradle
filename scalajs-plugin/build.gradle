@@ -6,6 +6,7 @@ plugins {
 }
 
 group 'io.github.machaval'
+
 version pluginVersion
 
 pluginBundle {
@@ -13,12 +14,6 @@ pluginBundle {
     vcsUrl = 'https://github.com/machaval/scalajs-gradle'
     tags = ['scalajs', 'scala', 'js']
 }
-
-compileGroovy {
-    classpath = classpath + files(compileScala.destinationDir)
-}
-
-compileGroovy.dependsOn(compileScala)
 
 sourceCompatibility = 1.8
 
@@ -28,27 +23,24 @@ repositories {
 
 dependencies {
     api gradleApi()
-    api localGroovy() //Use same version as the one used by Gradle
-    api group: 'org.scala-js', name: 'scalajs-sbt-test-adapter_2.12', version: scalaJSVersion
-    api group: 'org.scala-js', name: 'scalajs-js-envs_2.12', version: scalaJSVersion
-    api group: 'org.scala-js', name: 'scalajs-tools_2.12', version: scalaJSVersion
+    // api group: 'org.scala-js', name: 'scalajs-sbt-test-adapter_2.12', version: scalaJSVersion
+    // api group: 'org.scala-js', name: 'scalajs-js-envs_2.12', version: scalaJSVersion
+   //  api group: 'org.scala-js', name: 'scalajs-tools_2.12', version: scalaJSVersion
+    compileOnly "org.scala-js:scalajs-linker_2.12:$scalaJSVersion"
+
     api 'org.scala-lang:scala-compiler:' + scalaVersion
     api 'org.scala-lang:scala-library:' + scalaVersion
-
-
-
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 
 
 
 gradlePlugin {
     plugins {
-        greetingsPlugin {
+        scalaJsPlugin {
             id = 'io.github.machaval.scalajs'
             displayName = 'ScalaJs Plugin'
             description = 'A ScalaJS Gradle Plugin'
-            implementationClass = 'com.github.gtache.ScalajsPlugin'
+            implementationClass = 'org.machaval.tools.scalajs.ScalaJSPlugin'
         }
     }
 }
