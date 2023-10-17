@@ -4,7 +4,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.{LogLevel => GLevel}
-import org.machaval.tools.build.Gradle
+import org.machaval.tools.buildutil.Gradle
 import org.machaval.tools.util.Files
 import org.scalajs.linker.PathIRContainer
 import org.scalajs.linker.PathOutputDirectory

@@ -12,7 +12,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
-import org.machaval.tools.build.Gradle
+import org.machaval.tools.buildutil.Gradle
 import org.machaval.tools.util.Files
 
 import java.io.File
