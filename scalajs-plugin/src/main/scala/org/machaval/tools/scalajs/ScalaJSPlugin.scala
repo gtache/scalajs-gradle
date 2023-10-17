@@ -3,10 +3,10 @@ package org.machaval.tools.scalajs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.machaval.tools.build.Configurations
-import org.machaval.tools.build.DependencyRequirement
-import org.machaval.tools.build.Gradle
-import org.machaval.tools.build.ScalaLibrary
+import org.machaval.tools.buildutil.Configurations
+import org.machaval.tools.buildutil.DependencyRequirement
+import org.machaval.tools.buildutil.Gradle
+import org.machaval.tools.buildutil.ScalaLibrary
 
 import collection.JavaConverters._
 import scala.collection.immutable.Seq

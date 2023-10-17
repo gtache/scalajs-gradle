@@ -1,12 +1,12 @@
 package org.machaval.tools.scalajs
 
 import org.gradle.api.artifacts.Configuration
-import org.machaval.tools.build
-import org.machaval.tools.build.Configurations
-import org.machaval.tools.build.DependencyRequirement
-import org.machaval.tools.build.ScalaDependency
-import org.machaval.tools.build.ScalaLibrary
-import org.machaval.tools.build.Version
+import org.machaval.tools.buildutil
+import org.machaval.tools.buildutil.Configurations
+import org.machaval.tools.buildutil.DependencyRequirement
+import org.machaval.tools.buildutil.ScalaDependency
+import org.machaval.tools.buildutil.ScalaLibrary
+import org.machaval.tools.buildutil.Version
 
 import scala.collection.immutable.Seq
 
@@ -35,7 +35,7 @@ object ScalaJSDependencies {
 
     val forPluginClassPath: Seq[DependencyRequirement] =
       Seq(
-        new build.ScalaDependency.Requirement(
+        new buildutil.ScalaDependency.Requirement(
           findable = Linker,
           version = new Version(scalaJSVersion),
           scalaLibrary = pluginScalaLibrary,
@@ -45,7 +45,7 @@ object ScalaJSDependencies {
       )
 
     val forProjectClassPath: Seq[DependencyRequirement] = Seq(
-      new build.ScalaDependency.Requirement(
+      new buildutil.ScalaDependency.Requirement(
         findable = Compiler,
         version = new Version(scalaJSVersion),
         scalaLibrary = projectScalaLibrary,
@@ -53,7 +53,7 @@ object ScalaJSDependencies {
         configurations = Configurations.scalaCompilerPlugins
       ),
 
-      new build.ScalaDependency.Requirement(
+      new buildutil.ScalaDependency.Requirement(
         findable = Library,
         version = new Version(scalaJSVersion),
         scalaLibrary = projectScalaLibrary,
